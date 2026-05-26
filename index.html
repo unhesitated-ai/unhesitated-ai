@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>unhesitated.ai — Speak. Without the pause.</title>
+<meta name="description" content="An AI English speaking companion built for South Asian learners. Judgment-free, mother-tongue aware, always patient." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg-void:#05080F;
+    --bg-deep:#080D1A;
+    --bg-surface:#0D1526;
+    --bg-card:rgba(13,21,38,0.85);
+    --electric:#4B7FFF;
+    --electric-bright:#6B9FFF;
+    --electric-glow:rgba(75,127,255,0.20);
+    --electric-ray:rgba(75,127,255,0.06);
+    --blue-mid:#1E3A8A;
+    --white:#FFFFFF;
+    --white-muted:rgba(255,255,255,0.65);
+    --white-faint:rgba(255,255,255,0.25);
+    --border-glass:rgba(255,255,255,0.07);
+    --border-electric:rgba(75,127,255,0.25);
+    --shadow-deep:rgba(0,0,0,0.5);
+    --shadow-electric:rgba(75,127,255,0.15);
+    --ease:cubic-bezier(0.25,0.46,0.45,0.94);
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'Inter',system-ui,-apple-system,sans-serif;
+    background:var(--bg-deep);
+    color:var(--white);
+    line-height:1.6;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+    position:relative;
+  }
+
+  /* ---------- Global background texture ---------- */
+  body::before{
+    content:"";
+    position:fixed;inset:0;
+    background-image:
+      radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px);
+    background-size:24px 24px;
+    pointer-events:none;
+    z-index:0;
+  }
+  .atmo-orb{
+    position:fixed;border-radius:50%;
+    pointer-events:none;z-index:0;
+    filter:blur(80px);
+  }
+  .atmo-orb.one{
+    width:600px;height:600px;
+    top:-150px;left:-150px;
+    background:radial-gradient(circle,rgba(75,127,255,0.08),transparent 70%);
+  }
+  .atmo-orb.two{
+    width:800px;height:800px;
+    bottom:-200px;right:-200px;
+    background:radial-gradient(circle,rgba(30,58,138,0.06),transparent 70%);
+    filter:blur(100px);
+  }
+  .noise{
+    position:fixed;inset:0;pointer-events:none;z-index:1;opacity:0.03;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.8'/></svg>");
+  }
+
+  main, nav, footer{position:relative;z-index:2}
+
+  /* ---------- Navbar ---------- */
+  .nav{
+    position:fixed;top:0;left:0;right:0;
+    background:rgba(5,8,15,0.85);
+    -webkit-backdrop-filter:blur(20px);
+    backdrop-filter:blur(20px);
+    border-bottom:1px solid rgba(255,255,255,0.06);
+    z-index:100;
+    padding:18px 32px;
+    display:flex;align-items:center;justify-content:space-between;
+    opacity:0;transform:translateY(-12px);
+    animation:navIn 0.4s var(--ease) forwards 0.1s;
+  }
+  @keyframes navIn{to{opacity:1;transform:none}}
+
+  .logo{
+    font-family:'Inter',sans-serif;font-weight:700;
+    font-size:1.25rem;color:var(--white);
+    letter-spacing:-0.01em;display:flex;align-items:center;gap:6px;
+    text-decoration:none;
+  }
+  .logo .dot-ai{color:var(--electric);font-weight:500}
+  .pulse-dot{
+    width:8px;height:8px;border-radius:50%;
+    background:var(--electric);
+    box-shadow:0 0 12px var(--electric);
+    animation:pulse 2s infinite var(--ease);
+    display:inline-block;
+  }
+  @keyframes pulse{
+    0%,100%{opacity:1;transform:scale(1)}
+    50%{opacity:0.2;transform:scale(1.4)}
+  }
+
+  .nav-links{display:flex;align-items:center;gap:32px;list-style:none}
+  .nav-links a{
+    color:var(--white-muted);text-decoration:none;
+    font-size:0.9rem;position:relative;transition:color 0.3s var(--ease);
+  }
+  .nav-links a:not(.btn-pill)::after{
+    content:"";position:absolute;left:0;bottom:-4px;
+    height:1px;width:100%;background:var(--electric);
+    transform:scaleX(0);transform-origin:left;
+    transition:transform 0.3s var(--ease);
+  }
+  .nav-links a:not(.btn-pill):hover{color:var(--white)}
+  .nav-links a:not(.btn-pill):hover::after{transform:scaleX(1)}
+
+  .btn-pill{
+    background:var(--electric);color:var(--white) !important;
+    border-radius:50px;padding:10px 22px;font-weight:600;
+    transition:all 0.3s var(--ease);display:inline-block;
+    border:none;cursor:pointer;font-size:0.9rem;
+    font-family:inherit;
+  }
+  .btn-pill:hover{
+    background:var(--electric-bright);
+    box-shadow:0 0 24px rgba(75,127,255,0.45);
+  }
+  .btn-pill::after{display:none !important}
+
+  .hamburger{
+    display:none;flex-direction:column;gap:5px;
+    background:none;border:none;cursor:pointer;padding:6px;
+  }
+  .hamburger span{
+    width:24px;height:2px;background:var(--white);
+    transition:all 0.3s var(--ease);
+  }
+
+  /* ---------- Buttons ---------- */
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    border-radius:50px;padding:14px 32px;font-weight:600;
+    font-family:inherit;font-size:1rem;cursor:pointer;
+    text-decoration:none;border:1px solid transparent;
+    transition:all 0.3s var(--ease);
+  }
+  .btn-primary{
+    background:var(--electric);color:var(--white);
+    animation:breath 2.5s infinite var(--ease);
+  }
+  .btn-primary:hover{
+    background:var(--electric-bright);
+    transform:scale(1.02);
+    box-shadow:0 0 30px rgba(75,127,255,0.4);
+  }
+  .btn-secondary{
+    background:transparent;color:var(--white);
+    border:1px solid rgba(255,255,255,0.2);
+  }
+  .btn-secondary:hover{
+    border-color:var(--border-electric);
+    background:rgba(75,127,255,0.08);
+  }
+  @keyframes breath{
+    0%,100%{box-shadow:0 0 0 0 rgba(75,127,255,0)}
+    50%{box-shadow:0 0 24px rgba(75,127,255,0.35)}
+  }
+  .btn-lg{padding:16px 40px;font-size:1.05rem}
+
+  /* ---------- Hero ---------- */
+  .hero{
+    background:var(--bg-void);
+    min-height:100vh;
+    padding:140px 24px 80px;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    position:relative;overflow:hidden;text-align:center;
+  }
+  .light-rays{
+    position:absolute;inset:0;pointer-events:none;z-index:1;
+    background:
+      radial-gradient(ellipse 60% 50% at 50% -10%, rgba(75,127,255,0.18) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 30% at 50% 0%, rgba(75,127,255,0.08) 0%, transparent 60%);
+    opacity:0;
+    animation:rayIn 1.2s var(--ease) forwards;
+  }
+  .light-rays::before{
+    content:"";position:absolute;inset:0;
+    background:conic-gradient(from 200deg at 50% -5%,
+      transparent 0deg,
+      rgba(75,127,255,0.05) 30deg,
+      transparent 50deg,
+      rgba(75,127,255,0.04) 80deg,
+      transparent 110deg,
+      rgba(75,127,255,0.06) 140deg,
+      transparent 170deg
+    );
+    mix-blend-mode:screen;
+  }
+  @keyframes rayIn{to{opacity:1}}
+  .light-rays.bottom{
+    background:
+      radial-gradient(ellipse 60% 50% at 50% 110%, rgba(75,127,255,0.15) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 30% at 50% 100%, rgba(75,127,255,0.08) 0%, transparent 60%);
+  }
+
+  .hero-content{position:relative;z-index:2;max-width:880px;display:flex;flex-direction:column;align-items:center;gap:28px}
+
+  .badge{
+    display:inline-flex;align-items:center;gap:8px;
+    background:rgba(75,127,255,0.12);
+    border:1px solid rgba(75,127,255,0.3);
+    border-radius:50px;padding:6px 16px;
+    color:var(--electric-bright);
+    font-size:0.8rem;letter-spacing:0.05em;font-weight:500;
+    opacity:0;animation:fadeUp 0.5s var(--ease) forwards 0.2s;
+  }
+  @keyframes fadeUp{
+    from{opacity:0;transform:translateY(12px)}
+    to{opacity:1;transform:none}
+  }
+
+  h1.hero-headline{
+    font-size:clamp(2.8rem,6vw,5.5rem);
+    font-weight:700;line-height:1.05;letter-spacing:-0.03em;
+    color:var(--white);
+    text-shadow:0 0 40px rgba(75,127,255,0.3);
+    max-width:900px;
+  }
+  h1 .word{display:inline-block;opacity:0;transform:translateY(20px);animation:fadeUp 0.6s var(--ease) forwards}
+
+  .subhead{
+    font-size:1.15rem;color:var(--white-muted);
+    max-width:560px;line-height:1.7;
+    opacity:0;animation:fadeUp 0.6s var(--ease) forwards 0.6s;
+  }
+
+  .cta-row{
+    display:flex;gap:14px;flex-wrap:wrap;justify-content:center;
+    opacity:0;animation:fadeUp 0.6s var(--ease) forwards 0.8s;
+  }
+  .cta-note{
+    color:var(--white-faint);font-size:0.85rem;
+    opacity:0;animation:fadeUp 0.6s var(--ease) forwards 0.95s;
+  }
+
+  /* ---------- Glass card ---------- */
+  .glass{
+    background:var(--bg-card);
+    border:1px solid var(--border-glass);
+    -webkit-backdrop-filter:blur(12px);
+    backdrop-filter:blur(12px);
+    border-radius:16px;
+    box-shadow:0 8px 32px rgba(0,0,0,0.4), 0 0 0 1px rgba(75,127,255,0.08);
+    transition:all 0.35s var(--ease);
+  }
+  .glass:hover{
+    border-color:var(--border-electric);
+    box-shadow:0 8px 32px rgba(0,0,0,0.5), 0 0 28px rgba(75,127,255,0.15);
+  }
+
+  /* ---------- Hero chat preview (Static Marketing Visual) ---------- */
+  .hero-chat{
+    max-width:500px;width:100%;
+    margin-top:50px;padding:20px;
+    opacity:0;transform:translateY(40px);
+    animation:fadeUp 0.8s var(--ease) forwards 1s, float 4s ease-in-out infinite 1.8s;
+  }
+  @keyframes float{
+    0%,100%{transform:translateY(0)}
+    50%{transform:translateY(-8px)}
+  }
+  .chat-top{
+    display:flex;align-items:center;justify-content:space-between;
+    padding-bottom:14px;margin-bottom:14px;
+    border-bottom:1px solid var(--border-glass);
+  }
+  .chat-title{display:flex;align-items:center;gap:10px;color:var(--white);font-weight:600;font-size:0.9rem}
+  .listening{
+    font-size:0.72rem;letter-spacing:0.05em;
+    color:var(--electric-bright);
+    background:rgba(75,127,255,0.08);
+    border:1px solid var(--border-electric);
+    border-radius:50px;padding:4px 10px;
+  }
+  .msg{
+    padding:12px 16px;font-size:0.95rem;line-height:1.55;color:var(--white);
+    max-width:85%;margin-bottom:10px;
+  }
+  .msg.user{
+    background:rgba(75,127,255,0.15);
+    border:1px solid rgba(75,127,255,0.25);
+    border-radius:18px 18px 4px 18px;
+    margin-left:auto;
+    text-align: left;
+  }
+  .msg.ai{
+    background:rgba(255,255,255,0.05);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:18px 18px 18px 4px;
+    margin-right:auto;
+    text-align: left;
+  }
+  .typing{display:inline-flex;gap:5px;padding:14px 16px;background:rgba(255,255,255,0.04);border-radius:18px;margin-bottom:10px}
+  .typing span{
+    width:6px;height:6px;border-radius:50%;background:var(--electric);
+    animation:bounce 1.2s infinite;
+  }
+  .typing span:nth-child(2){animation-delay:0.15s}
+  .typing span:nth-child(3){animation-delay:0.3s}
+  @keyframes bounce{
+    0%,60%,100%{transform:translateY(0);opacity:0.4}
+    30%{transform:translateY(-6px);opacity:1}
+  }
+
+  /* ---------- Sections ---------- */
+  section{padding:100px 24px;position:relative}
+  .container{max-width:1100px;margin:0 auto}
+  .separator{
+    width:100%;max-width:1100px;margin:0 auto;height:1px;
+    background:linear-gradient(90deg,transparent,rgba(75,127,255,0.3),transparent);
+  }
+  .label{
+    display:block;text-align:center;
+    color:var(--electric);font-size:0.8rem;font-weight:600;
+    letter-spacing:0.2em;text-transform:uppercase;margin-bottom:18px;
+  }
+  h2{
+    font-size:clamp(1.8rem,3.5vw,3rem);
+    font-weight:700;letter-spacing:-0.02em;line-height:1.15;
+    text-align:center;color:var(--white);
+  }
+  .section-sub{
+    text-align:center;color:var(--white-muted);
+    max-width:640px;margin:18px auto 0;font-size:1.05rem;
+  }
+
+  /* Reveal */
+  .reveal{opacity:0;transform:translateY(40px);transition:all 0.6s var(--ease)}
+  .reveal.in{opacity:1;transform:none}
+
+  /* ---------- Empathy ---------- */
+  .empathy{background:var(--bg-deep);text-align:center}
+  .empathy blockquote{
+    font-size:clamp(1.6rem,3vw,2.4rem);
+    font-weight:500;line-height:1.4;color:var(--white);
+    max-width:800px;margin:0 auto 28px;letter-spacing:-0.01em;
+  }
+
+  /* ---------- How it works / Features grids ---------- */
+  .grid-3{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:60px;
+  }
+  .grid-2x3{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:60px;
+  }
+  .step-card,.feature-card,.principle-card{
+    padding:32px;display:flex;flex-direction:column;gap:14px;
+  }
+  .num-badge{
+    width:44px;height:44px;border-radius:50%;
+    background:rgba(75,127,255,0.15);
+    border:1px solid var(--border-electric);
+    color:var(--electric-bright);font-weight:700;
+    display:flex;align-items:center;justify-content:center;
+    font-size:0.95rem;
+  }
+  .step-card h3, .feature-card h3, .principle-card h3{
+    font-size:1.25rem;font-weight:700;color:var(--white);
+  }
+  .step-card p, .feature-card p, .principle-card p{
+    color:var(--white-muted);font-size:0.96rem;line-height:1.7;
+  }
+  .icon-badge{
+    width:44px;height:44px;border-radius:12px;
+    background:rgba(75,127,255,0.12);
+    border:1px solid var(--border-electric);
+    display:flex;align-items:center;justify-content:center;
+    color:var(--electric);
+    transition:all 0.3s var(--ease);
+  }
+  .feature-card:hover .icon-badge{transform:rotate(5deg);color:var(--electric-bright)}
+  .icon-badge svg{width:22px;height:22px}
+
+  .caption{
+    text-align:center;color:var(--white-faint);font-size:0.9rem;margin-top:40px;
+  }
+
+  /* ---------- Founding card ---------- */
+  .founding-card{
+    max-width:680px;margin:0 auto;padding:48px 40px;text-align:center;
+    background:rgba(13,21,38,0.9);
+    border:1px solid rgba(75,127,255,0.2);
+    box-shadow:0 0 60px rgba(75,127,255,0.08), 0 8px 32px rgba(0,0,0,0.4);
+    border-radius:20px;
+    display:flex;flex-direction:column;gap:20px;align-items:center;
+  }
+  .founding-card h2{font-size:clamp(1.6rem,2.8vw,2.4rem)}
+  .founding-card p{color:var(--white-muted);line-height:1.85;font-size:1.05rem;max-width:560px}
+
+  /* ---------- Philosophy ---------- */
+  .diamond{
+    color:var(--electric);font-size:1.4rem;
+  }
+  .principle-card{align-items:flex-start;text-align:left}
+
+  /* ---------- Final CTA ---------- */
+  .final-cta{
+    background:var(--bg-deep);text-align:center;overflow:hidden;
+    padding:140px 24px;
+  }
+  .final-cta h2{
+    font-size:clamp(2rem,4.5vw,3.6rem);
+    text-shadow:0 0 40px rgba(75,127,255,0.3);
+    max-width:820px;margin:0 auto;
+  }
+  .final-cta .subhead{margin:24px auto 36px;font-size:1.15rem}
+  .final-cta .micro{
+    margin-top:18px;color:var(--white-faint);font-size:0.85rem;
+  }
+  .tagline-bottom{
+    margin-top:48px;color:var(--electric-bright);
+    letter-spacing:0.18em;font-size:0.78rem;font-weight:600;
+  }
+
+  /* ---------- Footer ---------- */
+  footer{
+    background:var(--bg-void);
+    border-top:1px solid rgba(255,255,255,0.06);
+    padding:60px 24px 32px;color:var(--white-faint);font-size:0.85rem;
+  }
+  .footer-top{
+    display:flex;align-items:center;justify-content:space-between;gap:20px;
+    flex-wrap:wrap;max-width:1100px;margin:0 auto;
+  }
+  .footer-center{color:var(--white-faint);font-size:0.9rem;text-align:center;flex:1;min-width:240px}
+  .socials{display:flex;gap:14px}
+  .socials a{
+    color:var(--white-faint);transition:color 0.3s var(--ease);
+    display:inline-flex;
+  }
+  .socials a:hover{color:var(--electric)}
+  .socials svg{width:18px;height:18px}
+  .footer-links{
+    text-align:center;margin:32px 0 18px;
+    display:flex;flex-wrap:wrap;justify-content:center;gap:14px 22px;
+  }
+  .footer-links a{color:var(--white-faint);text-decoration:none;transition:color 0.3s var(--ease)}
+  .footer-links a:hover{color:var(--white)}
+  .footer-strip{text-align:center;margin-bottom:10px}
+  .footer-micro{text-align:center;font-size:0.8rem;color:var(--white-faint)}
+
+  /* ---------- Cursor ---------- */
+  .cursor-dot{
+    position:fixed;top:0;left:0;width:8px;height:8px;
+    border-radius:50%;background:var(--electric);
+    pointer-events:none;z-index:9999;
+    transform:translate(-50%,-50%);
+    box-shadow:0 0 12px var(--electric);
+    transition:opacity 0.2s;mix-blend-mode:screen;
+  }
+  .cursor-trail{
+    position:fixed;top:0;left:0;width:24px;height:24px;
+    border-radius:50%;
+    background:radial-gradient(circle,rgba(75,127,255,0.25),transparent 70%);
+    pointer-events:none;z-index:9998;
+    transform:translate(-50%,-50%);
+    transition:opacity 0.3s;
+  }
+
+  /* ---------- Mobile ---------- */
+  @media (max-width:900px){
+    .grid-3,.grid-2x3{grid-template-columns:1fr 1fr}
+  }
+  @media (max-width:768px){
+    .nav-links{
+      position:fixed;top:64px;left:16px;right:16px;
+      flex-direction:column;align-items:stretch;gap:14px;
+      padding:20px;border-radius:16px;
+      background:rgba(5,8,15,0.95);
+      -webkit-backdrop-filter:blur(20px);
+      backdrop-filter:blur(20px);
+      border:1px solid var(--border-glass);
+      display:none;
+    }
+    .nav-links.open{display:flex;animation:fadeUp 0.3s var(--ease)}
+    .hamburger{display:flex}
+    .nav-links a{font-size:1rem;padding:8px 0}
+    .nav-links a:not(.btn-pill)::after{display:none}
+    .grid-3,.grid-2x3{grid-template-columns:1fr}
+    section{padding:70px 20px}
+    .hero{padding:120px 20px 60px}
+    .cursor-dot,.cursor-trail{display:none}
+  }
+</style>
+</head>
+<body>
+
+<div class="atmo-orb one" aria-hidden="true"></div>
+<div class="atmo-orb two" aria-hidden="true"></div>
+<div class="noise" aria-hidden="true"></div>
+
+<nav class="nav" aria-label="Primary">
+  <a href="#" class="logo" aria-label="unhesitated.ai home">
+    <span>unhesitated<span class="dot-ai">.ai</span></span>
+    <span class="pulse-dot" aria-hidden="true"></span>
+  </a>
+  <button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#top">Home</a></li>
+    <li><a href="#how">How It Works</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="chat.html" class="btn-pill">Start Talking</a></li>
+  </ul>
+</nav>
+
+<main id="top">
+
+  <section class="hero" aria-label="Hero">
+    <div class="light-rays" aria-hidden="true"></div>
+    <div class="hero-content">
+      <span class="badge"><span class="pulse-dot" aria-hidden="true"></span> Your AI English Companion</span>
+      <h1 class="hero-headline" id="heroHead">You already speak perfect English in your head. Let's say it out loud.</h1>
+      <p class="subhead">unhesitated.ai is a judgment-free space where South Asian learners can practice English with an AI friend who understands their language, their culture, and their journey.</p>
+      <div class="cta-row">
+        <a href="chat.html" class="btn btn-primary">Start Talking — It's Free</a>
+        <a href="#how" class="btn btn-secondary">See How It Works</a>
+      </div>
+      <p class="cta-note">No perfect English required. Speak however feels natural.</p>
+
+      <div class="glass hero-chat" role="region" aria-label="Conversation preview">
+        <div class="chat-top">
+          <div class="chat-title"><span class="pulse-dot" aria-hidden="true"></span> unhesitated.ai</div>
+          <span class="listening">Listening...</span>
+        </div>
+        <div class="msg user">I went to the bazaar and bought... um... سبزیاں (sabziyaan)</div>
+        <div class="typing" aria-label="AI is typing"><span></span><span></span><span></span></div>
+        <div class="msg ai">Fresh vegetables — lovely! Was the bazaar crowded today, or did you get there early?</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="separator"></div>
+
+  <section class="empathy reveal" aria-label="Why we exist">
+    <div class="container">
+      <blockquote>"Millions of brilliant people across South Asia speak English perfectly — in their heads. They just never had someone safe enough to say it to."</blockquote>
+      <span class="badge">unhesitated.ai exists for them.</span>
+    </div>
+  </section>
+
+  <div class="separator"></div>
+
+  <section id="how" aria-label="How it works">
+    <div class="container">
+      <span class="label">The Process</span>
+      <h2 class="reveal">How It Works</h2>
+      <div class="grid-3">
+        <div class="glass step-card reveal">
+          <div class="num-badge">01</div>
+          <h3>Just Start Talking</h3>
+          <p>Begin any topic — your day, a memory, a question. No script, no preparation. unhesitated.ai listens first.</p>
+        </div>
+        <div class="glass step-card reveal">
+          <div class="num-badge">02</div>
+          <h3>Mix Languages Freely</h3>
+          <p>Forgot the English word? Say it in Urdu, Hindi, or Bengali — your AI friend understands and gently keeps the conversation going.</p>
+        </div>
+        <div class="glass step-card reveal">
+          <div class="num-badge">03</div>
+          <h3>Grow Without Noticing</h3>
+          <p>You'll find yourself reaching for English words first. Not because you were corrected — but because you felt safe enough to try.</p>
+        </div>
+      </div>
+      <p class="caption reveal">No scores. No red marks. No awkward silence after a wrong word.</p>
+    </div>
+  </section>
+
+  <div class="separator"></div>
+
+  <section id="features" aria-label="Features">
+    <div class="container">
+      <span class="label">What You Get</span>
+      <h2 class="reveal">Everything You Need. Nothing That Judges You.</h2>
+      <div class="grid-2x3">
+        <div class="glass feature-card reveal">
+          <div class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+          <h3>Speaks Your Language</h3>
+          <p>Whether you switch to Hindi, Urdu, or Bengali mid-sentence — unhesitated.ai understands and gently keeps the conversation going in English.</p>
+        </div>
+        <div class="glass feature-card reveal">
+          <div class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg></div>
+          <h3>Zero Judgment. Always.</h3>
+          <p>No error logs. No red underlines. No fluency scores. No comparison to anyone else. Ever.</p>
+        </div>
+        <div class="glass feature-card reveal">
+          <div class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg></div>
+          <h3>Culturally Grounded</h3>
+          <p>Examples and references drawn from South Asian daily life — not just Western contexts.</p>
+        </div>
+        <div class="glass feature-card reveal">
+          <div class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg></div>
+          <h3>Mood-Aware Responses</h3>
+          <p>Detects when you feel nervous or frustrated and adjusts its warmth and pace accordingly.</p>
+        </div>
+        <div class="glass feature-card reveal">
+          <div class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h7l-1 8 10-12h-7z"/></svg></div>
+          <h3>Conversation Starters Ready</h3>
+          <p>Never face a blank screen — 30+ warm prompts built around everyday South Asian life: markets, family, work, dreams, food.</p>
+        </div>
+        <div class="glass feature-card reveal">
+          <div class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
+          <h3>Private & Yours</h3>
+          <p>Your conversations are never stored, never judged, and never used against you. This is your space.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="separator"></div>
+
+  <section id="start" aria-label="Founding message" class="empathy">
+    <div class="container">
+      <div class="founding-card reveal">
+        <span class="badge">Day One</span>
+        <h2>Be One Of The First Voices Here.</h2>
+        <p>unhesitated.ai is brand new. There are no thousands of users yet. There is just a quiet, carefully built space — made for you to try first.</p>
+        <a href="chat.html" class="btn btn-primary">Start Talking — It's Free</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="separator"></div>
+
+  <section aria-label="Our belief">
+    <div class="container">
+      <span class="label">Our Belief</span>
+      <h2 class="reveal">We Don't Teach English.<br/>We Make You Feel At Home In It.</h2>
+      <div class="grid-3">
+        <div class="glass principle-card reveal">
+          <div class="icon-badge"><span class="diamond">◈</span></div>
+          <h3>Comfort Before Correction</h3>
+          <p>Fluency is built through comfort, not correction.</p>
+        </div>
+        <div class="glass principle-card reveal">
+          <div class="icon-badge"><span class="diamond">◈</span></div>
+          <h3>Your Tongue Is An Asset</h3>
+          <p>Your mother tongue is a strength, not an obstacle.</p>
+        </div>
+        <div class="glass principle-card reveal">
+          <div class="icon-badge"><span class="diamond">◈</span></div>
+          <h3>Connection Over Perfection</h3>
+          <p>The goal is connection — not perfection.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="separator"></div>
+
+  <section id="final" class="final-cta" aria-label="Start your first conversation">
+    <div class="light-rays bottom" aria-hidden="true"></div>
+    <div class="container" style="position:relative;z-index:2">
+      <h2 class="reveal">Your First Conversation Starts With One Sentence.</h2>
+      <p class="subhead reveal">It doesn't have to be perfect. It just has to begin.</p>
+      <a href="chat.html" class="btn btn-primary btn-lg">Talk To unhesitated.ai Now →</a>
+      <p class="micro">Free to start. No sign-up needed for your first conversation.</p>
+      <p class="tagline-bottom">BECAUSE YOU WERE NEVER HESITANT — YOU WERE JUST UNHEARD.</p>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="footer-top">
+    <a href="#" class="logo" aria-label="unhesitated.ai">
+      <span>unhesitated<span class="dot-ai">.ai</span></span>
+      <span class="pulse-dot" aria-hidden="true"></span>
+    </a>
+    <div class="footer-center">A safe space for your English journey.</div>
+    <div class="socials" aria-label="Social links">
+      <a href="#" aria-label="Twitter"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 5.8c-.7.3-1.5.6-2.3.7.8-.5 1.5-1.3 1.8-2.2-.8.5-1.7.8-2.6 1-1.5-1.6-4-1.7-5.6-.2-1 1-1.5 2.4-1.2 3.8C8.7 8.6 5.7 7 3.7 4.5 2.6 6.3 3.1 8.7 4.8 9.9c-.6 0-1.2-.2-1.8-.5 0 1.9 1.3 3.5 3.1 3.9-.6.2-1.2.2-1.8.1.5 1.6 2 2.7 3.7 2.7-1.5 1.2-3.4 1.8-5.3 1.6 1.8 1.2 3.9 1.8 6 1.8 7.2 0 11.2-6 11.2-11.2v-.5c.8-.6 1.5-1.3 2.1-2.1z"/></svg></a>
+      <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg></a>
+      <a href="#" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h4v16H4zM6 2a2 2 0 1 1 0 4 2 2 0 0 1 0-4zM10 8h4v2c.7-1.2 2-2.3 4-2.3 3.2 0 4 2 4 5V20h-4v-6c0-1.4-.6-2.4-2-2.4S14 12.7 14 14v6h-4z"/></svg></a>
+    </div>
+  </div>
+  <nav class="footer-links" aria-label="Footer">
+    <a href="#">About</a>
+    <a href="#">Privacy</a>
+    <a href="#">Languages Supported</a>
+    <a href="#">Contact</a>
+  </nav>
+  <p class="footer-strip">Built with love for learners across South Asia.</p>
+  <p class="footer-micro">© 2026 unhesitated.ai — Speak. Without the pause.</p>
+</footer>
+
+<div class="cursor-dot" id="cd" aria-hidden="true"></div>
+<div class="cursor-trail" id="ct" aria-hidden="true"></div>
+
+<script>
+  // Word-by-word hero reveal
+  (() => {
+    const h = document.getElementById('heroHead');
+    if (!h) return;
+    const words = h.textContent.trim().split(/\s+/);
+    h.innerHTML = words.map((w,i)=>`<span class="word" style="animation-delay:${0.3 + i*0.08}s">${w}&nbsp;</span>`).join('');
+  })();
+
+  // Hamburger menu
+  const hb = document.getElementById('hamburger');
+  const nl = document.getElementById('navLinks');
+  hb?.addEventListener('click', () => {
+    const open = nl.classList.toggle('open');
+    hb.setAttribute('aria-expanded', open);
+  });
+  nl?.querySelectorAll('a').forEach(a => a.addEventListener('click', () => nl.classList.remove('open')));
+
+  // Scroll reveal animations
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e) => {
+      if (e.isIntersecting) {
+        const cards = e.target.parentElement?.querySelectorAll('.reveal') || [];
+        const idx = Array.from(cards).indexOf(e.target);
+        e.target.style.transitionDelay = (idx > 0 ? Math.min(idx,5)*0.12 : 0) + 's';
+        e.target.classList.add('in');
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  // Custom cursor (desktop only)
+  if (window.matchMedia('(pointer:fine)').matches) {
+    const cd = document.getElementById('cd');
+    const ct = document.getElementById('ct');
+    let tx=0,ty=0,cx=0,cy=0;
+    window.addEventListener('mousemove', (e) => {
+      cd.style.left = e.clientX + 'px';
+      cd.style.top = e.clientY + 'px';
+      tx = e.clientX; ty = e.clientY;
+    });
+    function loop(){
+      cx += (tx-cx)*0.15; cy += (ty-cy)*0.15;
+      ct.style.left = cx+'px'; ct.style.top = cy+'px';
+      requestAnimationFrame(loop);
+    }
+    loop();
+  } else {
+    document.getElementById('cd').style.display='none';
+    document.getElementById('ct').style.display='none';
+  }
+</script>
+</body>
+</html>

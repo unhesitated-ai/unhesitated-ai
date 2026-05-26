@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Chat | unhesitated.ai</title>
+<meta name="description" content="Talk to your AI English speaking companion." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg-void:#05080F;
+    --bg-deep:#080D1A;
+    --bg-surface:#0D1526;
+    --bg-card:rgba(13,21,38,0.85);
+    --electric:#4B7FFF;
+    --electric-bright:#6B9FFF;
+    --electric-glow:rgba(75,127,255,0.20);
+    --electric-ray:rgba(75,127,255,0.06);
+    --blue-mid:#1E3A8A;
+    --white:#FFFFFF;
+    --white-muted:rgba(255,255,255,0.65);
+    --white-faint:rgba(255,255,255,0.25);
+    --border-glass:rgba(255,255,255,0.07);
+    --border-electric:rgba(75,127,255,0.25);
+    --shadow-deep:rgba(0,0,0,0.5);
+    --shadow-electric:rgba(75,127,255,0.15);
+    --ease:cubic-bezier(0.25,0.46,0.45,0.94);
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'Inter',system-ui,-apple-system,sans-serif;
+    background:var(--bg-deep);
+    color:var(--white);
+    line-height:1.6;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+    position:relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ---------- Global background texture ---------- */
+  body::before{
+    content:"";
+    position:fixed;inset:0;
+    background-image:
+      radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px);
+    background-size:24px 24px;
+    pointer-events:none;
+    z-index:0;
+  }
+  .atmo-orb{
+    position:fixed;border-radius:50%;
+    pointer-events:none;z-index:0;
+    filter:blur(80px);
+  }
+  .atmo-orb.one{
+    width:600px;height:600px;
+    top:-150px;left:-150px;
+    background:radial-gradient(circle,rgba(75,127,255,0.08),transparent 70%);
+  }
+  .atmo-orb.two{
+    width:800px;height:800px;
+    bottom:-200px;right:-200px;
+    background:radial-gradient(circle,rgba(30,58,138,0.06),transparent 70%);
+    filter:blur(100px);
+  }
+  .noise{
+    position:fixed;inset:0;pointer-events:none;z-index:1;opacity:0.03;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.8'/></svg>");
+  }
+
+  main, nav{position:relative;z-index:2}
+
+  /* ---------- Navbar ---------- */
+  .nav{
+    position:fixed;top:0;left:0;right:0;
+    background:rgba(5,8,15,0.85);
+    -webkit-backdrop-filter:blur(20px);
+    backdrop-filter:blur(20px);
+    border-bottom:1px solid rgba(255,255,255,0.06);
+    z-index:100;
+    padding:18px 32px;
+    display:flex;align-items:center;justify-content:space-between;
+  }
+
+  .logo{
+    font-family:'Inter',sans-serif;font-weight:700;
+    font-size:1.25rem;color:var(--white);
+    letter-spacing:-0.01em;display:flex;align-items:center;gap:6px;
+    text-decoration:none;
+  }
+  .logo .dot-ai{color:var(--electric);font-weight:500}
+  .pulse-dot{
+    width:8px;height:8px;border-radius:50%;
+    background:var(--electric);
+    box-shadow:0 0 12px var(--electric);
+    animation:pulse 2s infinite var(--ease);
+    display:inline-block;
+  }
+  @keyframes pulse{
+    0%,100%{opacity:1;transform:scale(1)}
+    50%{opacity:0.2;transform:scale(1.4)}
+  }
+
+  .nav-links{display:flex;align-items:center;gap:32px;list-style:none}
+  .nav-links a{
+    color:var(--white-muted);text-decoration:none;
+    font-size:0.9rem;position:relative;transition:color 0.3s var(--ease);
+  }
+  .nav-links a:hover{color:var(--white)}
+
+  /* ---------- Glass card / Chat Window ---------- */
+  .glass{
+    background:var(--bg-card);
+    border:1px solid var(--border-glass);
+    -webkit-backdrop-filter:blur(12px);
+    backdrop-filter:blur(12px);
+    border-radius:16px;
+    box-shadow:0 8px 32px rgba(0,0,0,0.4), 0 0 0 1px rgba(75,127,255,0.08);
+  }
+
+  .chat-app-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 120px 24px 40px;
+  }
+
+  .chat-window{
+    width:100%;
+    max-width:640px;
+    padding:24px;
+  }
+  .chat-top{
+    display:flex;align-items:center;justify-content:space-between;
+    padding-bottom:14px;margin-bottom:14px;
+    border-bottom:1px solid var(--border-glass);
+  }
+  .chat-title{display:flex;align-items:center;gap:10px;color:var(--white);font-weight:600;font-size:0.9rem}
+  .listening{
+    font-size:0.72rem;letter-spacing:0.05em;
+    color:var(--electric-bright);
+    background:rgba(75,127,255,0.08);
+    border:1px solid var(--border-electric);
+    border-radius:50px;padding:4px 10px;
+  }
+  .msg{
+    padding:12px 16px;font-size:0.95rem;line-height:1.55;color:var(--white);
+    max-width:85%;margin-bottom:10px;
+  }
+  .msg.user{
+    background:rgba(75,127,255,0.15);
+    border:1px solid rgba(75,127,255,0.25);
+    border-radius:18px 18px 4px 18px;
+    margin-left:auto;
+  }
+  .msg.ai{
+    background:rgba(255,255,255,0.05);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:18px 18px 18px 4px;
+    margin-right:auto;
+  }
+  .typing{display:inline-flex;gap:5px;padding:14px 16px;background:rgba(255,255,255,0.04);border-radius:18px;margin-bottom:10px}
+  .typing span{
+    width:6px;height:6px;border-radius:50%;background:var(--electric);
+    animation:bounce 1.2s infinite;
+  }
+  .typing span:nth-child(2){animation-delay:0.15s}
+  .typing span:nth-child(3){animation-delay:0.3s}
+  @keyframes bounce{
+    0%,60%,100%{transform:translateY(0);opacity:0.4}
+    30%{transform:translateY(-6px);opacity:1}
+  }
+
+  .chat-input{
+    margin-top:18px;display:flex;gap:10px;align-items:center;
+    background:rgba(5,8,15,0.6);
+    border:1px solid var(--border-glass);
+    border-radius:50px;padding:8px 8px 8px 18px;
+  }
+  .chat-input input{
+    flex:1;background:transparent;border:none;outline:none;
+    color:var(--white);font-family:inherit;font-size:0.95rem;
+  }
+  .chat-input input::placeholder{color:var(--white-faint)}
+  .mic-btn{
+    background:none;border:none;color:var(--electric);cursor:pointer;
+    padding:8px;display:flex;align-items:center;
+    transition: color 0.3s ease;
+  }
+  .send-btn{
+    background:var(--electric);color:var(--white);border:none;
+    border-radius:50px;padding:10px 18px;font-weight:600;font-family:inherit;
+    cursor:pointer;font-size:0.85rem;
+    transition:all 0.3s var(--ease);
+  }
+  .send-btn:hover{background:var(--electric-bright);box-shadow:0 0 18px rgba(75,127,255,0.4)}
+
+</style>
+</head>
+<body>
+
+<div class="atmo-orb one" aria-hidden="true"></div>
+<div class="atmo-orb two" aria-hidden="true"></div>
+<div class="noise" aria-hidden="true"></div>
+
+<nav class="nav" aria-label="Primary">
+  <a href="index.html" class="logo" aria-label="unhesitated.ai home">
+    <span>unhesitated<span class="dot-ai">.ai</span></span>
+    <span class="pulse-dot" aria-hidden="true"></span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html">← Back to Home</a></li>
+  </ul>
+</nav>
+
+<main class="chat-app-container">
+  <div class="glass chat-window">
+    <div class="chat-top">
+      <div class="chat-title"><span class="pulse-dot" aria-hidden="true"></span> unhesitated.ai</div>
+      <span class="listening">Ready</span>
+    </div>
+    
+    <div class="msg ai">Hello! I am ready to listen. You can type to me, or click the microphone to practice speaking. Remember, there is no judgment here.</div>
+
+    <div id="live-chat-feed" style="display:flex;flex-direction:column;width:100%;"></div>
+
+    <div class="chat-input">
+      <input type="text" placeholder="Type or speak in any language..." aria-label="Message input" />
+      <button class="mic-btn" aria-label="Speak">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+      </button>
+      <button class="send-btn">Send</button>
+    </div>
+  </div>
+</main>
+
+<script>
+  // ============================================================
+  // CHAT LOGIC 
+  // ============================================================
+  let mediaRecorder;
+  let audioChunks = [];  
+  let globalStream = null;
+
+  const micBtn   = document.querySelector('.mic-btn');
+  const sendBtn  = document.querySelector('.send-btn');
+  const chatInput = document.querySelector('.chat-input input');
+  const chatFeed = document.getElementById('live-chat-feed');
+
+  // Stops recording and triggers the onstop handler which sends audio
+  function stopAndSendAudio() {
+    if (mediaRecorder && mediaRecorder.state === 'recording') {
+      mediaRecorder.stop();
+      micBtn.style.color = 'var(--electric)'; 
+    }
+  }
+
+  // MIC BUTTON — only starts recording
+  if (micBtn) {
+    micBtn.addEventListener('click', async () => {
+      // Request mic access if not already granted
+      if (!globalStream) {
+        try {
+          globalStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        } catch (err) {
+          alert("Please allow microphone access to talk to unhesitated.ai");
+          return;
+        }
+      }
+
+      // Start recording only if not already recording
+      if (!mediaRecorder || mediaRecorder.state === 'inactive') {
+        mediaRecorder = new MediaRecorder(globalStream);
+        audioChunks = [];  
+
+        mediaRecorder.ondataavailable = event => {
+          if (event.data.size > 0) audioChunks.push(event.data);
+        };
+
+        // What happens after recording stops
+        mediaRecorder.onstop = async () => {
+          chatFeed.innerHTML += `<div class="typing" aria-label="AI is typing"><span></span><span></span><span></span></div>`;
+
+          const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+          const formData  = new FormData();
+          formData.append('audio', audioBlob, 'recording.webm');
+
+          try {
+            const response = await fetch('/api/chat', { method: 'POST', body: formData });
+            const data = await response.json();
+            
+            // Remove typing indicator
+            const typingInd = chatFeed.querySelector('.typing:last-child');
+            if(typingInd) typingInd.remove();
+            
+            chatFeed.innerHTML += `<div class="msg ai">${data.message}</div>`;
+            if (window.speechSynthesis.speaking) window.speechSynthesis.cancel();
+            const speech = new SpeechSynthesisUtterance(data.message);
+            speech.rate = 1.0;
+            window.speechSynthesis.speak(speech);
+          } catch (error) {
+            chatFeed.innerHTML += `<div class="msg ai" style="color:#ff4b4b;">Oops! Something went wrong connecting to the brain.</div>`;
+          }
+
+          audioChunks = [];
+          globalStream.getTracks().forEach(track => track.stop());
+          globalStream = null;
+        };
+
+        mediaRecorder.start();
+        micBtn.style.color = '#ff4b4b'; 
+        chatFeed.innerHTML += `<div class="msg user" style="opacity:0.6;font-style:italic;">Listening to your voice...</div>`;
+      }
+    });
+  }
+
+  // SEND BUTTON — stops mic recording OR sends typed text
+  if (sendBtn) {
+    sendBtn.addEventListener('click', async () => {
+
+      // If mic is currently recording, stop it and send the audio
+      if (mediaRecorder && mediaRecorder.state === 'recording') {
+        stopAndSendAudio();
+        return; 
+      }
+
+      // Otherwise handle typed text
+      const textMessage = chatInput.value.trim();
+      if (textMessage !== '') {
+        chatFeed.innerHTML += `<div class="msg user">${textMessage}</div>`;
+        chatInput.value = '';
+        chatFeed.innerHTML += `<div class="typing"><span></span><span></span><span></span></div>`;
+
+        try {
+          const response = await fetch('/api/text-chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: textMessage })
+          });
+          const data = await response.json();
+          
+          // Remove typing indicator
+          const typingInd = chatFeed.querySelector('.typing:last-child');
+          if(typingInd) typingInd.remove();
+            
+          chatFeed.innerHTML += `<div class="msg ai">${data.message}</div>`;
+          if (window.speechSynthesis.speaking) window.speechSynthesis.cancel();
+          const speech = new SpeechSynthesisUtterance(data.message);
+          window.speechSynthesis.speak(speech);
+        } catch (error) {
+          chatFeed.innerHTML += `<div class="msg ai" style="color:red;">Error connecting to brain.</div>`;
+        }
+      }
+    });
+  }
+
+  // ENTER KEY — triggers Send button
+  if (chatInput) {
+    chatInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') sendBtn.click();
+    });
+  }
+
+  // Stop voice if user clicks anywhere on the page
+  document.addEventListener('click', () => {
+    if (window.speechSynthesis.speaking) window.speechSynthesis.cancel();
+  });
+</script>
+</body>
+</html>

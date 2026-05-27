@@ -495,7 +495,6 @@
     isVoiceMode = true;
     voiceOverlay.classList.add('active');
     setOrbState('listening');
-    console.log("Voice Mode Opened. Initializing recognition...");
     startRecognition();
   }
 
@@ -522,23 +521,13 @@
 
     recognition.onstart = () => {
       isListening = true;
-      console.log("Mic active. Monitoring for barge-in...");
       if (!isThinking && !isSpeaking) {
         setOrbState('listening');
       }
     };
 
-    // CRITICAL FIX: Direct audio-level interruption hook
-    recognition.onsoundstart = () => {
-      if (isSpeaking) {
-        console.log("User sound detected! Force-canceling AI speech immediately.");
-        window.speechSynthesis.cancel(); 
-        isSpeaking = false;
-        setOrbState('listening');
-      }
-    };
-
     recognition.onresult = (event) => {
+      // BARGE-IN FIX: If the AI is talking and the mic picks up NEW speech, stop the AI immediately.
       if (isSpeaking) {
         window.speechSynthesis.cancel();
         isSpeaking = false;
@@ -565,7 +554,6 @@
         silenceTimer = setTimeout(() => {
           const toSend = accumulatedText.trim() || interim.trim();
           if (toSend) {
-            console.log("Silence detected. Sending:", toSend);
             accumulatedText = '';
             voiceTranscript.textContent = '';
             sendVoiceMessage(toSend);
@@ -575,7 +563,6 @@
     };
 
     recognition.onerror = (e) => {
-      console.warn('Speech recognition error:', e.error);
       if (e.error === 'not-allowed') {
         alert("Microphone access blocked. Please allow mic permissions in your browser address bar.");
         closeVoiceMode();
@@ -584,11 +571,10 @@
 
     recognition.onend = () => {
       isListening = false;
-      console.log("Mic stopped. Restarting listening loop...");
-      if (isVoiceMode && !isThinking && !isSpeaking) {
+      if (isVoiceMode && !isThinking) {
         setTimeout(() => {
           if (isVoiceMode && !isListening) {
-             try { recognition.start(); } catch(err) { console.error("Restart blocked by browser", err); }
+             try { recognition.start(); } catch(err) {}
           }
         }, 400);
       }
@@ -612,7 +598,7 @@
   async function sendVoiceMessage(text) {
     if (!text) return;
 
-    stopRecognition();
+    stopRecognition(); // Turn off mic ONLY while thinking, so background noise doesn't interrupt the API fetch.
     setOrbState('thinking');
     isThinking = true;
 
@@ -634,16 +620,20 @@
 
       isThinking = false;
       setOrbState('speaking');
+
+      // CRITICAL LOGIC FIX: Turn the microphone BACK ON right before the AI starts speaking, so it can hear you interrupt.
+      if (isVoiceMode) {
+        startRecognition();
+      }
+
       speakVoice(data.message, () => {
-        if (isVoiceMode) {
+        if (isVoiceMode && !isThinking) {
           isSpeaking = false;
           setOrbState('listening');
-          startRecognition();
         }
       });
 
     } catch (err) {
-      console.error("Backend Error during Voice Fetch:", err);
       removeTyping();
       appendMsg('ai', '<span style="color:#ff4b4b">Something went wrong contacting the server. Please check your backend.</span>');
       isThinking = false;
@@ -677,7 +667,6 @@
       if (onDone) onDone();
     };
     utterance.onerror = (e) => {
-      console.error("Speech Synthesis Error", e);
       isSpeaking = false;
       if (onDone) onDone();
     };

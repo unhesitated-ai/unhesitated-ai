@@ -522,12 +522,23 @@
 
     recognition.onstart = () => {
       isListening = true;
-      console.log("Mic started capturing audio.");
-      if (!isThinking && !isSpeaking) setOrbState('listening');
+      console.log("Mic active. Monitoring for barge-in...");
+      if (!isThinking && !isSpeaking) {
+        setOrbState('listening');
+      }
+    };
+
+    // CRITICAL FIX: Direct audio-level interruption hook
+    recognition.onsoundstart = () => {
+      if (isSpeaking) {
+        console.log("User sound detected! Force-canceling AI speech immediately.");
+        window.speechSynthesis.cancel(); 
+        isSpeaking = false;
+        setOrbState('listening');
+      }
     };
 
     recognition.onresult = (event) => {
-      console.log("Audio detected, processing speech...");
       if (isSpeaking) {
         window.speechSynthesis.cancel();
         isSpeaking = false;
@@ -573,9 +584,8 @@
 
     recognition.onend = () => {
       isListening = false;
-      console.log("Mic stopped. Attempting to restart if needed...");
+      console.log("Mic stopped. Restarting listening loop...");
       if (isVoiceMode && !isThinking && !isSpeaking) {
-        // FIXED: Added a timeout to prevent the crash loop
         setTimeout(() => {
           if (isVoiceMode && !isListening) {
              try { recognition.start(); } catch(err) { console.error("Restart blocked by browser", err); }

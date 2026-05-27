@@ -483,36 +483,9 @@
   let silenceTimer      = null;
   let accumulatedText   = '';
 
-  micBtn.addEventListener('click', openVoiceMode);
-  voiceEndBtn.addEventListener('click', closeVoiceMode);
-
-  function openVoiceMode() {
-    if (!SpeechRecognition) {
-      browserWarn.style.display = 'block';
-      setTimeout(() => browserWarn.style.display = 'none', 5000);
-      return;
-    }
-    isVoiceMode = true;
-    voiceOverlay.classList.add('active');
-    setOrbState('listening');
-    startRecognition();
-  }
-
-  function closeVoiceMode() {
-    isVoiceMode = false;
-    voiceOverlay.classList.remove('active');
-    stopRecognition();
-    window.speechSynthesis.cancel();
-    isSpeaking  = false;
-    isThinking  = false;
-    clearTimeout(silenceTimer);
-    accumulatedText   = '';
-    voiceTranscript.textContent = '';
-    statusBadge.textContent = 'Ready';
-  }
-
-  function startRecognition() {
-    if (!SpeechRecognition || isListening) return;
+  // CRITICAL FIX: Initialize recognition exactly ONCE to prevent memory leaks and crash loops.
+  function initRecognition() {
+    if (!SpeechRecognition || recognition) return;
 
     recognition = new SpeechRecognition();
     recognition.continuous      = true;
@@ -526,8 +499,16 @@
       }
     };
 
+    recognition.onsoundstart = () => {
+      // BARGE-IN FIX: Stop AI speech the exact millisecond user sound is detected
+      if (isSpeaking) {
+        window.speechSynthesis.cancel();
+        isSpeaking = false;
+        setOrbState('listening');
+      }
+    };
+
     recognition.onresult = (event) => {
-      // BARGE-IN FIX: If the AI is talking and the mic picks up NEW speech, stop the AI immediately.
       if (isSpeaking) {
         window.speechSynthesis.cancel();
         isSpeaking = false;
@@ -563,42 +544,65 @@
     };
 
     recognition.onerror = (e) => {
+      console.warn("Speech Recognition Error:", e.error);
       if (e.error === 'not-allowed') {
-        alert("Microphone access blocked. Please allow mic permissions in your browser address bar.");
+        alert("Microphone access is blocked! Please click the lock icon in your URL bar, allow the microphone, and refresh the page.");
         closeVoiceMode();
       }
     };
 
     recognition.onend = () => {
       isListening = false;
-      if (isVoiceMode && !isThinking) {
+      // Only restart if we are actively in voice mode and the AI isn't processing a backend request.
+      if (isVoiceMode && !isThinking && !isSpeaking) {
         setTimeout(() => {
           if (isVoiceMode && !isListening) {
              try { recognition.start(); } catch(err) {}
           }
-        }, 400);
+        }, 500);
       }
     };
-
-    try { 
-      recognition.start(); 
-    } catch(err) {
-      console.error("Failed to start recognition:", err);
-    }
   }
 
-  function stopRecognition() {
-    if (recognition) {
-      try { recognition.abort(); } catch(e) {}
-      recognition = null;
-      isListening = false;
+  micBtn.addEventListener('click', openVoiceMode);
+  voiceEndBtn.addEventListener('click', closeVoiceMode);
+
+  function openVoiceMode() {
+    if (!SpeechRecognition) {
+      browserWarn.style.display = 'block';
+      setTimeout(() => browserWarn.style.display = 'none', 5000);
+      return;
     }
+    isVoiceMode = true;
+    voiceOverlay.classList.add('active');
+    setOrbState('listening');
+    initRecognition(); // Create object once
+    try { 
+      if (!isListening) recognition.start(); 
+    } catch(err) {}
+  }
+
+  function closeVoiceMode() {
+    isVoiceMode = false;
+    voiceOverlay.classList.remove('active');
+    if (recognition) {
+        try { recognition.stop(); } catch(e) {}
+    }
+    window.speechSynthesis.cancel();
+    isSpeaking  = false;
+    isThinking  = false;
+    clearTimeout(silenceTimer);
+    accumulatedText   = '';
+    voiceTranscript.textContent = '';
+    statusBadge.textContent = 'Ready';
   }
 
   async function sendVoiceMessage(text) {
     if (!text) return;
 
-    stopRecognition(); // Turn off mic ONLY while thinking, so background noise doesn't interrupt the API fetch.
+    if (recognition) {
+        try { recognition.stop(); } catch(e) {}
+    }
     setOrbState('thinking');
     isThinking = true;
 
@@ -621,9 +625,9 @@
       isThinking = false;
       setOrbState('speaking');
 
-      // CRITICAL LOGIC FIX: Turn the microphone BACK ON right before the AI starts speaking, so it can hear you interrupt.
+      // Turn microphone back on right before speaking so it catches barge-ins
       if (isVoiceMode) {
-        startRecognition();
+        try { recognition.start(); } catch(err) {}
       }
 
       speakVoice(data.message, () => {
@@ -640,7 +644,7 @@
       isSpeaking = false;
       if (isVoiceMode) {
         setOrbState('listening');
-        setTimeout(() => startRecognition(), 1000);
+        setTimeout(() => { try { recognition.start(); } catch(e){} }, 1000);
       }
     }
   }

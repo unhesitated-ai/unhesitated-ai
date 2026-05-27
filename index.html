@@ -33,7 +33,9 @@
   html{scroll-behavior:smooth}
   body{
     font-family:'Inter',system-ui,-apple-system,sans-serif;
-    background:var(--bg-deep);
+    /* Added the split gradient background */
+    background: linear-gradient(90deg, var(--bg-deep) 0%, var(--bg-deep) 20%, #1A0A29 80%, #1A0A29 100%);
+    background-attachment: fixed;
     color:var(--white);
     line-height:1.6;
     overflow-x:hidden;
@@ -64,7 +66,8 @@
   .atmo-orb.two{
     width:800px;height:800px;
     bottom:-200px;right:-200px;
-    background:radial-gradient(circle,rgba(30,58,138,0.06),transparent 70%);
+    /* Updated orb to have a purplish glow to match the right side */
+    background:radial-gradient(circle, rgba(168, 85, 247, 0.08), transparent 70%);
     filter:blur(100px);
   }
   .noise{
@@ -177,7 +180,8 @@
 
   /* ---------- Hero ---------- */
   .hero{
-    background:var(--bg-void);
+    /* Made background transparent so body gradient shows through */
+    background: transparent;
     min-height:100vh;
     padding:140px 24px 80px;
     display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -347,7 +351,8 @@
   .reveal.in{opacity:1;transform:none}
 
   /* ---------- Empathy ---------- */
-  .empathy{background:var(--bg-deep);text-align:center}
+  /* Made background transparent so body gradient shows through */
+  .empathy{background:transparent;text-align:center}
   .empathy blockquote{
     font-size:clamp(1.6rem,3vw,2.4rem);
     font-weight:500;line-height:1.4;color:var(--white);
@@ -412,8 +417,9 @@
   .principle-card{align-items:flex-start;text-align:left}
 
   /* ---------- Final CTA ---------- */
+  /* Made background transparent so body gradient shows through */
   .final-cta{
-    background:var(--bg-deep);text-align:center;overflow:hidden;
+    background:transparent;text-align:center;overflow:hidden;
     padding:140px 24px;
   }
   .final-cta h2{
@@ -432,7 +438,8 @@
 
   /* ---------- Footer ---------- */
   footer{
-    background:var(--bg-void);
+    /* Slightly translucent glass background to let the gradient peek through */
+    background:rgba(5, 8, 15, 0.3);
     border-top:1px solid rgba(255,255,255,0.06);
     padding:60px 24px 32px;color:var(--white-faint);font-size:0.85rem;
   }

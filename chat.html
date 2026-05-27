@@ -89,7 +89,6 @@
     padding:18px 32px;
     display:flex;align-items:center;justify-content:space-between;
   }
-
   .logo{
     font-family:'Inter',sans-serif;font-weight:700;
     font-size:1.25rem;color:var(--white);
@@ -108,15 +107,14 @@
     0%,100%{opacity:1;transform:scale(1)}
     50%{opacity:0.2;transform:scale(1.4)}
   }
-
   .nav-links{display:flex;align-items:center;gap:32px;list-style:none}
   .nav-links a{
     color:var(--white-muted);text-decoration:none;
-    font-size:0.9rem;position:relative;transition:color 0.3s var(--ease);
+    font-size:0.9rem;transition:color 0.3s var(--ease);
   }
   .nav-links a:hover{color:var(--white)}
 
-  /* ---------- Glass card / Chat Window ---------- */
+  /* ---------- Glass ---------- */
   .glass{
     background:var(--bg-card);
     border:1px solid var(--border-glass);
@@ -126,18 +124,13 @@
     box-shadow:0 8px 32px rgba(0,0,0,0.4), 0 0 0 1px rgba(75,127,255,0.08);
   }
 
-  .chat-app-container {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 120px 24px 40px;
+  /* ---------- Chat layout ---------- */
+  .chat-app-container{
+    flex:1;display:flex;align-items:center;justify-content:center;
+    padding:120px 24px 40px;
   }
-
   .chat-window{
-    width:100%;
-    max-width:640px;
-    padding:24px;
+    width:100%;max-width:640px;padding:24px;
   }
   .chat-top{
     display:flex;align-items:center;justify-content:space-between;
@@ -150,7 +143,7 @@
     letter-spacing:-0.01em;
   }
   .chat-title .dot-ai{color:var(--electric);font-weight:500}
-  .listening{
+  .listening-badge{
     font-size:0.72rem;letter-spacing:0.05em;
     color:var(--electric-bright);
     background:rgba(75,127,255,0.08);
@@ -173,7 +166,10 @@
     border-radius:18px 18px 18px 4px;
     margin-right:auto;
   }
-  .typing{display:inline-flex;gap:5px;padding:14px 16px;background:rgba(255,255,255,0.04);border-radius:18px;margin-bottom:10px}
+  .typing{
+    display:inline-flex;gap:5px;padding:14px 16px;
+    background:rgba(255,255,255,0.04);border-radius:18px;margin-bottom:10px;
+  }
   .typing span{
     width:6px;height:6px;border-radius:50%;background:var(--electric);
     animation:bounce 1.2s infinite;
@@ -185,6 +181,7 @@
     30%{transform:translateY(-6px);opacity:1}
   }
 
+  /* ---------- Chat input bar ---------- */
   .chat-input{
     margin-top:18px;display:flex;gap:10px;align-items:center;
     background:rgba(5,8,15,0.6);
@@ -199,7 +196,12 @@
   .mic-btn{
     background:none;border:none;color:var(--electric);cursor:pointer;
     padding:8px;display:flex;align-items:center;
-    transition: color 0.3s ease;
+    transition:color 0.3s ease, transform 0.2s ease;
+    border-radius:50%;
+  }
+  .mic-btn:hover{
+    color:var(--electric-bright);
+    transform:scale(1.1);
   }
   .send-btn{
     background:var(--electric);color:var(--white);border:none;
@@ -209,6 +211,162 @@
   }
   .send-btn:hover{background:var(--electric-bright);box-shadow:0 0 18px rgba(75,127,255,0.4)}
 
+  /* ============================================================
+     VOICE MODE OVERLAY
+  ============================================================ */
+  .voice-overlay{
+    position:fixed;inset:0;
+    background:rgba(5,8,15,0.96);
+    -webkit-backdrop-filter:blur(24px);
+    backdrop-filter:blur(24px);
+    z-index:300;
+    display:none;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:40px;
+  }
+  .voice-overlay.active{display:flex}
+
+  /* Orb */
+  .voice-orb-wrap{
+    position:relative;
+    width:220px;height:220px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .voice-orb-ring{
+    position:absolute;
+    width:220px;height:220px;
+    border-radius:50%;
+    border:1px solid rgba(75,127,255,0.15);
+    animation:ringPulse 3s ease-in-out infinite;
+  }
+  .voice-orb-ring:nth-child(2){
+    width:190px;height:190px;
+    border-color:rgba(168,85,247,0.1);
+    animation-delay:0.5s;
+  }
+  @keyframes ringPulse{
+    0%,100%{transform:scale(1);opacity:0.5}
+    50%{transform:scale(1.08);opacity:1}
+  }
+  .voice-orb{
+    width:150px;height:150px;
+    border-radius:50%;
+    background:radial-gradient(circle at 35% 35%,
+      #6B9FFF 0%,
+      #4B7FFF 35%,
+      #7C3AED 70%,
+      #2D1B69 100%
+    );
+    box-shadow:
+      0 0 60px rgba(75,127,255,0.5),
+      0 0 120px rgba(124,58,237,0.25),
+      inset 0 0 40px rgba(255,255,255,0.05);
+    transition:all 0.3s var(--ease);
+    animation:orbIdle 3s ease-in-out infinite;
+    position:relative;z-index:1;
+  }
+
+  /* Orb states */
+  .voice-orb.state-listening{
+    animation:orbListen 1.8s ease-in-out infinite;
+    box-shadow:
+      0 0 80px rgba(75,127,255,0.65),
+      0 0 160px rgba(124,58,237,0.3),
+      inset 0 0 40px rgba(255,255,255,0.08);
+  }
+  .voice-orb.state-thinking{
+    animation:orbThink 1.2s ease-in-out infinite;
+    box-shadow:
+      0 0 60px rgba(168,85,247,0.5),
+      0 0 120px rgba(75,127,255,0.2),
+      inset 0 0 40px rgba(255,255,255,0.05);
+  }
+  .voice-orb.state-speaking{
+    animation:orbSpeak 0.5s ease-in-out infinite;
+    box-shadow:
+      0 0 100px rgba(107,159,255,0.7),
+      0 0 200px rgba(124,58,237,0.35),
+      inset 0 0 60px rgba(255,255,255,0.1);
+  }
+
+  @keyframes orbIdle{
+    0%,100%{transform:scale(1)}
+    50%{transform:scale(1.04)}
+  }
+  @keyframes orbListen{
+    0%,100%{transform:scale(1)}
+    50%{transform:scale(1.1)}
+  }
+  @keyframes orbThink{
+    0%,100%{transform:scale(0.97) rotate(0deg)}
+    50%{transform:scale(1.03) rotate(180deg)}
+  }
+  @keyframes orbSpeak{
+    0%,100%{transform:scale(1)}
+    25%{transform:scale(1.14)}
+    75%{transform:scale(0.95)}
+  }
+
+  /* Voice status text */
+  .voice-status-wrap{
+    display:flex;flex-direction:column;align-items:center;gap:10px;
+    text-align:center;
+  }
+  .voice-status{
+    font-size:1rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;
+    color:var(--electric-bright);
+    transition:color 0.3s ease;
+    min-height:24px;
+  }
+  .voice-status.state-thinking{color:rgba(168,85,247,0.9)}
+  .voice-status.state-speaking{color:var(--white)}
+
+  .voice-transcript{
+    font-size:1rem;color:var(--white-muted);
+    max-width:460px;line-height:1.6;
+    min-height:28px;
+    font-style:italic;
+    transition:opacity 0.3s ease;
+  }
+
+  /* End button */
+  .voice-end-btn{
+    background:transparent;
+    border:1px solid rgba(255,255,255,0.15);
+    color:var(--white-muted);
+    border-radius:50px;
+    padding:12px 32px;
+    font-family:inherit;font-size:0.9rem;font-weight:600;
+    cursor:pointer;
+    transition:all 0.3s var(--ease);
+    display:flex;align-items:center;gap:8px;
+  }
+  .voice-end-btn:hover{
+    border-color:rgba(255,100,100,0.5);
+    color:#ff6b6b;
+    background:rgba(255,100,100,0.06);
+  }
+  .voice-end-btn svg{width:16px;height:16px}
+
+  /* Voice mode hint at top of overlay */
+  .voice-hint{
+    position:absolute;top:32px;
+    font-size:0.8rem;color:var(--white-faint);
+    letter-spacing:0.05em;
+  }
+
+  /* Browser warning */
+  .browser-warn{
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+    background:rgba(255,100,50,0.12);
+    border:1px solid rgba(255,100,50,0.3);
+    color:#ffaa80;
+    border-radius:50px;padding:10px 22px;font-size:0.82rem;
+    z-index:400;display:none;
+    white-space:nowrap;
+  }
 </style>
 </head>
 <body>
@@ -217,6 +375,39 @@
 <div class="atmo-orb two" aria-hidden="true"></div>
 <div class="noise" aria-hidden="true"></div>
 
+<!-- Browser warning -->
+<div class="browser-warn" id="browserWarn">
+  ⚠️ Voice Mode works best in Chrome or Edge. Please switch browsers for full support.
+</div>
+
+<!-- ============================================================
+     VOICE MODE OVERLAY
+============================================================ -->
+<div class="voice-overlay" id="voiceOverlay" aria-modal="true" role="dialog" aria-label="Voice conversation mode">
+  <p class="voice-hint">Just speak naturally — interrupt anytime</p>
+
+  <div class="voice-orb-wrap">
+    <div class="voice-orb-ring"></div>
+    <div class="voice-orb-ring"></div>
+    <div class="voice-orb" id="voiceOrb"></div>
+  </div>
+
+  <div class="voice-status-wrap">
+    <p class="voice-status" id="voiceStatus">Listening...</p>
+    <p class="voice-transcript" id="voiceTranscript"></p>
+  </div>
+
+  <button class="voice-end-btn" id="voiceEndBtn" aria-label="End voice chat">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+    </svg>
+    End Voice Chat
+  </button>
+</div>
+
+<!-- ============================================================
+     NAVBAR
+============================================================ -->
 <nav class="nav" aria-label="Primary">
   <a href="index.html" class="logo" aria-label="unhesitated.ai home">
     <span>unhesitated<span class="dot-ai">.ai</span></span>
@@ -227,6 +418,9 @@
   </ul>
 </nav>
 
+<!-- ============================================================
+     MAIN CHAT
+============================================================ -->
 <main class="chat-app-container">
   <div class="glass chat-window">
     <div class="chat-top">
@@ -234,154 +428,326 @@
         <span class="pulse-dot" aria-hidden="true"></span>
         unhesitated<span class="dot-ai">.ai</span>
       </div>
-      <span class="listening">Ready</span>
+      <span class="listening-badge" id="statusBadge">Ready</span>
     </div>
 
-    <div class="msg ai">Hello! I am ready to listen. You can type to me, or click the microphone to practice speaking. Remember, there is no judgment here.</div>
+    <div class="msg ai">Hello! I am ready to listen. You can type below, or click the microphone to start a real-time voice conversation. Remember, there is no judgment here.</div>
 
-    <div id="live-chat-feed" style="display:flex;flex-direction:column;width:100%;"></div>
+    <div id="live-chat-feed" style="display:flex;flex-direction:column;width:100%;max-height:380px;overflow-y:auto;"></div>
 
     <div class="chat-input">
-      <input type="text" placeholder="Type or speak in any language..." aria-label="Message input" />
-      <button class="mic-btn" aria-label="Speak">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+      <input type="text" placeholder="Type or click mic for voice mode..." aria-label="Message input" />
+      <!-- Mic icon now launches Voice Mode -->
+      <button class="mic-btn" id="micBtn" aria-label="Start voice conversation" title="Start voice conversation">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
+          <rect x="9" y="3" width="6" height="12" rx="3"/>
+          <path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>
+        </svg>
       </button>
-      <button class="send-btn">Send</button>
+      <button class="send-btn" id="sendBtn">Send</button>
     </div>
   </div>
 </main>
 
+<!-- ============================================================
+     JAVASCRIPT
+============================================================ -->
 <script>
-  // ============================================================
-  // CHAT LOGIC 
-  // ============================================================
-  let mediaRecorder;
-  let audioChunks = [];  
-  let globalStream = null;
+  // ── DOM refs ──────────────────────────────────────────────
+  const micBtn        = document.getElementById('micBtn');
+  const sendBtn       = document.getElementById('sendBtn');
+  const chatInput     = document.querySelector('.chat-input input');
+  const chatFeed      = document.getElementById('live-chat-feed');
+  const statusBadge   = document.getElementById('statusBadge');
 
-  const micBtn   = document.querySelector('.mic-btn');
-  const sendBtn  = document.querySelector('.send-btn');
-  const chatInput = document.querySelector('.chat-input input');
-  const chatFeed = document.getElementById('live-chat-feed');
+  const voiceOverlay  = document.getElementById('voiceOverlay');
+  const voiceOrb      = document.getElementById('voiceOrb');
+  const voiceStatus   = document.getElementById('voiceStatus');
+  const voiceTranscript = document.getElementById('voiceTranscript');
+  const voiceEndBtn   = document.getElementById('voiceEndBtn');
+  const browserWarn   = document.getElementById('browserWarn');
 
-  // Stops recording and triggers the onstop handler which sends audio
-  function stopAndSendAudio() {
-    if (mediaRecorder && mediaRecorder.state === 'recording') {
-      mediaRecorder.stop();
-      micBtn.style.color = 'var(--electric)'; 
+  // ── Browser support check ─────────────────────────────────
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    browserWarn.style.display = 'block';
+    setTimeout(() => browserWarn.style.display = 'none', 6000);
+  }
+
+  // ══════════════════════════════════════════════════════════
+  //  TEXT CHAT  (unchanged behaviour)
+  // ══════════════════════════════════════════════════════════
+  sendBtn.addEventListener('click', async () => {
+    const text = chatInput.value.trim();
+    if (!text) return;
+    appendMsg('user', text);
+    chatInput.value = '';
+    showTyping();
+
+    try {
+      const res  = await fetch('/api/text-chat', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ message: text })
+      });
+      const data = await res.json();
+      removeTyping();
+      appendMsg('ai', data.message);
+      speakText(data.message);
+    } catch {
+      removeTyping();
+      appendMsg('ai', '<span style="color:#ff4b4b">Error connecting. Please try again.</span>');
+    }
+  });
+
+  chatInput.addEventListener('keypress', e => {
+    if (e.key === 'Enter') sendBtn.click();
+  });
+
+  document.addEventListener('click', e => {
+    // Cancel TTS on any click unless it's inside the voice overlay
+    if (!voiceOverlay.contains(e.target) && window.speechSynthesis.speaking) {
+      window.speechSynthesis.cancel();
+    }
+  });
+
+  // ══════════════════════════════════════════════════════════
+  //  VOICE MODE
+  // ══════════════════════════════════════════════════════════
+  let recognition       = null;
+  let isVoiceMode       = false;
+  let isSpeaking        = false;
+  let isThinking        = false;
+  let silenceTimer      = null;
+  let accumulatedText   = '';
+
+  // ── Open / Close ──────────────────────────────────────────
+  micBtn.addEventListener('click', openVoiceMode);
+  voiceEndBtn.addEventListener('click', closeVoiceMode);
+
+  function openVoiceMode() {
+    if (!SpeechRecognition) {
+      browserWarn.style.display = 'block';
+      setTimeout(() => browserWarn.style.display = 'none', 5000);
+      return;
+    }
+    isVoiceMode = true;
+    voiceOverlay.classList.add('active');
+    setOrbState('listening');
+    startRecognition();
+  }
+
+  function closeVoiceMode() {
+    isVoiceMode = false;
+    voiceOverlay.classList.remove('active');
+    stopRecognition();
+    window.speechSynthesis.cancel();
+    isSpeaking  = false;
+    isThinking  = false;
+    clearTimeout(silenceTimer);
+    accumulatedText   = '';
+    voiceTranscript.textContent = '';
+    statusBadge.textContent = 'Ready';
+  }
+
+  // ── Speech Recognition ────────────────────────────────────
+  function startRecognition() {
+    if (!SpeechRecognition) return;
+
+    recognition = new SpeechRecognition();
+    recognition.continuous      = true;
+    recognition.interimResults  = true;
+    recognition.lang            = 'en-US';
+
+    recognition.onstart = () => {
+      if (!isThinking) setOrbState('listening');
+    };
+
+    recognition.onresult = (event) => {
+      // Barge-in: if AI is speaking, interrupt it immediately
+      if (isSpeaking) {
+        window.speechSynthesis.cancel();
+        isSpeaking = false;
+        setOrbState('listening');
+      }
+
+      let interim = '';
+      let final   = '';
+
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const t = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          final += t;
+        } else {
+          interim += t;
+        }
+      }
+
+      accumulatedText += final;
+      voiceTranscript.textContent = (accumulatedText + interim).trim();
+
+      // Silence detection — send after 1.5s of no new speech
+      clearTimeout(silenceTimer);
+      if (accumulatedText.trim() || final.trim()) {
+        silenceTimer = setTimeout(() => {
+          const toSend = accumulatedText.trim();
+          if (toSend) {
+            accumulatedText = '';
+            voiceTranscript.textContent = '';
+            sendVoiceMessage(toSend);
+          }
+        }, 1500);
+      }
+    };
+
+    recognition.onerror = (e) => {
+      // 'no-speech' is normal — just keep going
+      if (e.error === 'no-speech') return;
+      if (e.error === 'aborted')   return;
+      console.warn('Speech recognition error:', e.error);
+    };
+
+    recognition.onend = () => {
+      // Auto-restart if still in voice mode and not thinking/speaking
+      if (isVoiceMode && !isThinking) {
+        try { recognition.start(); } catch {}
+      }
+    };
+
+    try { recognition.start(); } catch {}
+  }
+
+  function stopRecognition() {
+    if (recognition) {
+      try { recognition.abort(); } catch {}
+      recognition = null;
     }
   }
 
-  // MIC BUTTON — only starts recording
-  if (micBtn) {
-    micBtn.addEventListener('click', async () => {
-      // Request mic access if not already granted
-      if (!globalStream) {
-        try {
-          globalStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        } catch (err) {
-          alert("Please allow microphone access to talk to unhesitated.ai");
-          return;
+  // ── Send voice message to API ─────────────────────────────
+  async function sendVoiceMessage(text) {
+    if (!text) return;
+
+    // Stop listening while thinking
+    stopRecognition();
+    setOrbState('thinking');
+    isThinking = true;
+
+    // Show message in chat feed
+    appendMsg('user', text);
+    showTyping();
+
+    try {
+      const res  = await fetch('/api/text-chat', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ message: text })
+      });
+      const data = await res.json();
+      removeTyping();
+      appendMsg('ai', data.message);
+
+      // Speak the response
+      isThinking = false;
+      setOrbState('speaking');
+      speakVoice(data.message, () => {
+        // After speaking ends, go back to listening
+        if (isVoiceMode) {
+          isSpeaking = false;
+          setOrbState('listening');
+          startRecognition();
         }
+      });
+
+    } catch {
+      removeTyping();
+      appendMsg('ai', '<span style="color:#ff4b4b">Something went wrong. Please try again.</span>');
+      isThinking = false;
+      isSpeaking = false;
+      if (isVoiceMode) {
+        setOrbState('listening');
+        startRecognition();
       }
-
-      // Start recording only if not already recording
-      if (!mediaRecorder || mediaRecorder.state === 'inactive') {
-        mediaRecorder = new MediaRecorder(globalStream);
-        audioChunks = [];  
-
-        mediaRecorder.ondataavailable = event => {
-          if (event.data.size > 0) audioChunks.push(event.data);
-        };
-
-        // What happens after recording stops
-        mediaRecorder.onstop = async () => {
-          chatFeed.innerHTML += `<div class="typing" aria-label="AI is typing"><span></span><span></span><span></span></div>`;
-
-          const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-          const formData  = new FormData();
-          formData.append('audio', audioBlob, 'recording.webm');
-
-          try {
-            const response = await fetch('/api/chat', { method: 'POST', body: formData });
-            const data = await response.json();
-            
-            // Remove typing indicator
-            const typingInd = chatFeed.querySelector('.typing:last-child');
-            if(typingInd) typingInd.remove();
-            
-            chatFeed.innerHTML += `<div class="msg ai">${data.message}</div>`;
-            if (window.speechSynthesis.speaking) window.speechSynthesis.cancel();
-            const speech = new SpeechSynthesisUtterance(data.message);
-            speech.rate = 1.0;
-            window.speechSynthesis.speak(speech);
-          } catch (error) {
-            chatFeed.innerHTML += `<div class="msg ai" style="color:#ff4b4b;">Oops! Something went wrong connecting to the brain.</div>`;
-          }
-
-          audioChunks = [];
-          globalStream.getTracks().forEach(track => track.stop());
-          globalStream = null;
-        };
-
-        mediaRecorder.start();
-        micBtn.style.color = '#ff4b4b'; 
-        chatFeed.innerHTML += `<div class="msg user" style="opacity:0.6;font-style:italic;">Listening to your voice...</div>`;
-      }
-    });
+    }
   }
 
-  // SEND BUTTON — stops mic recording OR sends typed text
-  if (sendBtn) {
-    sendBtn.addEventListener('click', async () => {
+  // ── Text-to-speech (voice mode) ───────────────────────────
+  function speakVoice(text, onDone) {
+    window.speechSynthesis.cancel();
+    isSpeaking = true;
 
-      // If mic is currently recording, stop it and send the audio
-      if (mediaRecorder && mediaRecorder.state === 'recording') {
-        stopAndSendAudio();
-        return; 
-      }
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate   = 1.0;
+    utterance.pitch  = 1.0;
 
-      // Otherwise handle typed text
-      const textMessage = chatInput.value.trim();
-      if (textMessage !== '') {
-        chatFeed.innerHTML += `<div class="msg user">${textMessage}</div>`;
-        chatInput.value = '';
-        chatFeed.innerHTML += `<div class="typing"><span></span><span></span><span></span></div>`;
+    // Try to pick a natural-sounding voice
+    const voices = window.speechSynthesis.getVoices();
+    const preferred = voices.find(v =>
+      v.name.includes('Google') ||
+      v.name.includes('Samantha') ||
+      v.name.includes('Karen') ||
+      v.name.includes('Daniel')
+    );
+    if (preferred) utterance.voice = preferred;
 
-        try {
-          const response = await fetch('/api/text-chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: textMessage })
-          });
-          const data = await response.json();
-          
-          // Remove typing indicator
-          const typingInd = chatFeed.querySelector('.typing:last-child');
-          if(typingInd) typingInd.remove();
-            
-          chatFeed.innerHTML += `<div class="msg ai">${data.message}</div>`;
-          if (window.speechSynthesis.speaking) window.speechSynthesis.cancel();
-          const speech = new SpeechSynthesisUtterance(data.message);
-          window.speechSynthesis.speak(speech);
-        } catch (error) {
-          chatFeed.innerHTML += `<div class="msg ai" style="color:red;">Error connecting to brain.</div>`;
-        }
-      }
-    });
+    utterance.onend = () => {
+      isSpeaking = false;
+      if (onDone) onDone();
+    };
+    utterance.onerror = () => {
+      isSpeaking = false;
+      if (onDone) onDone();
+    };
+
+    window.speechSynthesis.speak(utterance);
   }
 
-  // ENTER KEY — triggers Send button
-  if (chatInput) {
-    chatInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') sendBtn.click();
-    });
+  // ── Text-to-speech (text chat) ────────────────────────────
+  function speakText(text) {
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate  = 1.0;
+    window.speechSynthesis.speak(utterance);
   }
 
-  // Stop voice if user clicks anywhere on the page
-  document.addEventListener('click', () => {
-    if (window.speechSynthesis.speaking) window.speechSynthesis.cancel();
-  });
+  // ── Orb visual state ──────────────────────────────────────
+  function setOrbState(state) {
+    voiceOrb.className    = 'voice-orb state-' + state;
+    voiceStatus.className = 'voice-status state-' + state;
+
+    const labels = {
+      listening : 'Listening...',
+      thinking  : 'Thinking...',
+      speaking  : 'Speaking...'
+    };
+    voiceStatus.textContent = labels[state] || '';
+  }
+
+  // ── Chat feed helpers ─────────────────────────────────────
+  function appendMsg(role, html) {
+    const div = document.createElement('div');
+    div.className = 'msg ' + role;
+    div.innerHTML = html;
+    chatFeed.appendChild(div);
+    chatFeed.scrollTop = chatFeed.scrollHeight;
+  }
+
+  function showTyping() {
+    const div = document.createElement('div');
+    div.className = 'typing';
+    div.id = 'typingIndicator';
+    div.innerHTML = '<span></span><span></span><span></span>';
+    chatFeed.appendChild(div);
+    chatFeed.scrollTop = chatFeed.scrollHeight;
+  }
+
+  function removeTyping() {
+    const t = document.getElementById('typingIndicator');
+    if (t) t.remove();
+  }
+
+  // Pre-load voices (Chrome loads them async)
+  window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
 </script>
 </body>
 </html>

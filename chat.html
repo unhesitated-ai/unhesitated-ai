@@ -459,6 +459,7 @@
       speakText(data.message);
     } catch (err) {
       removeTyping();
+      console.error("Text chat fetch error:", err);
       appendMsg('ai', '<span style="color:#ff4b4b">Error connecting to the backend API. Please check your Render logs.</span>');
     }
   });
@@ -473,7 +474,7 @@
     }
   });
 
-  // VOICE MODE (Continuous Listening Architecture)
+  // VOICE MODE
   let recognition       = null;
   let isVoiceMode       = false;
   let isSpeaking        = false;
@@ -482,6 +483,7 @@
   let silenceTimer      = null;
   let accumulatedText   = '';
 
+  // Initialize recognition exactly ONCE
   function initRecognition() {
     if (!SpeechRecognition || recognition) return;
 
@@ -498,9 +500,6 @@
     };
 
     recognition.onresult = (event) => {
-      // Software mute: ignore mic if waiting for API response to prevent overlap
-      if (isThinking) return;
-
       let interim = '';
       let final   = '';
 
@@ -515,7 +514,7 @@
 
       const newSpeech = (final + interim).trim();
 
-      // BARGE-IN: If AI is speaking and actual words are caught, instantly shut off the AI.
+      // BARGE-IN FIX: Only stop the AI if actual words/text are detected by the microphone.
       if (isSpeaking && newSpeech.length > 0) {
         window.speechSynthesis.cancel();
         isSpeaking = false;
@@ -539,6 +538,7 @@
     };
 
     recognition.onerror = (e) => {
+      console.warn("Speech Recognition Error:", e.error);
       if (e.error === 'not-allowed') {
         alert("Microphone access is blocked! Please click the lock icon in your URL bar, allow the microphone, and refresh the page.");
         closeVoiceMode();
@@ -547,13 +547,12 @@
 
     recognition.onend = () => {
       isListening = false;
-      // Restart naturally if it idles out, maintaining continuous listening.
-      if (isVoiceMode) {
+      if (isVoiceMode && !isThinking && !isSpeaking) {
         setTimeout(() => {
           if (isVoiceMode && !isListening) {
              try { recognition.start(); } catch(err) {}
           }
-        }, 400);
+        }, 500);
       }
     };
   }
@@ -594,6 +593,9 @@
   async function sendVoiceMessage(text) {
     if (!text) return;
 
+    if (recognition) {
+        try { recognition.stop(); } catch(e) {}
+    }
     setOrbState('thinking');
     isThinking = true;
 
@@ -616,8 +618,11 @@
       isThinking = false;
       setOrbState('speaking');
 
+      if (isVoiceMode) {
+        try { recognition.start(); } catch(err) {}
+      }
+
       speakVoice(data.message, () => {
-        // Only switch back to listening orb if we weren't already interrupted
         if (isVoiceMode && !isThinking) {
           isSpeaking = false;
           setOrbState('listening');
@@ -631,6 +636,7 @@
       isSpeaking = false;
       if (isVoiceMode) {
         setOrbState('listening');
+        setTimeout(() => { try { recognition.start(); } catch(e){} }, 1000);
       }
     }
   }
@@ -656,7 +662,7 @@
       isSpeaking = false;
       if (onDone) onDone();
     };
-    utterance.onerror = () => {
+    utterance.onerror = (e) => {
       isSpeaking = false;
       if (onDone) onDone();
     };

@@ -459,7 +459,6 @@
       speakText(data.message);
     } catch (err) {
       removeTyping();
-      console.error("Text chat fetch error:", err);
       appendMsg('ai', '<span style="color:#ff4b4b">Error connecting to the backend API. Please check your Render logs.</span>');
     }
   });
@@ -474,7 +473,7 @@
     }
   });
 
-  // VOICE MODE
+  // VOICE MODE (Continuous Listening Architecture)
   let recognition       = null;
   let isVoiceMode       = false;
   let isSpeaking        = false;
@@ -483,7 +482,6 @@
   let silenceTimer      = null;
   let accumulatedText   = '';
 
-  // CRITICAL FIX: Initialize recognition exactly ONCE to prevent memory leaks and crash loops.
   function initRecognition() {
     if (!SpeechRecognition || recognition) return;
 
@@ -499,21 +497,9 @@
       }
     };
 
-    recognition.onsoundstart = () => {
-      // BARGE-IN FIX: Stop AI speech the exact millisecond user sound is detected
-      if (isSpeaking) {
-        window.speechSynthesis.cancel();
-        isSpeaking = false;
-        setOrbState('listening');
-      }
-    };
-
     recognition.onresult = (event) => {
-      if (isSpeaking) {
-        window.speechSynthesis.cancel();
-        isSpeaking = false;
-        setOrbState('listening');
-      }
+      // Software mute: ignore mic if waiting for API response to prevent overlap
+      if (isThinking) return;
 
       let interim = '';
       let final   = '';
@@ -525,6 +511,15 @@
         } else {
           interim += t;
         }
+      }
+
+      const newSpeech = (final + interim).trim();
+
+      // BARGE-IN: If AI is speaking and actual words are caught, instantly shut off the AI.
+      if (isSpeaking && newSpeech.length > 0) {
+        window.speechSynthesis.cancel();
+        isSpeaking = false;
+        setOrbState('listening');
       }
 
       accumulatedText += final;
@@ -544,7 +539,6 @@
     };
 
     recognition.onerror = (e) => {
-      console.warn("Speech Recognition Error:", e.error);
       if (e.error === 'not-allowed') {
         alert("Microphone access is blocked! Please click the lock icon in your URL bar, allow the microphone, and refresh the page.");
         closeVoiceMode();
@@ -553,13 +547,13 @@
 
     recognition.onend = () => {
       isListening = false;
-      // Only restart if we are actively in voice mode and the AI isn't processing a backend request.
-      if (isVoiceMode && !isThinking && !isSpeaking) {
+      // Restart naturally if it idles out, maintaining continuous listening.
+      if (isVoiceMode) {
         setTimeout(() => {
           if (isVoiceMode && !isListening) {
              try { recognition.start(); } catch(err) {}
           }
-        }, 500);
+        }, 400);
       }
     };
   }
@@ -576,7 +570,7 @@
     isVoiceMode = true;
     voiceOverlay.classList.add('active');
     setOrbState('listening');
-    initRecognition(); // Create object once
+    initRecognition(); 
     try { 
       if (!isListening) recognition.start(); 
     } catch(err) {}
@@ -600,9 +594,6 @@
   async function sendVoiceMessage(text) {
     if (!text) return;
 
-    if (recognition) {
-        try { recognition.stop(); } catch(e) {}
-    }
     setOrbState('thinking');
     isThinking = true;
 
@@ -625,12 +616,8 @@
       isThinking = false;
       setOrbState('speaking');
 
-      // Turn microphone back on right before speaking so it catches barge-ins
-      if (isVoiceMode) {
-        try { recognition.start(); } catch(err) {}
-      }
-
       speakVoice(data.message, () => {
+        // Only switch back to listening orb if we weren't already interrupted
         if (isVoiceMode && !isThinking) {
           isSpeaking = false;
           setOrbState('listening');
@@ -644,7 +631,6 @@
       isSpeaking = false;
       if (isVoiceMode) {
         setOrbState('listening');
-        setTimeout(() => { try { recognition.start(); } catch(e){} }, 1000);
       }
     }
   }
@@ -670,7 +656,7 @@
       isSpeaking = false;
       if (onDone) onDone();
     };
-    utterance.onerror = (e) => {
+    utterance.onerror = () => {
       isSpeaking = false;
       if (onDone) onDone();
     };

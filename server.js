@@ -206,18 +206,21 @@ app.get('/api/realtime-token', async (req, res) => {
   const modelDef = MODELS[modelKey] || MODELS['nova'];
 
   try {
-    const response = await fetch('https://api.openai.com/v1/realtime/sessions', {
+    const response = await fetch('https://api.openai.com/v1/realtime/client_secrets', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-realtime-preview-2024-12-17',
-        voice: modelDef.ttsVoice,
-        instructions: buildSystemPrompt(modelKey),
-        input_audio_transcription: { model: 'whisper-1' },
-        turn_detection: { type: 'server_vad' }
+        session: {
+          type: 'realtime',
+          model: 'gpt-4o-realtime-preview-2024-12-17',
+          voice: modelDef.ttsVoice,
+          instructions: buildSystemPrompt(modelKey),
+          input_audio_transcription: { model: 'whisper-1' },
+          turn_detection: { type: 'server_vad' }
+        }
       }),
     });
 

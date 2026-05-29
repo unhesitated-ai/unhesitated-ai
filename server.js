@@ -53,10 +53,10 @@ app.get('/api/realtime-token', async (req, res) => {
                     type: 'realtime',
                     model: 'gpt-4o-realtime-preview-2024-12-17',
                     instructions: systemPrompt,
-                    // UPDATED: Voice is now strictly nested under audio.output
                     audio: {
                         output: {
-                            voice: 'nova'
+                            // UPDATED: Changed from 'nova' to 'shimmer' (Supported Realtime voice)
+                            voice: 'shimmer'
                         }
                     }
                 }
@@ -78,6 +78,7 @@ app.post('/api/tts', async (req, res) => {
     try {
         const speech = await openai.audio.speech.create({
             model : 'tts-1', 
+            // Standard TTS still supports 'nova'
             voice : 'nova',    
             input : text
         });

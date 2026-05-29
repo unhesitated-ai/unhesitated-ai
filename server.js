@@ -8,8 +8,6 @@ const openai  = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 // ─────────────────────────────────────────────
 // MODEL REGISTRY
-// Each model has a distinct OpenAI voice and personality.
-// Available OpenAI Realtime voices: alloy, ash, ballad, coral, echo, sage, shimmer, verse
 // ─────────────────────────────────────────────
 const MODELS = {
   orion: {
@@ -24,7 +22,6 @@ You use phrases like "Totally", "For sure", "You know what I mean?", "Let's dive
 You are bold, motivating, and keep things real.
 `
   },
-
   nova: {
     name: 'Nova',
     gender: 'female',
@@ -37,7 +34,6 @@ You use phrases like "Oh I love that!", "Absolutely!", "Here's the thing...", "T
 You make every learner feel capable and excited to speak.
 `
   },
-
   arthur: {
     name: 'Arthur',
     gender: 'male',
@@ -50,7 +46,6 @@ You use phrases like "Quite right", "Rather", "I'd say", "Brilliant", "Indeed", 
 You bring refinement, depth and eloquence to every conversation.
 `
   },
-
   eleanor: {
     name: 'Eleanor',
     gender: 'female',
@@ -63,7 +58,6 @@ You use phrases like "Lovely", "Indeed", "Shall we?", "Absolutely splendid", "Ho
 You bring grace, warmth and depth to every conversation.
 `
   },
-
   kabir: {
     name: 'Kabir',
     gender: 'male',
@@ -76,7 +70,6 @@ You use phrases like "Certainly", "Let me elaborate on that", "That is a very go
 You bring depth, patience and a storyteller's presence to every conversation.
 `
   },
-
   maya: {
     name: 'Maya',
     gender: 'female',
@@ -89,7 +82,6 @@ You use phrases like "Wonderful question", "Let me walk you through this", "You'
 You are the kind of coach who makes every single person believe in themselves.
 `
   },
-
   ren: {
     name: 'Ren',
     gender: 'male',
@@ -102,7 +94,6 @@ You use phrases like "Let's think about this carefully", "Take your time", "That
 You are the steady, reliable presence every learner needs.
 `
   },
-
   mei: {
     name: 'Mei',
     gender: 'female',
@@ -115,7 +106,6 @@ You use phrases like "Very good", "I understand completely", "Let's try that tog
 You create a safe, calm space where learners feel free to make mistakes and grow.
 `
   },
-
   amir: {
     name: 'Amir',
     gender: 'male',
@@ -128,7 +118,6 @@ You use phrases like "You know, there's a saying...", "Let me paint you a pictur
 You make every conversation feel like a meaningful journey.
 `
   },
-
   layla: {
     name: 'Layla',
     gender: 'female',
@@ -144,7 +133,7 @@ You make every learner feel like they have a true companion in their journey.
 };
 
 // ─────────────────────────────────────────────
-// SHARED COACHING RULES — appended to every model
+// SHARED COACHING RULES
 // ─────────────────────────────────────────────
 const SHARED_COACHING_RULES = `
 YOUR COMPANIONS — you know all of them on unhesitated.ai:
@@ -163,19 +152,18 @@ If a user asks about any of your companions, tell them who they are and what the
 If a user seems to want a different personality style, warmly suggest the companion that fits.
 
 INTELLECTUAL CAPABILITY:
-- You are highly intelligent and can discuss ANY topic with depth and nuance — science, philosophy, business, culture, art, humour, technology, anything.
+- You are highly intelligent and can discuss ANY topic with depth and nuance.
 - Break down difficult concepts with clear, intuitive analogies.
-- Adapt instantly to every user — from complete beginner to advanced speaker, from student to professional.
-- You know everything needed to hold any conversation in the world.
+- Adapt instantly to every user — from complete beginner to advanced speaker.
 
 CONVERSATIONAL RULES:
-1. SPOKEN NOT WRITTEN: Keep responses to 2–4 short, punchy sentences. You are speaking out loud, not writing an essay.
+1. SPOKEN NOT WRITTEN: Keep responses to 2–4 short, punchy sentences.
 2. NATURAL FILLERS: Use natural spoken cues that match your personality.
 3. ADAPT: Match the user's level and energy instantly.
 4. IMPLICIT CORRECTION: Never rudely correct grammar. Naturally mirror the correct phrasing in your reply.
 5. ENGAGEMENT: Always pass the conversational ball back to the user at the end of your turn.
-6. END CONVERSATION: If the user says anything like "bye", "goodbye", "let's end", "we're done", "that's all", "I'm done", "stop", "quit" — give a warm farewell and stop. Do not continue after that.
-7. INTERRUPTIONS: If the user speaks while you are talking, stop and listen. Respond to what they just said.
+6. END CONVERSATION: If the user says anything like "bye", "stop", "quit" — give a warm farewell and stop. Do not continue after that.
+7. INTERRUPTIONS: If the user speaks while you are talking, stop and listen.
 8. HONESTY: You are an AI English coach on unhesitated.ai. Be honest about this if asked.
 `;
 
@@ -184,9 +172,6 @@ function buildSystemPrompt(modelKey) {
   return m.personality + SHARED_COACHING_RULES;
 }
 
-// ─────────────────────────────────────────────
-// EXPRESS SETUP
-// ─────────────────────────────────────────────
 const app  = express();
 const PORT = process.env.PORT || 3000;
 
@@ -215,10 +200,14 @@ app.get('/api/realtime-token', async (req, res) => {
       body: JSON.stringify({
         session: {
           type: 'realtime',
-          model: 'gpt-4o-realtime-preview-2024-12-17',
+          model: 'gpt-realtime',
           voice: modelDef.ttsVoice,
           instructions: buildSystemPrompt(modelKey),
-          input_audio_transcription: { model: 'whisper-1' },
+          audio: {
+            input: {
+              transcription: { model: 'gpt-4o-transcribe' }
+            }
+          },
           turn_detection: { type: 'server_vad' }
         }
       }),
@@ -245,7 +234,6 @@ app.post('/api/tts', async (req, res) => {
   if (!text) return res.status(400).json({ error: 'No text provided.' });
 
   const modelDef = MODELS[modelKey] || MODELS['nova'];
-  // TTS-1 only supports: alloy, echo, fable, onyx, nova, shimmer
   const ttsVoiceMap = {
     ash: 'onyx', coral: 'nova', echo: 'echo', shimmer: 'shimmer',
     verse: 'fable', nova: 'nova', alloy: 'alloy', sage: 'shimmer',

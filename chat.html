@@ -1,852 +1,787 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Chat | unhesitated.ai</title>
 
-<title>unhesitated.ai</title>
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
 
 <style>
-
 :root{
-  --bg:#050816;
-  --panel:#0d1325;
-  --panel2:#121a31;
-  --border:rgba(255,255,255,0.08);
-  --text:#ffffff;
-  --muted:rgba(255,255,255,0.6);
-  --blue:#4B7FFF;
-  --blue2:#7da2ff;
+  --bg-void:#03050D;
+  --bg-deep:#080D1A;
+  --electric:#4B7FFF;
+  --electric-bright:#6B9FFF;
+  --white:#FFFFFF;
+  --white-muted:rgba(255,255,255,0.60);
+  --border-glass:rgba(255,255,255,0.07);
+  --ease:cubic-bezier(0.25,0.46,0.45,0.94);
 }
 
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-}
+*{ margin:0; padding:0; box-sizing:border-box; }
 
 body{
   font-family:'DM Sans',sans-serif;
-  background:radial-gradient(circle at top,#0c1738,#050816 70%);
-  color:white;
+  background:var(--bg-void);
+  color:var(--white);
+  overflow-x:hidden;
   min-height:100vh;
-  overflow:hidden;
+  position:relative;
 }
 
-/* BACKGROUND */
-
-.bg-glow{
-  position:fixed;
-  width:700px;
-  height:700px;
-  border-radius:50%;
-  filter:blur(120px);
-  pointer-events:none;
+#starCanvas{
+  position:fixed; inset:0; width:100%; height:100%;
+  z-index:0; pointer-events:none;
 }
 
-.bg-glow.one{
-  top:-250px;
-  left:-250px;
-  background:rgba(75,127,255,0.12);
+.atmo-orb{
+  position:fixed; border-radius:50%;
+  filter:blur(90px); pointer-events:none; z-index:0;
+}
+.atmo-orb.one{
+  width:700px; height:700px; top:-200px; left:-200px;
+  background:radial-gradient(circle,rgba(75,127,255,0.08),transparent 70%);
+}
+.atmo-orb.two{
+  width:900px; height:900px; bottom:-250px; right:-250px;
+  background:radial-gradient(circle,rgba(168,85,247,0.08),transparent 70%);
 }
 
-.bg-glow.two{
-  bottom:-300px;
-  right:-300px;
-  background:rgba(140,90,255,0.12);
+/* NAV */
+.nav{
+  position:fixed; top:0; left:0; right:0; z-index:100;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:18px 32px;
+  backdrop-filter:blur(20px);
+  background:rgba(3,5,13,0.82);
+  border-bottom:1px solid rgba(255,255,255,0.05);
 }
+.logo{
+  text-decoration:none; color:white;
+  display:flex; align-items:center; gap:8px;
+}
+.dot-ai{ color:var(--electric); }
+.pulse-dot{
+  width:7px; height:7px; border-radius:50%;
+  background:var(--electric); box-shadow:0 0 12px var(--electric);
+  animation:pulse 2s infinite;
+}
+@keyframes pulse{
+  0%,100%{transform:scale(1);opacity:1}
+  50%{transform:scale(1.5);opacity:0.2}
+}
+.nav-links{ list-style:none; }
+.nav-links a{ color:var(--white-muted); text-decoration:none; font-size:0.9rem; }
 
 /* MAIN */
-
-.wrapper{
-  position:relative;
-  z-index:2;
-  width:100%;
-  min-height:100vh;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  padding:40px 20px;
+main{
+  min-height:100vh; display:flex;
+  justify-content:center; align-items:center;
+  padding:120px 24px 40px;
+  position:relative; z-index:2;
 }
 
-.chat-shell{
-  width:100%;
-  max-width:720px;
-  height:90vh;
-
-  background:rgba(12,18,35,0.82);
-
-  border:1px solid var(--border);
-
+.glass{
+  width:100%; max-width:680px;
+  border-radius:24px;
+  background:rgba(8,13,26,0.78);
+  border:1px solid rgba(255,255,255,0.06);
   backdrop-filter:blur(18px);
-
-  border-radius:28px;
-
-  display:flex;
-  flex-direction:column;
-
-  overflow:hidden;
+  padding:30px;
+  box-shadow:0 0 60px rgba(0,0,0,0.45), inset 0 0 1px rgba(255,255,255,0.06);
 }
 
-/* HEADER */
-
-.topbar{
-  padding:22px 28px;
-  border-bottom:1px solid var(--border);
-
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
+.chat-top{
+  display:flex; justify-content:center; align-items:center; margin-bottom:26px;
+}
+.chat-title{
+  display:flex; align-items:center; gap:10px;
+  font-family:'Sora',sans-serif; font-weight:700; font-size:1.05rem;
 }
 
-.logo{
+.phrase-strip{
+  display:flex; flex-direction:column; align-items:center;
+  margin-bottom:24px; padding:14px 18px;
+  background:rgba(75,127,255,0.05);
+  border:1px solid rgba(75,127,255,0.12);
+  border-radius:16px;
+}
+.phrase-label{
+  font-size:0.7rem; letter-spacing:0.12em; text-transform:uppercase;
+  color:rgba(107,159,255,0.55); margin-bottom:6px;
   font-family:'Sora',sans-serif;
-  font-weight:700;
-  font-size:1.1rem;
 }
+.phrase-text{ font-family:'Sora',sans-serif; font-size:1.12rem; font-weight:600; }
+.phrase-meaning{ color:var(--white-muted); margin-top:4px; font-size:0.82rem; }
 
-.logo span{
-  color:var(--blue);
-}
-
-.status{
-  font-size:0.85rem;
-  color:var(--muted);
-}
-
-/* COMPANIONS */
-
-.companions{
-  padding:22px;
-  display:grid;
-  grid-template-columns:repeat(5,1fr);
-  gap:12px;
-  border-bottom:1px solid var(--border);
-}
-
-@media(max-width:700px){
-  .companions{
-    grid-template-columns:repeat(2,1fr);
-  }
-}
-
-.companion{
-  background:rgba(255,255,255,0.03);
-  border:1px solid rgba(255,255,255,0.06);
-  border-radius:18px;
-  padding:18px 10px;
-  text-align:center;
-  cursor:pointer;
-  transition:0.25s ease;
-}
-
-.companion:hover{
-  transform:translateY(-2px);
-  border-color:rgba(75,127,255,0.35);
-}
-
-.companion.active{
-  background:rgba(75,127,255,0.12);
-  border-color:rgba(75,127,255,0.6);
-}
-
-.avatar{
-  width:52px;
-  height:52px;
-  margin:auto;
-  margin-bottom:12px;
-
-  border-radius:50%;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  font-size:1.3rem;
-
-  background:radial-gradient(circle,#4B7FFF,#13214a);
-}
-
-.cname{
+.topics-label{
+  text-align:center; margin-bottom:10px;
+  font-size:0.72rem; letter-spacing:0.12em;
+  color:rgba(255,255,255,0.28); text-transform:uppercase;
   font-family:'Sora',sans-serif;
-  font-size:0.92rem;
 }
-
-/* FEED */
-
-.feed{
-  flex:1;
-  overflow-y:auto;
-  padding:24px;
-
-  display:flex;
-  flex-direction:column;
-  gap:14px;
+.planets{
+  display:flex; gap:10px; flex-wrap:wrap;
+  justify-content:center; margin-bottom:40px;
 }
-
-.msg{
-  max-width:80%;
-  padding:14px 16px;
-  border-radius:18px;
-  line-height:1.5;
-  font-size:0.95rem;
+.planet{
+  padding:7px 16px; border-radius:50px;
+  border:1px solid rgba(75,127,255,0.22);
+  background:rgba(75,127,255,0.05);
+  color:rgba(255,255,255,0.7);
+  cursor:pointer; transition:all .25s ease; font-size:0.84rem;
 }
-
-.msg.user{
-  align-self:flex-end;
+.planet:hover,.planet.active{
   background:rgba(75,127,255,0.18);
-  border:1px solid rgba(75,127,255,0.25);
+  border-color:rgba(107,159,255,0.6);
+  color:white; transform:translateY(-2px);
 }
 
+/* CHAT FEED */
+#live-chat-feed{
+  display:flex; flex-direction:column; gap:12px;
+  width:100%; max-height:320px; overflow-y:auto; margin-bottom:20px;
+}
+.msg{
+  padding:13px 16px; border-radius:18px;
+  max-width:84%; line-height:1.6; font-size:0.93rem;
+}
+.msg.user{
+  margin-left:auto;
+  background:rgba(75,127,255,0.14);
+  border:1px solid rgba(75,127,255,0.24);
+}
 .msg.ai{
-  align-self:flex-start;
+  margin-right:auto;
   background:rgba(255,255,255,0.04);
-  border:1px solid rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.07);
 }
 
-/* CONTROLS */
-
-.controls{
-  padding:26px;
-  border-top:1px solid var(--border);
-
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:18px;
+/* ORB */
+.orb-section{
+  width:100%; display:flex;
+  justify-content:center; align-items:center;
+  padding-top:10px; padding-bottom:14px;
 }
-
-.orb{
-  width:140px;
-  height:140px;
-  border-radius:50%;
-  cursor:pointer;
-
-  display:flex;
-  justify-content:center;
-  align-items:center;
-
-  background:
-    radial-gradient(circle at 30% 30%,
-    rgba(255,255,255,0.22),
-    rgba(18,33,82,1));
-
-  box-shadow:
-    0 0 50px rgba(75,127,255,0.35),
-    inset 0 0 25px rgba(255,255,255,0.04);
-
-  transition:0.3s ease;
+.orb-shell{
+  width:150px; height:150px; border-radius:50%;
+  position:relative; cursor:pointer;
+  display:flex; justify-content:center; align-items:center;
+  transition:transform 1.8s cubic-bezier(0.22,1,0.36,1), box-shadow 0.8s ease;
+  background:radial-gradient(circle at 30% 30%, rgba(180,220,255,0.22), rgba(10,20,60,0.96));
+  box-shadow:0 0 45px rgba(75,127,255,0.35), inset 0 0 25px rgba(255,255,255,0.04);
 }
-
-.orb.active{
-  transform:scale(1.05);
+.orb-shell::before{
+  content:''; position:absolute; inset:-10px; border-radius:50%;
+  border:1px solid rgba(75,127,255,0.15);
+  animation:ringFloat 5s ease-in-out infinite;
 }
-
-.orb canvas{
-  width:100%;
-  height:100%;
-  border-radius:50%;
+.orb-shell.active{
+  transform:scale(2.1);
+  box-shadow:0 0 120px rgba(75,127,255,0.55), 0 0 220px rgba(75,127,255,0.18), inset 0 0 40px rgba(255,255,255,0.08);
 }
+@keyframes ringFloat{
+  0%,100%{transform:scale(1);opacity:0.45}
+  50%{transform:scale(1.08);opacity:1}
+}
+#orbButtonCanvas{ width:100%; height:100%; border-radius:50%; }
 
+/* ACTIVE COMPANION BAR */
+.active-companion-bar{
+  display:flex; align-items:center; gap:10px;
+  padding:10px 16px; border-radius:14px;
+  background:rgba(75,127,255,0.06);
+  border:1px solid rgba(75,127,255,0.14);
+  margin-bottom:20px; cursor:pointer;
+  transition:all 0.22s ease;
+}
+.active-companion-bar:hover{ background:rgba(75,127,255,0.11); }
+.acb-avatar{
+  width:32px; height:32px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center; font-size:0.9rem;
+}
+.acb-avatar.male{
+  background:radial-gradient(circle,rgba(75,127,255,0.35),rgba(10,20,60,0.9));
+}
+.acb-avatar.female{
+  background:radial-gradient(circle,rgba(168,85,247,0.35),rgba(30,10,60,0.9));
+}
+.acb-name{ font-family:'Sora',sans-serif; font-weight:600; font-size:0.88rem; }
+.acb-sub{ font-size:0.72rem; color:var(--white-muted); }
+.acb-change{ font-size:0.72rem; color:rgba(107,159,255,0.6); letter-spacing:0.05em; margin-left:auto; }
+
+/* VOICE OVERLAY */
+.voice-overlay{
+  position:fixed; inset:0; z-index:300;
+  display:none; justify-content:center; align-items:center; flex-direction:column;
+  background:rgba(3,5,13,0.94); backdrop-filter:blur(30px);
+}
+.voice-overlay.active{ display:flex; }
+.voice-big-orb{
+  width:340px; height:340px; border-radius:50%;
+  display:flex; justify-content:center; align-items:center; position:relative;
+}
+#voiceOrbCanvas{ width:100%; height:100%; border-radius:50%; }
 .voice-status{
-  font-family:'Sora',sans-serif;
-  font-size:0.82rem;
-  letter-spacing:0.12em;
-  text-transform:uppercase;
-  color:var(--blue2);
+  margin-top:26px; font-family:'Sora',sans-serif;
+  letter-spacing:0.12em; text-transform:uppercase;
+  color:var(--electric-bright); font-size:0.88rem;
 }
+.voice-end-btn{
+  margin-top:26px; border:none;
+  background:rgba(255,255,255,0.06); color:white;
+  padding:12px 26px; border-radius:50px; cursor:pointer;
+  transition:all .25s ease;
+}
+.voice-end-btn:hover{ background:rgba(255,255,255,0.12); }
 
-.end-btn{
-  border:none;
-  background:rgba(255,255,255,0.06);
-  color:white;
-  padding:12px 24px;
-  border-radius:50px;
+/* COMPANION SELECTOR SCREEN */
+#companionScreen{
+  position:fixed; inset:0; z-index:200;
+  display:flex; justify-content:center; align-items:flex-start;
+  padding:100px 20px 60px;
+  background:rgba(3,5,13,0.97);
+  backdrop-filter:blur(28px);
+  overflow-y:auto;
+}
+#companionScreen.hidden{ display:none; }
+.companion-wrapper{ width:100%; max-width:660px; }
+.companion-header{
+  text-align:center; margin-bottom:40px;
+}
+.companion-header h2{
+  font-family:'Sora',sans-serif; font-size:1.5rem;
+  font-weight:700; letter-spacing:-0.01em; margin-bottom:8px;
+}
+.companion-header p{
+  color:var(--white-muted); font-size:0.88rem;
+}
+.companion-grid{
+  display:grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap:12px;
+  margin-bottom:36px;
+}
+@media(max-width:600px){
+  .companion-grid{ grid-template-columns: repeat(2, 1fr); }
+}
+.companion-card{
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  gap:10px; padding:20px 12px;
+  border-radius:20px;
+  border:1px solid rgba(255,255,255,0.06);
+  background:rgba(255,255,255,0.03);
   cursor:pointer;
-  transition:0.25s ease;
+  transition:all 0.22s var(--ease);
+  position:relative; overflow:hidden;
+  text-align:center;
 }
-
-.end-btn:hover{
-  background:rgba(255,255,255,0.12);
+.companion-card::before{
+  content:''; position:absolute; inset:0; border-radius:20px;
+  background:radial-gradient(circle at 50% 30%, rgba(75,127,255,0.09), transparent 70%);
+  opacity:0; transition:opacity 0.3s ease;
 }
-
-.error{
-  color:#ff9090;
-  font-size:0.88rem;
+.companion-card:hover::before{ opacity:1; }
+.companion-card:hover{
+  border-color:rgba(75,127,255,0.35);
+  background:rgba(75,127,255,0.07);
+  transform:translateY(-3px);
 }
-
+.companion-card.selected{
+  border-color:rgba(107,159,255,0.75);
+  background:rgba(75,127,255,0.14);
+  box-shadow:0 0 24px rgba(75,127,255,0.22);
+}
+.companion-avatar{
+  width:48px; height:48px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.3rem;
+  border:1px solid rgba(255,255,255,0.08);
+  flex-shrink:0;
+}
+.companion-avatar.male{
+  background:radial-gradient(circle at 30% 30%, rgba(75,127,255,0.35), rgba(10,20,60,0.92));
+}
+.companion-avatar.female{
+  background:radial-gradient(circle at 30% 30%, rgba(168,85,247,0.32), rgba(30,10,60,0.92));
+}
+.companion-name{
+  font-family:'Sora',sans-serif;
+  font-weight:600; font-size:0.95rem;
+}
+.companion-check{
+  position:absolute; top:10px; right:10px;
+  width:18px; height:18px; border-radius:50%;
+  border:1.5px solid rgba(255,255,255,0.15);
+  display:flex; align-items:center; justify-content:center;
+  transition:all 0.2s ease;
+}
+.companion-card.selected .companion-check{
+  background:var(--electric); border-color:var(--electric);
+}
+.companion-check svg{ opacity:0; transition:opacity 0.2s ease; }
+.companion-card.selected .companion-check svg{ opacity:1; }
+.companion-cta{
+  display:flex; justify-content:center;
+}
+.btn-start{
+  padding:14px 48px; border-radius:50px; border:none;
+  background:linear-gradient(135deg,rgba(75,127,255,0.9),rgba(107,159,255,0.7));
+  color:white; font-family:'Sora',sans-serif;
+  font-weight:600; font-size:0.95rem; cursor:pointer;
+  transition:all 0.25s ease;
+  box-shadow:0 0 30px rgba(75,127,255,0.3);
+  opacity:0.38; pointer-events:none;
+}
+.btn-start.ready{ opacity:1; pointer-events:all; }
+.btn-start.ready:hover{
+  transform:translateY(-2px);
+  box-shadow:0 0 50px rgba(75,127,255,0.5);
+}
 </style>
 </head>
 
 <body>
+<canvas id="starCanvas"></canvas>
+<div class="atmo-orb one"></div>
+<div class="atmo-orb two"></div>
 
-<div class="bg-glow one"></div>
-<div class="bg-glow two"></div>
+<nav class="nav">
+  <a href="index.html" class="logo">
+    <span style="font-size:1.2rem;font-weight:700">unhesitated<span class="dot-ai">.ai</span></span>
+    <span class="pulse-dot"></span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html">← Back to Home</a></li>
+  </ul>
+</nav>
 
-<div class="wrapper">
-
-<div class="chat-shell">
-
-<!-- HEADER -->
-
-<div class="topbar">
-
-<div class="logo">
-unhesitated<span>.ai</span>
+<div id="companionScreen">
+  <div class="companion-wrapper">
+    <div class="companion-header">
+      <h2>Choose Your Speaking Companion</h2>
+      <p>Pick the voice you'd like to practise with today.</p>
+    </div>
+    <div class="companion-grid">
+      <!-- Orion -->
+      <div class="companion-card" data-key="orion" data-gender="male">
+        <div class="companion-check">
+          <svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.2 5.8L8 1" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="companion-avatar male">🎙️</div><div class="companion-name">Orion</div>
+      </div>
+      <!-- Nova -->
+      <div class="companion-card" data-key="nova" data-gender="female">
+        <div class="companion-check">
+          <svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.2 5.8L8 1" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="companion-avatar female">🎙️</div><div class="companion-name">Nova</div>
+      </div>
+      <!-- Arthur -->
+      <div class="companion-card" data-key="arthur" data-gender="male">
+        <div class="companion-check">
+          <svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.2 5.8L8 1" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="companion-avatar male">🎙️</div><div class="companion-name">Arthur</div>
+      </div>
+      <!-- Eleanor -->
+      <div class="companion-card" data-key="eleanor" data-gender="female">
+        <div class="companion-check">
+          <svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.2 5.8L8 1" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="companion-avatar female">🎙️</div><div class="companion-name">Eleanor</div>
+      </div>
+      <!-- Kabir -->
+      <div class="companion-card" data-key="kabir" data-gender="male">
+        <div class="companion-check">
+          <svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.2 5.8L8 1" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="companion-avatar male">🎙️</div><div class="companion-name">Kabir</div>
+      </div>
+      <!-- Maya -->
+      <div class="companion-card" data-key="maya" data-gender="female">
+        <div class="companion-check">
+          <svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.2 5.8L8 1" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="companion-avatar female">🎙️</div><div class="companion-name">Maya</div>
+      </div>
+      <!-- Ren -->
+      <div class="companion-card" data-key="ren" data-gender="male">
+        <div class="companion-check">
+          <svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.2 5.8L8 1" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="companion-avatar male">🎙️</div><div class="companion-name">Ren</div>
+      </div>
+      <!-- Mei -->
+      <div class="companion-card" data-key="mei" data-gender="female">
+        <div class="companion-check">
+          <svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.2 5.8L8 1" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="companion-avatar female">🎙️</div><div class="companion-name">Mei</div>
+      </div>
+      <!-- Amir -->
+      <div class="companion-card" data-key="amir" data-gender="male">
+        <div class="companion-check">
+          <svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.2 5.8L8 1" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="companion-avatar male">🎙️</div><div class="companion-name">Amir</div>
+      </div>
+      <!-- Layla -->
+      <div class="companion-card" data-key="layla" data-gender="female">
+        <div class="companion-check">
+          <svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.2 5.8L8 1" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="companion-avatar female">🎙️</div><div class="companion-name">Layla</div>
+      </div>
+    </div>
+    <div class="companion-cta">
+      <button class="btn-start" id="btnStartChat">Start Conversation →</button>
+    </div>
+  </div>
 </div>
 
-<div class="status" id="connectionStatus">
-Idle
+<div class="voice-overlay" id="voiceOverlay">
+  <div class="voice-big-orb">
+    <canvas id="voiceOrbCanvas" width="340" height="340"></canvas>
+  </div>
+  <div class="voice-status" id="voiceStatus">Listening...</div>
+  <button class="voice-end-btn" id="voiceEndBtn">End Voice Chat</button>
 </div>
 
-</div>
+<main>
+  <div class="glass">
+    <div class="chat-top">
+      <div class="chat-title">
+        <span class="pulse-dot"></span>
+        <span>unhesitated<span class="dot-ai">.ai</span></span>
+      </div>
+    </div>
 
-<!-- COMPANIONS -->
+    <div class="active-companion-bar" id="activeCompanionBar" style="display:none">
+      <div class="acb-avatar" id="acbAvatar">🎙️</div>
+      <div>
+        <div class="acb-name" id="acbName">—</div>
+        <div class="acb-sub">Speaking Companion</div>
+      </div>
+      <div class="acb-change">Change ›</div>
+    </div>
 
-<div class="companions" id="companions"></div>
+    <div class="phrase-strip">
+      <div class="phrase-label">✦ Today's Phrase</div>
+      <div class="phrase-text" id="phraseText"></div>
+      <div class="phrase-meaning" id="phraseMeaning"></div>
+    </div>
 
-<!-- CHAT FEED -->
+    <div class="topics-label">Pick a topic to talk about</div>
+    <div class="planets">
+      <div class="planet">👋 Greetings</div>
+      <div class="planet">✈️ Travel</div>
+      <div class="planet">💼 Work</div>
+      <div class="planet">💬 Emotions</div>
+      <div class="planet">🌟 Idioms</div>
+      <div class="planet">🍜 Food</div>
+    </div>
 
-<div class="feed" id="feed"></div>
+    <div id="live-chat-feed"></div>
 
-<!-- CONTROLS -->
-
-<div class="controls">
-
-<div class="orb" id="micBtn">
-<canvas id="orbCanvas" width="140" height="140"></canvas>
-</div>
-
-<div class="voice-status" id="voiceStatus">
-Tap To Speak
-</div>
-
-<button class="end-btn" id="endBtn">
-End Conversation
-</button>
-
-<div class="error" id="errorBox"></div>
-
-</div>
-
-</div>
-
-</div>
+    <div class="orb-section">
+      <div class="orb-shell" id="micBtn">
+        <canvas id="orbButtonCanvas" width="150" height="150"></canvas>
+      </div>
+    </div>
+  </div>
+</main>
 
 <script>
-
-/* ─────────────────────────────
-   COMPANIONS
-───────────────────────────── */
-
-const MODELS = {
-
-  orion:{ name:'Orion' },
-  nova:{ name:'Nova' },
-  arthur:{ name:'Arthur' },
-  eleanor:{ name:'Eleanor' },
-  kabir:{ name:'Kabir' },
-  maya:{ name:'Maya' },
-  ren:{ name:'Ren' },
-  mei:{ name:'Mei' },
-  amir:{ name:'Amir' },
-  layla:{ name:'Layla' }
+const MODEL_META = {
+  orion:   { name:'Orion',   gender:'male'   },
+  nova:    { name:'Nova',    gender:'female' },
+  arthur:  { name:'Arthur',  gender:'male'   },
+  eleanor: { name:'Eleanor', gender:'female' },
+  kabir:   { name:'Kabir',   gender:'male'   },
+  maya:    { name:'Maya',    gender:'female' },
+  ren:     { name:'Ren',     gender:'male'   },
+  mei:     { name:'Mei',     gender:'female' },
+  amir:    { name:'Amir',    gender:'male'   },
+  layla:   { name:'Layla',   gender:'female' }
 };
 
-let selectedModel = 'nova';
+let selectedModel = null;
 
-const companionsEl =
-  document.getElementById('companions');
+const companionScreen = document.getElementById('companionScreen');
+const btnStartChat    = document.getElementById('btnStartChat');
+const cards           = document.querySelectorAll('.companion-card');
 
-Object.entries(MODELS).forEach(([key,val])=>{
-
-  const div = document.createElement('div');
-
-  div.className =
-    'companion' +
-    (key==='nova' ? ' active' : '');
-
-  div.innerHTML = `
-    <div class="avatar">🎙️</div>
-    <div class="cname">${val.name}</div>
-  `;
-
-  div.onclick = ()=>{
-
-    document
-      .querySelectorAll('.companion')
-      .forEach(c=>c.classList.remove('active'));
-
-    div.classList.add('active');
-
-    selectedModel = key;
-  };
-
-  companionsEl.appendChild(div);
+cards.forEach(card => {
+  card.addEventListener('click', () => {
+    cards.forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    selectedModel = card.dataset.key;
+    btnStartChat.classList.add('ready');
+  });
 });
 
-/* ─────────────────────────────
-   CHAT FEED
-───────────────────────────── */
+btnStartChat.addEventListener('click', () => {
+  if (!selectedModel) return;
+  companionScreen.classList.add('hidden');
+  updateActiveBar(selectedModel);
+});
 
-const feed =
-  document.getElementById('feed');
-
-function addMessage(role,text){
-
-  const div =
-    document.createElement('div');
-
-  div.className =
-    'msg ' + role;
-
-  div.textContent = text;
-
-  feed.appendChild(div);
-
-  feed.scrollTop =
-    feed.scrollHeight;
+function updateActiveBar(key) {
+  const meta = MODEL_META[key];
+  const bar  = document.getElementById('activeCompanionBar');
+  const av   = document.getElementById('acbAvatar');
+  document.getElementById('acbName').textContent = meta.name;
+  av.className = 'acb-avatar ' + meta.gender;
+  bar.style.display = 'flex';
 }
 
-/* ─────────────────────────────
-   UI ELEMENTS
-───────────────────────────── */
+document.getElementById('activeCompanionBar').addEventListener('click', () => {
+  companionScreen.classList.remove('hidden');
+});
 
-const micBtn =
-  document.getElementById('micBtn');
+const PHRASES = [
+  { text:'"Break the ice"',              meaning:'Start a conversation in a social situation' },
+  { text:'"Under the weather"',          meaning:'Feeling slightly ill or unwell' },
+  { text:'"Hit the nail on the head"',   meaning:'Describe exactly what is happening' },
+  { text:'"Bite the bullet"',            meaning:'Endure a painful or difficult situation' },
+  { text:'"On the same page"',           meaning:'In agreement and thinking the same way' },
+  { text:'"Piece of cake"',              meaning:'Something very easy to do' },
+];
+const chosen = PHRASES[Math.floor(Math.random() * PHRASES.length)];
+document.getElementById('phraseText').textContent    = chosen.text;
+document.getElementById('phraseMeaning').textContent = chosen.meaning;
 
-const voiceStatus =
-  document.getElementById('voiceStatus');
-
-const endBtn =
-  document.getElementById('endBtn');
-
-const errorBox =
-  document.getElementById('errorBox');
-
-const connectionStatus =
-  document.getElementById('connectionStatus');
-
-/* ─────────────────────────────
-   ORB ANIMATION
-───────────────────────────── */
-
-const orbCanvas =
-  document.getElementById('orbCanvas');
-
-const ctx =
-  orbCanvas.getContext('2d');
+const starCanvas = document.getElementById('starCanvas');
+const sctx = starCanvas.getContext('2d');
+let W, H;
+function resize(){ W = starCanvas.width = innerWidth; H = starCanvas.height = innerHeight; }
+resize();
+addEventListener('resize', resize);
+const stars = [];
+for(let i=0;i<180;i++) stars.push({ x:Math.random()*W, y:Math.random()*H, r:Math.random()*1.5, a:Math.random(), v:Math.random()*0.2 });
+function drawStars(){
+  sctx.clearRect(0,0,W,H);
+  stars.forEach(s=>{
+    s.y += s.v;
+    if(s.y>H){ s.y=-10; s.x=Math.random()*W; }
+    sctx.globalAlpha=s.a;
+    sctx.beginPath(); sctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+    sctx.fillStyle='white'; sctx.fill();
+  });
+  requestAnimationFrame(drawStars);
+}
+drawStars();
 
 let orbState = 'idle';
-
-let phase = 0;
-let energy = 0;
-
 function setState(state){
-
   orbState = state;
-
-  if(state==='idle'){
-    voiceStatus.textContent =
-      'Tap To Speak';
-  }
-
-  if(state==='connecting'){
-    voiceStatus.textContent =
-      'Connecting...';
-  }
-
-  if(state==='listening'){
-    voiceStatus.textContent =
-      'Listening...';
-  }
-
-  if(state==='thinking'){
-    voiceStatus.textContent =
-      'Thinking...';
-  }
-
-  if(state==='speaking'){
-    voiceStatus.textContent =
-      'Speaking...';
-  }
+  const vs = document.getElementById('voiceStatus');
+  if(state==='listening') vs.textContent='Listening...';
+  if(state==='thinking')  vs.textContent='Thinking...';
+  if(state==='speaking')  vs.textContent='Speaking...';
 }
 
-function animateOrb(){
-
-  ctx.clearRect(0,0,140,140);
-
-  let target = 0.1;
-
-  if(orbState==='listening'){
-    target = 0.7;
-  }
-
-  if(orbState==='thinking'){
-    target = 0.4;
-  }
-
-  if(orbState==='speaking'){
-    target = 1;
-  }
-
-  energy += (target-energy)*0.08;
-
-  phase += 0.03;
-
-  const cx = 70;
-  const cy = 70;
-  const r = 40;
-
+const orbCanvas = document.getElementById('orbButtonCanvas');
+const orbCtx    = orbCanvas.getContext('2d');
+let phase=0, energy=0;
+function renderSmallOrb(){
+  orbCtx.clearRect(0,0,150,150);
+  let target=0.1;
+  if(orbState==='listening') target=0.6;
+  if(orbState==='thinking')  target=0.35;
+  if(orbState==='speaking')  target=0.9;
+  energy+=(target-energy)*0.08; phase+=0.03;
+  const CX=75,CY=75,R=42;
   for(let i=3;i>=1;i--){
-
-    ctx.beginPath();
-
-    ctx.arc(
-      cx,
-      cy,
-      r + i*8 + energy*16,
-      0,
-      Math.PI*2
-    );
-
-    ctx.fillStyle =
-      `rgba(75,127,255,${
-        energy*0.12/i
-      })`;
-
-    ctx.fill();
+    orbCtx.beginPath(); orbCtx.arc(CX,CY,R+i*10+energy*16,0,Math.PI*2);
+    let alpha=energy*0.16/i;
+    orbCtx.fillStyle=orbState==='thinking'?`rgba(168,85,247,${alpha})`:`rgba(75,127,255,${alpha})`;
+    orbCtx.fill();
   }
-
-  ctx.beginPath();
-
+  orbCtx.beginPath();
   for(let i=0;i<=80;i++){
-
-    const angle =
-      (i/80)*Math.PI*2;
-
-    const bump =
-      Math.sin(angle*8 + phase*3)
-      * energy * 10;
-
-    const rr = r + bump;
-
-    const x =
-      cx + Math.cos(angle)*rr;
-
-    const y =
-      cy + Math.sin(angle)*rr;
-
-    if(i===0){
-      ctx.moveTo(x,y);
-    } else {
-      ctx.lineTo(x,y);
-    }
+    const angle=(i/80)*Math.PI*2;
+    const bump=Math.sin(angle*5+phase*2)*energy*12;
+    const rr=R+bump;
+    const x=CX+Math.cos(angle)*rr; const y=CY+Math.sin(angle)*rr;
+    if(i===0) orbCtx.moveTo(x,y); else orbCtx.lineTo(x,y);
   }
+  orbCtx.closePath();
+  const grd=orbCtx.createRadialGradient(CX-12,CY-12,0,CX,CY,R+30);
+  grd.addColorStop(0,'#cde2ff'); grd.addColorStop(1,'#14224f');
+  orbCtx.fillStyle=grd; orbCtx.fill();
+  requestAnimationFrame(renderSmallOrb);
+}
+renderSmallOrb();
 
-  ctx.closePath();
+const voiceOrbCanvas = document.getElementById('voiceOrbCanvas');
+const vctx           = voiceOrbCanvas.getContext('2d');
+let vPhase=0, vEnergy=0;
+function renderBigOrb(){
+  vctx.clearRect(0,0,340,340);
+  let target=0.1;
+  if(orbState==='listening') target=0.7;
+  if(orbState==='thinking')  target=0.45;
+  if(orbState==='speaking')  target=1;
+  vEnergy+=(target-vEnergy)*0.06; vPhase+=0.025;
+  const CX=170,CY=170,R=100;
+  for(let i=4;i>=1;i--){
+    vctx.beginPath(); vctx.arc(CX,CY,R+i*14+vEnergy*20,0,Math.PI*2);
+    let alpha=vEnergy*0.18/i;
+    vctx.fillStyle=orbState==='thinking'?`rgba(168,85,247,${alpha})`:`rgba(75,127,255,${alpha})`;
+    vctx.fill();
+  }
+  vctx.beginPath();
+  for(let i=0;i<=120;i++){
+    const angle=(i/120)*Math.PI*2;
+    let bump=0;
+    if(orbState==='listening') bump=Math.sin(angle*9+vPhase*5)*vEnergy*14;
+    if(orbState==='thinking')  bump=Math.sin(angle*5+vPhase*2)*vEnergy*10;
+    if(orbState==='speaking')  bump=Math.sin(angle*12+vPhase*5)*vEnergy*22+Math.sin(angle*6-vPhase*3)*vEnergy*10;
+    const rr=R+bump;
+    const x=CX+Math.cos(angle)*rr; const y=CY+Math.sin(angle)*rr;
+    if(i===0) vctx.moveTo(x,y); else vctx.lineTo(x,y);
+  }
+  vctx.closePath();
+  const grd=vctx.createRadialGradient(CX-20,CY-24,0,CX,CY,R+50);
+  if(orbState==='thinking'){ grd.addColorStop(0,'#d9c8ff'); grd.addColorStop(1,'#1d0b42'); }
+  else{ grd.addColorStop(0,'#d5e6ff'); grd.addColorStop(1,'#10214f'); }
+  vctx.fillStyle=grd; vctx.fill();
+  requestAnimationFrame(renderBigOrb);
+}
+renderBigOrb();
 
-  const grd =
-    ctx.createRadialGradient(
-      cx-12,
-      cy-12,
-      0,
-      cx,
-      cy,
-      r+20
-    );
-
-  grd.addColorStop(0,'#dce8ff');
-  grd.addColorStop(1,'#13214a');
-
-  ctx.fillStyle = grd;
-  ctx.fill();
-
-  requestAnimationFrame(animateOrb);
+const feed = document.getElementById('live-chat-feed');
+function appendMsg(role, text){
+  const div=document.createElement('div');
+  div.className='msg '+role;
+  div.textContent=text;
+  feed.appendChild(div);
+  feed.scrollTop=feed.scrollHeight;
 }
 
-animateOrb();
+const FAREWELL_RE = /\b(bye|goodbye|good bye|see you|see ya|take care|that'?s? all|we'?re done|let'?s end|end (the )?conversation|stop|quit|i'?m done|thank you that'?s all|farewell)\b/i;
+function isFarewell(text){ return FAREWELL_RE.test(text); }
 
-/* ─────────────────────────────
-   REALTIME VOICE
-───────────────────────────── */
+const micBtn  = document.getElementById('micBtn');
+const overlay = document.getElementById('voiceOverlay');
+const endBtn  = document.getElementById('voiceEndBtn');
 
-let pc = null;
-let dc = null;
-let remoteAudio = null;
+let pc=null, dc=null, remoteAudio=null;
+let farewellTimer=null;
 
-/* START */
+micBtn.addEventListener('click', ()=>{
+  if(!selectedModel){ companionScreen.classList.remove('hidden'); return; }
+  openVoiceMode();
+});
 
-micBtn.onclick = ()=>{
+endBtn.addEventListener('click', closeVoiceMode);
 
-  if(pc){
-    return;
-  }
+async function openVoiceMode(){
+  document.querySelector('.orb-shell').classList.add('active');
+  overlay.classList.add('active');
+  setState('thinking');
 
-  startVoice();
-};
-
-/* END */
-
-endBtn.onclick = ()=>{
-  stopVoice();
-};
-
-/* START VOICE */
-
-async function startVoice(){
-
-  try {
-
-    errorBox.textContent = '';
-
-    setState('connecting');
-
-    connectionStatus.textContent =
-      'Connecting';
-
-    micBtn.classList.add('active');
-
-    /* TOKEN */
-
-    const tokenRes =
-      await fetch(
-        `/api/realtime-token?model=${selectedModel}`
-      );
-
-    const tokenData =
-      await tokenRes.json();
-
-    console.log(tokenData);
-
-    const EPHEMERAL_KEY =
-      tokenData?.client_secret?.value;
+  try{
+    const tokenRes  = await fetch(`/api/realtime-token?model=${selectedModel}`);
+    const tokenData = await tokenRes.json();
+    const EPHEMERAL_KEY = tokenData?.client_secret?.value || tokenData?.value || null;
 
     if(!EPHEMERAL_KEY){
-
-      throw new Error(
-        'No realtime token returned'
-      );
+      console.error('No ephemeral key received:', tokenData);
+      closeVoiceMode(); return;
     }
-
-    /* PEER */
 
     pc = new RTCPeerConnection();
-
-    remoteAudio =
-      document.createElement('audio');
-
+    remoteAudio = document.createElement('audio');
     remoteAudio.autoplay = true;
-
     document.body.appendChild(remoteAudio);
 
-    pc.ontrack = e=>{
-      remoteAudio.srcObject =
-        e.streams[0];
-    };
+    pc.ontrack = e => { remoteAudio.srcObject = e.streams[0]; };
 
-    /* MIC */
+    const ms = await navigator.mediaDevices.getUserMedia({ audio:true });
+    ms.getTracks().forEach(t => pc.addTrack(t, ms));
 
-    const stream =
-      await navigator.mediaDevices
-      .getUserMedia({
-        audio:true
-      });
+    dc = pc.createDataChannel('oai-events');
+    dc.onopen = () => { setState('listening'); };
 
-    stream.getTracks().forEach(track=>{
-      pc.addTrack(track,stream);
-    });
-
-    /* DATA CHANNEL */
-
-    dc =
-      pc.createDataChannel(
-        'oai-events'
-      );
-
-    dc.onopen = ()=>{
-
-      console.log('Data channel open');
-
-      setState('listening');
-
-      connectionStatus.textContent =
-        'Connected';
-    };
-
-    dc.onmessage = event=>{
-
+    dc.onmessage = e => {
       let msg;
+      try{ msg=JSON.parse(e.data); }catch{ return; }
 
-      try{
-        msg = JSON.parse(event.data);
-      }catch{
-        return;
+      if(msg.type==='response.created')          setState('thinking');
+      if(msg.type==='response.output_item.added') setState('speaking');
+      if(msg.type==='response.done')              setState('listening');
+
+      if(msg.type==='conversation.item.input_audio_transcription.completed'){
+        const userText = msg.transcript || '';
+        appendMsg('user', userText);
+        if(isFarewell(userText) && !farewellTimer){
+          farewellTimer = setTimeout(()=>closeVoiceMode(), 2800);
+        }
       }
 
-      console.log(msg);
-
-      if(msg.type==='response.created'){
-        setState('thinking');
-      }
-
-      if(msg.type==='response.done'){
-        setState('listening');
-      }
-
-      if(
-        msg.type===
-        'response.output_item.added'
-      ){
-        setState('speaking');
-      }
-
-      /* USER TRANSCRIPT */
-
-      if(
-        msg.type===
-        'conversation.item.input_audio_transcription.completed'
-      ){
-
-        const text =
-          msg.transcript || '';
-
-        addMessage('user',text);
-      }
-
-      /* AI TRANSCRIPT */
-
-      if(
-        msg.type===
-        'response.audio_transcript.done'
-        ||
-        msg.type===
-        'response.output_audio_transcript.done'
-      ){
-
-        const text =
-          msg.transcript || '';
-
-        addMessage('ai',text);
+      if(msg.type==='response.audio_transcript.done' || msg.type==='response.output_audio_transcript.done'){
+        const aiText = msg.transcript || '...';
+        appendMsg('ai', aiText);
+        if(isFarewell(aiText) && !farewellTimer){
+          farewellTimer = setTimeout(()=>closeVoiceMode(), 1800);
+        }
       }
     };
 
-    /* OFFER */
+    const offer = await pc.createOffer();
+    await pc.setLocalDescription(offer);
 
-    const offer =
-      await pc.createOffer();
-
-    await pc.setLocalDescription(
-      offer
+    const sdpRes = await fetch(
+      'https://api.openai.com/v1/realtime/calls',
+      {
+        method:'POST',
+        body: offer.sdp,
+        headers:{
+          'Authorization':`Bearer ${EPHEMERAL_KEY}`,
+          'Content-Type':'application/sdp'
+        }
+      }
     );
 
-    /* OPENAI SDP */
-
-    const sdpResponse =
-      await fetch(
-        'https://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview-2024-12-17',
-        {
-          method:'POST',
-
-          body:offer.sdp,
-
-          headers:{
-            Authorization:
-              `Bearer ${EPHEMERAL_KEY}`,
-
-            'Content-Type':
-              'application/sdp'
-          }
-        }
-      );
-
-    if(!sdpResponse.ok){
-
-      const err =
-        await sdpResponse.text();
-
-      throw new Error(err);
+    if(!sdpRes.ok){
+      const errText = await sdpRes.text();
+      console.error('SDP exchange failed:', sdpRes.status, errText);
+      closeVoiceMode(); return;
     }
 
-    const answer =
-      await sdpResponse.text();
-
-    await pc.setRemoteDescription({
-      type:'answer',
-      sdp:answer
-    });
-
-    console.log(
-      'Realtime connected'
-    );
+    const sdpAnswer = await sdpRes.text();
+    await pc.setRemoteDescription({ type:'answer', sdp:sdpAnswer });
 
   } catch(err){
-
-    console.error(err);
-
-    errorBox.textContent =
-      'Voice connection failed';
-
-    stopVoice();
+    console.error('openVoiceMode error:', err);
+    closeVoiceMode();
   }
 }
 
-/* STOP */
-
-function stopVoice(){
-
+function closeVoiceMode(){
+  if(farewellTimer){ clearTimeout(farewellTimer); farewellTimer=null; }
+  overlay.classList.remove('active');
+  document.querySelector('.orb-shell').classList.remove('active');
   setState('idle');
-
-  connectionStatus.textContent =
-    'Idle';
-
-  micBtn.classList.remove('active');
-
-  if(dc){
-    try{
-      dc.close();
-    }catch{}
-    dc = null;
-  }
-
+  if(dc){ try{ dc.close(); }catch{} dc=null; }
   if(pc){
-
-    pc.getSenders().forEach(sender=>{
-
-      if(sender.track){
-        sender.track.stop();
-      }
-    });
-
-    try{
-      pc.close();
-    }catch{}
-
-    pc = null;
+    pc.getSenders().forEach(s=>{ if(s.track) s.track.stop(); });
+    try{ pc.close(); }catch{} pc=null;
   }
-
   if(remoteAudio){
-
-    remoteAudio.srcObject = null;
-
-    if(remoteAudio.parentNode){
-      remoteAudio.parentNode
-      .removeChild(remoteAudio);
-    }
-
-    remoteAudio = null;
+    remoteAudio.srcObject=null;
+    if(remoteAudio.parentNode) remoteAudio.parentNode.removeChild(remoteAudio);
+    remoteAudio=null;
   }
 }
-
 </script>
 
 </body>
 </html>
-```

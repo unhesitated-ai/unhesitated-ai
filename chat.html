@@ -553,9 +553,11 @@
 
     recognition.onend = () => {
       isListening = false;
-      if (isVoiceMode && !isThinking && !isSpeaking) {
+      // FIX: Only auto-restart recognition when NOT speaking and NOT thinking.
+      // This prevents the mic from picking up the AI's own audio output.
+      if (isVoiceMode && !isThinking && !isSpeaking && !isListening) {
         setTimeout(() => {
-          if (isVoiceMode && !isListening) {
+          if (isVoiceMode && !isListening && !isSpeaking && !isThinking) {
              try { recognition.start(); } catch(err) {}
           }
         }, 500);
@@ -625,16 +627,20 @@
       appendMsg('ai', data.message);
 
       isThinking = false;
+      isSpeaking = true; // FIX: Set isSpeaking to true BEFORE starting audio
       setOrbState('speaking');
 
-      if (isVoiceMode) {
-        try { recognition.start(); } catch(err) {}
-      }
+      // FIX: Do NOT restart recognition here. It is now moved inside the
+      // speakVoice() callback so the mic only opens AFTER audio has finished.
+      // This prevents the mic from hearing the AI's own voice and sending a duplicate.
 
       speakVoice(data.message, () => {
+        // This callback runs only after the AI finishes speaking
+        isSpeaking = false;
         if (isVoiceMode && !isThinking) {
-          isSpeaking = false;
           setOrbState('listening');
+          // FIX: Mic restarts HERE — safely after audio ends — not before
+          try { recognition.start(); } catch(err) {}
         }
       });
 
@@ -655,7 +661,6 @@
     if (currentAudio) {
       currentAudio.pause();
     }
-    isSpeaking = true;
 
     try {
       const res = await fetch('/api/tts', {

@@ -238,7 +238,9 @@ main{
 }
 .voice-end-btn:hover{ background:rgba(255,255,255,0.12); }
 
-/* COMPANION SELECTOR SCREEN */
+/* ─────────────────────────────────────────
+   COMPANION SELECTOR SCREEN
+───────────────────────────────────────── */
 #companionScreen{
   position:fixed; inset:0; z-index:200;
   display:flex; justify-content:center; align-items:flex-start;
@@ -248,7 +250,9 @@ main{
   overflow-y:auto;
 }
 #companionScreen.hidden{ display:none; }
+
 .companion-wrapper{ width:100%; max-width:660px; }
+
 .companion-header{
   text-align:center; margin-bottom:40px;
 }
@@ -259,6 +263,8 @@ main{
 .companion-header p{
   color:var(--white-muted); font-size:0.88rem;
 }
+
+/* Grid of cards — 5 columns on desktop, 2 on mobile */
 .companion-grid{
   display:grid;
   grid-template-columns: repeat(5, 1fr);
@@ -268,6 +274,7 @@ main{
 @media(max-width:600px){
   .companion-grid{ grid-template-columns: repeat(2, 1fr); }
 }
+
 .companion-card{
   display:flex; flex-direction:column;
   align-items:center; justify-content:center;
@@ -296,6 +303,7 @@ main{
   background:rgba(75,127,255,0.14);
   box-shadow:0 0 24px rgba(75,127,255,0.22);
 }
+
 .companion-avatar{
   width:48px; height:48px; border-radius:50%;
   display:flex; align-items:center; justify-content:center;
@@ -309,10 +317,13 @@ main{
 .companion-avatar.female{
   background:radial-gradient(circle at 30% 30%, rgba(168,85,247,0.32), rgba(30,10,60,0.92));
 }
+
 .companion-name{
   font-family:'Sora',sans-serif;
   font-weight:600; font-size:0.95rem;
 }
+
+/* selected checkmark ring */
 .companion-check{
   position:absolute; top:10px; right:10px;
   width:18px; height:18px; border-radius:50%;
@@ -325,6 +336,8 @@ main{
 }
 .companion-check svg{ opacity:0; transition:opacity 0.2s ease; }
 .companion-card.selected .companion-check svg{ opacity:1; }
+
+/* CTA button */
 .companion-cta{
   display:flex; justify-content:center;
 }
@@ -346,10 +359,12 @@ main{
 </head>
 
 <body>
+
 <canvas id="starCanvas"></canvas>
 <div class="atmo-orb one"></div>
 <div class="atmo-orb two"></div>
 
+<!-- NAV -->
 <nav class="nav">
   <a href="index.html" class="logo">
     <span style="font-size:1.2rem;font-weight:700">unhesitated<span class="dot-ai">.ai</span></span>
@@ -360,90 +375,137 @@ main{
   </ul>
 </nav>
 
+<!-- ──────── COMPANION SELECTOR ──────── -->
 <div id="companionScreen">
   <div class="companion-wrapper">
+
     <div class="companion-header">
       <h2>Choose Your Speaking Companion</h2>
       <p>Pick the voice you'd like to practise with today.</p>
     </div>
+
     <div class="companion-grid">
+
       <!-- Orion -->
       <div class="companion-card" data-key="orion" data-gender="male">
         <div class="companion-check">
-          <svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.2 5.8L8 1" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg width="9" height="7" viewBox="0 0 9 7" fill="none">
+            <path d="M1 3.5L3.2 5.8L8 1" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
         </div>
-        <div class="companion-avatar male">🎙️</div><div class="companion-name">Orion</div>
+        <div class="companion-avatar male">🎙️</div>
+        <div class="companion-name">Orion</div>
       </div>
+
       <!-- Nova -->
       <div class="companion-card" data-key="nova" data-gender="female">
         <div class="companion-check">
-          <svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.2 5.8L8 1" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg width="9" height="7" viewBox="0 0 9 7" fill="none">
+            <path d="M1 3.5L3.2 5.8L8 1" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
         </div>
-        <div class="companion-avatar female">🎙️</div><div class="companion-name">Nova</div>
+        <div class="companion-avatar female">🎙️</div>
+        <div class="companion-name">Nova</div>
       </div>
+
       <!-- Arthur -->
       <div class="companion-card" data-key="arthur" data-gender="male">
         <div class="companion-check">
-          <svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.2 5.8L8 1" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg width="9" height="7" viewBox="0 0 9 7" fill="none">
+            <path d="M1 3.5L3.2 5.8L8 1" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
         </div>
-        <div class="companion-avatar male">🎙️</div><div class="companion-name">Arthur</div>
+        <div class="companion-avatar male">🎙️</div>
+        <div class="companion-name">Arthur</div>
       </div>
+
       <!-- Eleanor -->
       <div class="companion-card" data-key="eleanor" data-gender="female">
         <div class="companion-check">
-          <svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.2 5.8L8 1" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg width="9" height="7" viewBox="0 0 9 7" fill="none">
+            <path d="M1 3.5L3.2 5.8L8 1" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
         </div>
-        <div class="companion-avatar female">🎙️</div><div class="companion-name">Eleanor</div>
+        <div class="companion-avatar female">🎙️</div>
+        <div class="companion-name">Eleanor</div>
       </div>
+
       <!-- Kabir -->
       <div class="companion-card" data-key="kabir" data-gender="male">
         <div class="companion-check">
-          <svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.2 5.8L8 1" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg width="9" height="7" viewBox="0 0 9 7" fill="none">
+            <path d="M1 3.5L3.2 5.8L8 1" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
         </div>
-        <div class="companion-avatar male">🎙️</div><div class="companion-name">Kabir</div>
+        <div class="companion-avatar male">🎙️</div>
+        <div class="companion-name">Kabir</div>
       </div>
+
       <!-- Maya -->
       <div class="companion-card" data-key="maya" data-gender="female">
         <div class="companion-check">
-          <svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.2 5.8L8 1" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg width="9" height="7" viewBox="0 0 9 7" fill="none">
+            <path d="M1 3.5L3.2 5.8L8 1" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
         </div>
-        <div class="companion-avatar female">🎙️</div><div class="companion-name">Maya</div>
+        <div class="companion-avatar female">🎙️</div>
+        <div class="companion-name">Maya</div>
       </div>
+
       <!-- Ren -->
       <div class="companion-card" data-key="ren" data-gender="male">
         <div class="companion-check">
-          <svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.2 5.8L8 1" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg width="9" height="7" viewBox="0 0 9 7" fill="none">
+            <path d="M1 3.5L3.2 5.8L8 1" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
         </div>
-        <div class="companion-avatar male">🎙️</div><div class="companion-name">Ren</div>
+        <div class="companion-avatar male">🎙️</div>
+        <div class="companion-name">Ren</div>
       </div>
+
       <!-- Mei -->
       <div class="companion-card" data-key="mei" data-gender="female">
         <div class="companion-check">
-          <svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.2 5.8L8 1" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg width="9" height="7" viewBox="0 0 9 7" fill="none">
+            <path d="M1 3.5L3.2 5.8L8 1" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
         </div>
-        <div class="companion-avatar female">🎙️</div><div class="companion-name">Mei</div>
+        <div class="companion-avatar female">🎙️</div>
+        <div class="companion-name">Mei</div>
       </div>
+
       <!-- Amir -->
       <div class="companion-card" data-key="amir" data-gender="male">
         <div class="companion-check">
-          <svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.2 5.8L8 1" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg width="9" height="7" viewBox="0 0 9 7" fill="none">
+            <path d="M1 3.5L3.2 5.8L8 1" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
         </div>
-        <div class="companion-avatar male">🎙️</div><div class="companion-name">Amir</div>
+        <div class="companion-avatar male">🎙️</div>
+        <div class="companion-name">Amir</div>
       </div>
+
       <!-- Layla -->
       <div class="companion-card" data-key="layla" data-gender="female">
         <div class="companion-check">
-          <svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.2 5.8L8 1" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg width="9" height="7" viewBox="0 0 9 7" fill="none">
+            <path d="M1 3.5L3.2 5.8L8 1" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
         </div>
-        <div class="companion-avatar female">🎙️</div><div class="companion-name">Layla</div>
+        <div class="companion-avatar female">🎙️</div>
+        <div class="companion-name">Layla</div>
       </div>
-    </div>
+
+    </div><!-- /companion-grid -->
+
     <div class="companion-cta">
       <button class="btn-start" id="btnStartChat">Start Conversation →</button>
     </div>
+
   </div>
 </div>
 
+<!-- ──────── VOICE OVERLAY ──────── -->
 <div class="voice-overlay" id="voiceOverlay">
   <div class="voice-big-orb">
     <canvas id="voiceOrbCanvas" width="340" height="340"></canvas>
@@ -452,8 +514,10 @@ main{
   <button class="voice-end-btn" id="voiceEndBtn">End Voice Chat</button>
 </div>
 
+<!-- ──────── MAIN CHAT ──────── -->
 <main>
   <div class="glass">
+
     <div class="chat-top">
       <div class="chat-title">
         <span class="pulse-dot"></span>
@@ -461,6 +525,7 @@ main{
       </div>
     </div>
 
+    <!-- Active companion bar — hidden until a model is chosen -->
     <div class="active-companion-bar" id="activeCompanionBar" style="display:none">
       <div class="acb-avatar" id="acbAvatar">🎙️</div>
       <div>
@@ -477,6 +542,7 @@ main{
     </div>
 
     <div class="topics-label">Pick a topic to talk about</div>
+
     <div class="planets">
       <div class="planet">👋 Greetings</div>
       <div class="planet">✈️ Travel</div>
@@ -493,10 +559,14 @@ main{
         <canvas id="orbButtonCanvas" width="150" height="150"></canvas>
       </div>
     </div>
+
   </div>
 </main>
 
 <script>
+/* ─────────────────────────────────────
+   MODEL META (frontend only — for UI)
+───────────────────────────────────── */
 const MODEL_META = {
   orion:   { name:'Orion',   gender:'male'   },
   nova:    { name:'Nova',    gender:'female' },
@@ -512,6 +582,9 @@ const MODEL_META = {
 
 let selectedModel = null;
 
+/* ─────────────────────────────────────
+   COMPANION SELECTOR
+───────────────────────────────────── */
 const companionScreen = document.getElementById('companionScreen');
 const btnStartChat    = document.getElementById('btnStartChat');
 const cards           = document.querySelectorAll('.companion-card');
@@ -544,8 +617,11 @@ document.getElementById('activeCompanionBar').addEventListener('click', () => {
   companionScreen.classList.remove('hidden');
 });
 
+/* ─────────────────────────────────────
+   PHRASES
+───────────────────────────────────── */
 const PHRASES = [
-  { text:'"Break the ice"',              meaning:'Start a conversation in a social situation' },
+  { text:'"Break the ice"',             meaning:'Start a conversation in a social situation' },
   { text:'"Under the weather"',          meaning:'Feeling slightly ill or unwell' },
   { text:'"Hit the nail on the head"',   meaning:'Describe exactly what is happening' },
   { text:'"Bite the bullet"',            meaning:'Endure a painful or difficult situation' },
@@ -556,6 +632,9 @@ const chosen = PHRASES[Math.floor(Math.random() * PHRASES.length)];
 document.getElementById('phraseText').textContent    = chosen.text;
 document.getElementById('phraseMeaning').textContent = chosen.meaning;
 
+/* ─────────────────────────────────────
+   STARFIELD
+───────────────────────────────────── */
 const starCanvas = document.getElementById('starCanvas');
 const sctx = starCanvas.getContext('2d');
 let W, H;
@@ -577,6 +656,9 @@ function drawStars(){
 }
 drawStars();
 
+/* ─────────────────────────────────────
+   ORB STATE
+───────────────────────────────────── */
 let orbState = 'idle';
 function setState(state){
   orbState = state;
@@ -586,6 +668,9 @@ function setState(state){
   if(state==='speaking')  vs.textContent='Speaking...';
 }
 
+/* ─────────────────────────────────────
+   SMALL ORB
+───────────────────────────────────── */
 const orbCanvas = document.getElementById('orbButtonCanvas');
 const orbCtx    = orbCanvas.getContext('2d');
 let phase=0, energy=0;
@@ -619,6 +704,9 @@ function renderSmallOrb(){
 }
 renderSmallOrb();
 
+/* ─────────────────────────────────────
+   BIG ORB
+───────────────────────────────────── */
 const voiceOrbCanvas = document.getElementById('voiceOrbCanvas');
 const vctx           = voiceOrbCanvas.getContext('2d');
 let vPhase=0, vEnergy=0;
@@ -656,6 +744,9 @@ function renderBigOrb(){
 }
 renderBigOrb();
 
+/* ─────────────────────────────────────
+   CHAT FEED
+───────────────────────────────────── */
 const feed = document.getElementById('live-chat-feed');
 function appendMsg(role, text){
   const div=document.createElement('div');
@@ -665,9 +756,15 @@ function appendMsg(role, text){
   feed.scrollTop=feed.scrollHeight;
 }
 
+/* ─────────────────────────────────────
+   FAREWELL DETECTION
+───────────────────────────────────── */
 const FAREWELL_RE = /\b(bye|goodbye|good bye|see you|see ya|take care|that'?s? all|we'?re done|let'?s end|end (the )?conversation|stop|quit|i'?m done|thank you that'?s all|farewell)\b/i;
 function isFarewell(text){ return FAREWELL_RE.test(text); }
 
+/* ─────────────────────────────────────
+   VOICE MODE
+───────────────────────────────────── */
 const micBtn  = document.getElementById('micBtn');
 const overlay = document.getElementById('voiceOverlay');
 const endBtn  = document.getElementById('voiceEndBtn');
@@ -688,6 +785,7 @@ async function openVoiceMode(){
   setState('thinking');
 
   try{
+    /* 1. Get ephemeral key from our backend */
     const tokenRes  = await fetch(`/api/realtime-token?model=${selectedModel}`);
     const tokenData = await tokenRes.json();
     const EPHEMERAL_KEY = tokenData?.client_secret?.value || tokenData?.value || null;
@@ -697,7 +795,9 @@ async function openVoiceMode(){
       closeVoiceMode(); return;
     }
 
+    /* 2. Build WebRTC peer connection */
     pc = new RTCPeerConnection();
+
     remoteAudio = document.createElement('audio');
     remoteAudio.autoplay = true;
     document.body.appendChild(remoteAudio);
@@ -707,17 +807,20 @@ async function openVoiceMode(){
     const ms = await navigator.mediaDevices.getUserMedia({ audio:true });
     ms.getTracks().forEach(t => pc.addTrack(t, ms));
 
+    /* 3. Data channel for events */
     dc = pc.createDataChannel('oai-events');
+
     dc.onopen = () => { setState('listening'); };
 
     dc.onmessage = e => {
       let msg;
       try{ msg=JSON.parse(e.data); }catch{ return; }
 
-      if(msg.type==='response.created')          setState('thinking');
+      if(msg.type==='response.created')           setState('thinking');
       if(msg.type==='response.output_item.added') setState('speaking');
       if(msg.type==='response.done')              setState('listening');
 
+      /* User transcript */
       if(msg.type==='conversation.item.input_audio_transcription.completed'){
         const userText = msg.transcript || '';
         appendMsg('user', userText);
@@ -726,6 +829,7 @@ async function openVoiceMode(){
         }
       }
 
+      /* AI transcript */
       if(msg.type==='response.audio_transcript.done' || msg.type==='response.output_audio_transcript.done'){
         const aiText = msg.transcript || '...';
         appendMsg('ai', aiText);
@@ -735,11 +839,12 @@ async function openVoiceMode(){
       }
     };
 
+    /* 4. SDP exchange */
     const offer = await pc.createOffer();
     await pc.setLocalDescription(offer);
 
     const sdpRes = await fetch(
-      'https://api.openai.com/v1/realtime/calls',
+      'https://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview-2024-12-17',
       {
         method:'POST',
         body: offer.sdp,

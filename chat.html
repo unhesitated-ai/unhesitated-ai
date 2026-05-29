@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -121,6 +120,7 @@ body{
   font-size:0.9rem;
 }
 
+/* ─── MAIN LAYOUT ─── */
 main{
   min-height:100vh;
   display:flex;
@@ -314,6 +314,7 @@ main{
   border-radius:50%;
 }
 
+/* ─── VOICE OVERLAY ─── */
 .voice-overlay{
   position:fixed;
   inset:0;
@@ -369,13 +370,276 @@ main{
 .voice-end-btn:hover{
   background:rgba(255,255,255,0.12);
 }
+
+/* ────────────────────────────────────────────
+   COMPANION SELECTOR SCREEN
+──────────────────────────────────────────── */
+#companionScreen{
+  position:fixed;
+  inset:0;
+  z-index:200;
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  padding:100px 20px 40px;
+  background:rgba(3,5,13,0.97);
+  backdrop-filter:blur(28px);
+  overflow-y:auto;
+}
+
+#companionScreen.hidden{
+  display:none;
+}
+
+.companion-wrapper{
+  width:100%;
+  max-width:720px;
+}
+
+.companion-header{
+  text-align:center;
+  margin-bottom:36px;
+}
+
+.companion-header h2{
+  font-family:'Sora',sans-serif;
+  font-size:1.45rem;
+  font-weight:700;
+  letter-spacing:-0.01em;
+  margin-bottom:8px;
+}
+
+.companion-header p{
+  color:var(--white-muted);
+  font-size:0.88rem;
+}
+
+/* region blocks */
+.region-block{
+  margin-bottom:28px;
+}
+
+.region-label{
+  font-family:'Sora',sans-serif;
+  font-size:0.65rem;
+  letter-spacing:0.18em;
+  text-transform:uppercase;
+  color:rgba(107,159,255,0.5);
+  margin-bottom:12px;
+  padding-left:2px;
+}
+
+.companion-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+.companion-card{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  padding:16px 18px;
+  border-radius:18px;
+  border:1px solid rgba(255,255,255,0.06);
+  background:rgba(255,255,255,0.03);
+  cursor:pointer;
+  transition:all 0.22s var(--ease);
+  position:relative;
+  overflow:hidden;
+}
+
+.companion-card::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  border-radius:18px;
+  background:radial-gradient(circle at 20% 50%, rgba(75,127,255,0.07), transparent 70%);
+  opacity:0;
+  transition:opacity 0.3s ease;
+}
+
+.companion-card:hover::before{
+  opacity:1;
+}
+
+.companion-card:hover{
+  border-color:rgba(75,127,255,0.38);
+  background:rgba(75,127,255,0.07);
+  transform:translateY(-2px);
+}
+
+.companion-card.selected{
+  border-color:rgba(107,159,255,0.7);
+  background:rgba(75,127,255,0.13);
+  box-shadow:0 0 22px rgba(75,127,255,0.18);
+}
+
+.companion-avatar{
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:1.25rem;
+  flex-shrink:0;
+  border:1px solid rgba(255,255,255,0.08);
+}
+
+.companion-avatar.male{
+  background:radial-gradient(circle at 30% 30%, rgba(75,127,255,0.3), rgba(10,20,60,0.9));
+}
+
+.companion-avatar.female{
+  background:radial-gradient(circle at 30% 30%, rgba(168,85,247,0.3), rgba(30,10,60,0.9));
+}
+
+.companion-info{
+  flex:1;
+  min-width:0;
+}
+
+.companion-name{
+  font-family:'Sora',sans-serif;
+  font-weight:600;
+  font-size:0.98rem;
+  margin-bottom:2px;
+}
+
+.companion-tag{
+  font-size:0.72rem;
+  color:rgba(255,255,255,0.38);
+  letter-spacing:0.04em;
+}
+
+.companion-check{
+  width:20px;
+  height:20px;
+  border-radius:50%;
+  border:1.5px solid rgba(255,255,255,0.15);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+  transition:all 0.2s ease;
+}
+
+.companion-card.selected .companion-check{
+  background:var(--electric);
+  border-color:var(--electric);
+}
+
+.companion-check svg{
+  opacity:0;
+  transition:opacity 0.2s ease;
+}
+
+.companion-card.selected .companion-check svg{
+  opacity:1;
+}
+
+.companion-cta{
+  margin-top:32px;
+  display:flex;
+  justify-content:center;
+}
+
+.btn-start{
+  padding:14px 42px;
+  border-radius:50px;
+  border:none;
+  background:linear-gradient(135deg,rgba(75,127,255,0.9),rgba(107,159,255,0.7));
+  color:white;
+  font-family:'Sora',sans-serif;
+  font-weight:600;
+  font-size:0.95rem;
+  cursor:pointer;
+  transition:all 0.25s ease;
+  box-shadow:0 0 30px rgba(75,127,255,0.3);
+  opacity:0.4;
+  pointer-events:none;
+}
+
+.btn-start.ready{
+  opacity:1;
+  pointer-events:all;
+}
+
+.btn-start.ready:hover{
+  transform:translateY(-2px);
+  box-shadow:0 0 45px rgba(75,127,255,0.5);
+}
+
+/* ─── active companion badge in chat ─── */
+.active-companion-bar{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 16px;
+  border-radius:14px;
+  background:rgba(75,127,255,0.06);
+  border:1px solid rgba(75,127,255,0.14);
+  margin-bottom:20px;
+  cursor:pointer;
+  transition:all 0.22s ease;
+}
+
+.active-companion-bar:hover{
+  background:rgba(75,127,255,0.1);
+}
+
+.acb-avatar{
+  width:32px;
+  height:32px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:0.9rem;
+}
+
+.acb-avatar.male{
+  background:radial-gradient(circle,rgba(75,127,255,0.35),rgba(10,20,60,0.9));
+}
+
+.acb-avatar.female{
+  background:radial-gradient(circle,rgba(168,85,247,0.35),rgba(30,10,60,0.9));
+}
+
+.acb-info{
+  flex:1;
+}
+
+.acb-name{
+  font-family:'Sora',sans-serif;
+  font-weight:600;
+  font-size:0.88rem;
+}
+
+.acb-accent{
+  font-size:0.72rem;
+  color:var(--white-muted);
+}
+
+.acb-change{
+  font-size:0.72rem;
+  color:rgba(107,159,255,0.6);
+  letter-spacing:0.05em;
+}
+
+/* divider */
+.region-divider{
+  height:1px;
+  background:linear-gradient(90deg,transparent,rgba(75,127,255,0.15),transparent);
+  margin:6px 0 20px;
+}
 </style>
 </head>
 
 <body>
 
 <canvas id="starCanvas"></canvas>
-
 <div class="atmo-orb one"></div>
 <div class="atmo-orb two"></div>
 
@@ -384,395 +648,499 @@ main{
     <span style="font-size:1.2rem;font-weight:700">unhesitated<span class="dot-ai">.ai</span></span>
     <span class="pulse-dot"></span>
   </a>
-
   <ul class="nav-links">
     <li><a href="index.html">← Back to Home</a></li>
   </ul>
 </nav>
 
+<!-- ────────── COMPANION SELECTOR SCREEN ────────── -->
+<div id="companionScreen">
+  <div class="companion-wrapper">
+
+    <div class="companion-header">
+      <h2>Choose Your Speaking Companion</h2>
+      <p>Each companion has a unique accent and personality to guide your English journey.</p>
+    </div>
+
+    <!-- US -->
+    <div class="region-block">
+      <div class="region-label">🇺🇸 &nbsp;United States</div>
+      <div class="companion-row">
+        <div class="companion-card" data-key="orion" data-gender="male">
+          <div class="companion-avatar male">🎙️</div>
+          <div class="companion-info">
+            <div class="companion-name">Orion</div>
+            <div class="companion-tag">American · Male</div>
+          </div>
+          <div class="companion-check">
+            <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+              <path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+        <div class="companion-card" data-key="nova" data-gender="female">
+          <div class="companion-avatar female">🎙️</div>
+          <div class="companion-info">
+            <div class="companion-name">Nova</div>
+            <div class="companion-tag">American · Female</div>
+          </div>
+          <div class="companion-check">
+            <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+              <path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="region-divider"></div>
+
+    <!-- UK -->
+    <div class="region-block">
+      <div class="region-label">🇬🇧 &nbsp;United Kingdom</div>
+      <div class="companion-row">
+        <div class="companion-card" data-key="arthur" data-gender="male">
+          <div class="companion-avatar male">🎙️</div>
+          <div class="companion-info">
+            <div class="companion-name">Arthur</div>
+            <div class="companion-tag">British · Male</div>
+          </div>
+          <div class="companion-check">
+            <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+              <path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+        <div class="companion-card" data-key="eleanor" data-gender="female">
+          <div class="companion-avatar female">🎙️</div>
+          <div class="companion-info">
+            <div class="companion-name">Eleanor</div>
+            <div class="companion-tag">British · Female</div>
+          </div>
+          <div class="companion-check">
+            <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+              <path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="region-divider"></div>
+
+    <!-- South Asia -->
+    <div class="region-block">
+      <div class="region-label">🌏 &nbsp;South Asia</div>
+      <div class="companion-row">
+        <div class="companion-card" data-key="kabir" data-gender="male">
+          <div class="companion-avatar male">🎙️</div>
+          <div class="companion-info">
+            <div class="companion-name">Kabir</div>
+            <div class="companion-tag">South Asian · Male</div>
+          </div>
+          <div class="companion-check">
+            <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+              <path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+        <div class="companion-card" data-key="maya" data-gender="female">
+          <div class="companion-avatar female">🎙️</div>
+          <div class="companion-info">
+            <div class="companion-name">Maya</div>
+            <div class="companion-tag">South Asian · Female</div>
+          </div>
+          <div class="companion-check">
+            <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+              <path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="region-divider"></div>
+
+    <!-- East Asia -->
+    <div class="region-block">
+      <div class="region-label">🌏 &nbsp;East Asia</div>
+      <div class="companion-row">
+        <div class="companion-card" data-key="ren" data-gender="male">
+          <div class="companion-avatar male">🎙️</div>
+          <div class="companion-info">
+            <div class="companion-name">Ren</div>
+            <div class="companion-tag">East Asian · Male</div>
+          </div>
+          <div class="companion-check">
+            <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+              <path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+        <div class="companion-card" data-key="mei" data-gender="female">
+          <div class="companion-avatar female">🎙️</div>
+          <div class="companion-info">
+            <div class="companion-name">Mei</div>
+            <div class="companion-tag">East Asian · Female</div>
+          </div>
+          <div class="companion-check">
+            <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+              <path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="region-divider"></div>
+
+    <!-- Middle East -->
+    <div class="region-block">
+      <div class="region-label">🌍 &nbsp;Middle East</div>
+      <div class="companion-row">
+        <div class="companion-card" data-key="amir" data-gender="male">
+          <div class="companion-avatar male">🎙️</div>
+          <div class="companion-info">
+            <div class="companion-name">Amir</div>
+            <div class="companion-tag">Middle Eastern · Male</div>
+          </div>
+          <div class="companion-check">
+            <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+              <path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+        <div class="companion-card" data-key="layla" data-gender="female">
+          <div class="companion-avatar female">🎙️</div>
+          <div class="companion-info">
+            <div class="companion-name">Layla</div>
+            <div class="companion-tag">Middle Eastern · Female</div>
+          </div>
+          <div class="companion-check">
+            <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+              <path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="companion-cta">
+      <button class="btn-start" id="btnStartChat">Start Conversation →</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ────────── VOICE OVERLAY ────────── -->
 <div class="voice-overlay" id="voiceOverlay">
   <div class="voice-big-orb">
     <canvas id="voiceOrbCanvas" width="340" height="340"></canvas>
   </div>
-
-  <div class="voice-status" id="voiceStatus">
-    Listening...
-  </div>
-
-  <button class="voice-end-btn" id="voiceEndBtn">
-    End Voice Chat
-  </button>
+  <div class="voice-status" id="voiceStatus">Listening...</div>
+  <button class="voice-end-btn" id="voiceEndBtn">End Voice Chat</button>
 </div>
 
+<!-- ────────── MAIN CHAT ────────── -->
 <main>
+  <div class="glass">
 
-<div class="glass">
-
-  <div class="chat-top">
-    <div class="chat-title">
-      <span class="pulse-dot"></span>
-
-      <span>
-        unhesitated<span class="dot-ai">.ai</span>
-      </span>
+    <div class="chat-top">
+      <div class="chat-title">
+        <span class="pulse-dot"></span>
+        <span>unhesitated<span class="dot-ai">.ai</span></span>
+      </div>
     </div>
-  </div>
 
-  <div class="phrase-strip">
-    <div class="phrase-label">✦ Today's Phrase</div>
-    <div class="phrase-text" id="phraseText"></div>
-    <div class="phrase-meaning" id="phraseMeaning"></div>
-  </div>
-
-  <div class="topics-label">
-    Pick a topic to talk about
-  </div>
-
-  <div class="planets">
-    <div class="planet">👋 Greetings</div>
-    <div class="planet">✈️ Travel</div>
-    <div class="planet">💼 Work</div>
-    <div class="planet">💬 Emotions</div>
-    <div class="planet">🌟 Idioms</div>
-    <div class="planet">🍜 Food</div>
-  </div>
-
-  <div id="live-chat-feed"></div>
-
-  <div class="orb-section">
-    <div class="orb-shell" id="micBtn">
-      <canvas id="orbButtonCanvas" width="150" height="150"></canvas>
+    <!-- Active companion bar (shown after selection) -->
+    <div class="active-companion-bar" id="activeCompanionBar" style="display:none">
+      <div class="acb-avatar" id="acbAvatar">🎙️</div>
+      <div class="acb-info">
+        <div class="acb-name" id="acbName">—</div>
+        <div class="acb-accent" id="acbAccent">—</div>
+      </div>
+      <div class="acb-change">Change ›</div>
     </div>
+
+    <div class="phrase-strip">
+      <div class="phrase-label">✦ Today's Phrase</div>
+      <div class="phrase-text" id="phraseText"></div>
+      <div class="phrase-meaning" id="phraseMeaning"></div>
+    </div>
+
+    <div class="topics-label">Pick a topic to talk about</div>
+
+    <div class="planets">
+      <div class="planet">👋 Greetings</div>
+      <div class="planet">✈️ Travel</div>
+      <div class="planet">💼 Work</div>
+      <div class="planet">💬 Emotions</div>
+      <div class="planet">🌟 Idioms</div>
+      <div class="planet">🍜 Food</div>
+    </div>
+
+    <div id="live-chat-feed"></div>
+
+    <div class="orb-section">
+      <div class="orb-shell" id="micBtn">
+        <canvas id="orbButtonCanvas" width="150" height="150"></canvas>
+      </div>
+    </div>
+
   </div>
-
-</div>
-
 </main>
 
 <script>
-/* PHRASES */
+/* ──────────────────────────────────────────
+   MODEL DATA (mirrors server.js)
+────────────────────────────────────────── */
+const MODEL_META = {
+  orion:   { name:'Orion',   gender:'male',   accent:'American Accent',              region:'US' },
+  nova:    { name:'Nova',    gender:'female', accent:'American Accent',              region:'US' },
+  arthur:  { name:'Arthur',  gender:'male',   accent:'British Accent',               region:'UK' },
+  eleanor: { name:'Eleanor', gender:'female', accent:'British Accent',               region:'UK' },
+  kabir:   { name:'Kabir',   gender:'male',   accent:'South Asian English',          region:'South Asia' },
+  maya:    { name:'Maya',    gender:'female', accent:'South Asian English',          region:'South Asia' },
+  ren:     { name:'Ren',     gender:'male',   accent:'Soft International English',   region:'East Asia' },
+  mei:     { name:'Mei',     gender:'female', accent:'Soft International English',   region:'East Asia' },
+  amir:    { name:'Amir',    gender:'male',   accent:'Warm International Accent',    region:'Middle East' },
+  layla:   { name:'Layla',   gender:'female', accent:'Warm International Accent',    region:'Middle East' }
+};
 
+let selectedModel = null;
+
+/* ──────────────────────────────────────────
+   COMPANION SELECTOR LOGIC
+────────────────────────────────────────── */
+const companionScreen = document.getElementById('companionScreen');
+const btnStartChat    = document.getElementById('btnStartChat');
+const cards           = document.querySelectorAll('.companion-card');
+
+cards.forEach(card => {
+  card.addEventListener('click', () => {
+    cards.forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    selectedModel = card.dataset.key;
+    btnStartChat.classList.add('ready');
+  });
+});
+
+btnStartChat.addEventListener('click', () => {
+  if (!selectedModel) return;
+  companionScreen.classList.add('hidden');
+  updateActiveCompanionBar(selectedModel);
+});
+
+function updateActiveCompanionBar(key) {
+  const meta = MODEL_META[key];
+  const bar  = document.getElementById('activeCompanionBar');
+  const av   = document.getElementById('acbAvatar');
+
+  document.getElementById('acbName').textContent   = meta.name;
+  document.getElementById('acbAccent').textContent = meta.accent;
+  av.className = 'acb-avatar ' + meta.gender;
+  bar.style.display = 'flex';
+}
+
+// Clicking the bar reopens the selector
+document.getElementById('activeCompanionBar').addEventListener('click', () => {
+  companionScreen.classList.remove('hidden');
+});
+
+/* ──────────────────────────────────────────
+   PHRASES
+────────────────────────────────────────── */
 const PHRASES = [
-  { text: '"Break the ice"', meaning: 'Start a conversation in a social situation' },
-  { text: '"Under the weather"', meaning: 'Feeling slightly ill or unwell' },
+  { text: '"Break the ice"',         meaning: 'Start a conversation in a social situation' },
+  { text: '"Under the weather"',     meaning: 'Feeling slightly ill or unwell' },
   { text: '"Hit the nail on the head"', meaning: 'Describe exactly what is happening' },
-  { text: '"Bite the bullet"', meaning: 'Endure a painful or difficult situation' },
-  { text: '"On the same page"', meaning: 'In agreement and thinking the same way' },
-  { text: '"Piece of cake"', meaning: 'Something very easy to do' },
+  { text: '"Bite the bullet"',       meaning: 'Endure a painful or difficult situation' },
+  { text: '"On the same page"',      meaning: 'In agreement and thinking the same way' },
+  { text: '"Piece of cake"',         meaning: 'Something very easy to do' },
 ];
 
-const chosen = PHRASES[Math.floor(Math.random()*PHRASES.length)];
-
-document.getElementById('phraseText').textContent = chosen.text;
+const chosen = PHRASES[Math.floor(Math.random() * PHRASES.length)];
+document.getElementById('phraseText').textContent   = chosen.text;
 document.getElementById('phraseMeaning').textContent = chosen.meaning;
 
-
-/* STARFIELD */
-
+/* ──────────────────────────────────────────
+   STARFIELD
+────────────────────────────────────────── */
 const starCanvas = document.getElementById('starCanvas');
 const sctx = starCanvas.getContext('2d');
+let W, H;
 
-let W,H;
-
-function resize(){
-  W = starCanvas.width = innerWidth;
+function resize() {
+  W = starCanvas.width  = innerWidth;
   H = starCanvas.height = innerHeight;
 }
-
 resize();
-addEventListener('resize',resize);
+addEventListener('resize', resize);
 
 const stars = [];
-
-for(let i=0;i<180;i++){
-  stars.push({
-    x:Math.random()*W,
-    y:Math.random()*H,
-    r:Math.random()*1.5,
-    a:Math.random(),
-    v:Math.random()*0.2
-  });
+for (let i = 0; i < 180; i++) {
+  stars.push({ x:Math.random()*W, y:Math.random()*H, r:Math.random()*1.5, a:Math.random(), v:Math.random()*0.2 });
 }
 
-function drawStars(){
-  sctx.clearRect(0,0,W,H);
-
-  stars.forEach(s=>{
+function drawStars() {
+  sctx.clearRect(0, 0, W, H);
+  stars.forEach(s => {
     s.y += s.v;
-
-    if(s.y > H){
-      s.y = -10;
-      s.x = Math.random()*W;
-    }
-
+    if (s.y > H) { s.y = -10; s.x = Math.random()*W; }
     sctx.globalAlpha = s.a;
-
     sctx.beginPath();
-    sctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+    sctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
     sctx.fillStyle = 'white';
     sctx.fill();
   });
-
   requestAnimationFrame(drawStars);
 }
-
 drawStars();
 
-
-/* ORB STATES */
-
+/* ──────────────────────────────────────────
+   ORB STATE
+────────────────────────────────────────── */
 let orbState = 'idle';
 
-function setState(state){
+function setState(state) {
   orbState = state;
-
-  const voiceStatus = document.getElementById('voiceStatus');
-
-  if(state === 'listening'){
-    voiceStatus.textContent = 'Listening...';
-  }
-
-  if(state === 'thinking'){
-    voiceStatus.textContent = 'Thinking...';
-  }
-
-  if(state === 'speaking'){
-    voiceStatus.textContent = 'Speaking...';
-  }
+  const vs = document.getElementById('voiceStatus');
+  if (state === 'listening') vs.textContent = 'Listening...';
+  if (state === 'thinking')  vs.textContent = 'Thinking...';
+  if (state === 'speaking')  vs.textContent = 'Speaking...';
 }
 
-
-/* SMALL ORB */
-
+/* ──────────────────────────────────────────
+   SMALL ORB
+────────────────────────────────────────── */
 const orbCanvas = document.getElementById('orbButtonCanvas');
-const orbCtx = orbCanvas.getContext('2d');
+const orbCtx    = orbCanvas.getContext('2d');
+let phase = 0, energy = 0;
 
-let phase = 0;
-let energy = 0;
-
-function renderSmallOrb(){
-
-  orbCtx.clearRect(0,0,150,150);
-
+function renderSmallOrb() {
+  orbCtx.clearRect(0, 0, 150, 150);
   let target = 0.1;
-
-  if(orbState === 'listening') target = 0.6;
-  if(orbState === 'thinking') target = 0.35;
-  if(orbState === 'speaking') target = 0.9;
-
-  energy += (target-energy)*0.08;
-
-  phase += 0.03;
-
-  const CX = 75;
-  const CY = 75;
-  const R = 42;
-
-  for(let i=3;i>=1;i--){
-
+  if (orbState === 'listening') target = 0.6;
+  if (orbState === 'thinking')  target = 0.35;
+  if (orbState === 'speaking')  target = 0.9;
+  energy += (target - energy) * 0.08;
+  phase  += 0.03;
+  const CX = 75, CY = 75, R = 42;
+  for (let i = 3; i >= 1; i--) {
     orbCtx.beginPath();
-
-    orbCtx.arc(
-      CX,
-      CY,
-      R + i*10 + energy*16,
-      0,
-      Math.PI*2
-    );
-
+    orbCtx.arc(CX, CY, R + i*10 + energy*16, 0, Math.PI*2);
     let alpha = energy*0.16/i;
-
-    orbCtx.fillStyle =
-      orbState === 'thinking'
-      ? `rgba(168,85,247,${alpha})`
-      : `rgba(75,127,255,${alpha})`;
-
+    orbCtx.fillStyle = orbState==='thinking' ? `rgba(168,85,247,${alpha})` : `rgba(75,127,255,${alpha})`;
     orbCtx.fill();
   }
-
   orbCtx.beginPath();
-
-  for(let i=0;i<=80;i++){
-
+  for (let i = 0; i <= 80; i++) {
     const angle = (i/80)*Math.PI*2;
-
-    let bump = Math.sin(angle*5 + phase*2) * energy * 12;
-
-    const rr = R + bump;
-
-    const x = CX + Math.cos(angle)*rr;
-    const y = CY + Math.sin(angle)*rr;
-
-    if(i===0){
-      orbCtx.moveTo(x,y);
-    }else{
-      orbCtx.lineTo(x,y);
-    }
+    const bump  = Math.sin(angle*5 + phase*2)*energy*12;
+    const rr    = R + bump;
+    const x     = CX + Math.cos(angle)*rr;
+    const y     = CY + Math.sin(angle)*rr;
+    if (i===0) orbCtx.moveTo(x,y); else orbCtx.lineTo(x,y);
   }
-
   orbCtx.closePath();
-
-  const grd = orbCtx.createRadialGradient(CX-12,CY-12,0,CX,CY,R+30);
-
-  grd.addColorStop(0,'#cde2ff');
-  grd.addColorStop(1,'#14224f');
-
+  const grd = orbCtx.createRadialGradient(CX-12, CY-12, 0, CX, CY, R+30);
+  grd.addColorStop(0, '#cde2ff');
+  grd.addColorStop(1, '#14224f');
   orbCtx.fillStyle = grd;
   orbCtx.fill();
-
   requestAnimationFrame(renderSmallOrb);
 }
-
 renderSmallOrb();
 
-
-/* BIG ORB */
-
+/* ──────────────────────────────────────────
+   BIG ORB
+────────────────────────────────────────── */
 const voiceOrbCanvas = document.getElementById('voiceOrbCanvas');
-const vctx = voiceOrbCanvas.getContext('2d');
+const vctx           = voiceOrbCanvas.getContext('2d');
+let vPhase = 0, vEnergy = 0;
 
-let vPhase = 0;
-let vEnergy = 0;
-
-function renderBigOrb(){
-
-  vctx.clearRect(0,0,340,340);
-
+function renderBigOrb() {
+  vctx.clearRect(0, 0, 340, 340);
   let target = 0.1;
-
-  if(orbState === 'listening') target = 0.7;
-  if(orbState === 'thinking') target = 0.45;
-  if(orbState === 'speaking') target = 1;
-
-  vEnergy += (target-vEnergy)*0.06;
-
-  vPhase += 0.025;
-
-  const CX = 170;
-  const CY = 170;
-  const R = 100;
-
-  for(let i=4;i>=1;i--){
-
+  if (orbState === 'listening') target = 0.7;
+  if (orbState === 'thinking')  target = 0.45;
+  if (orbState === 'speaking')  target = 1;
+  vEnergy += (target - vEnergy) * 0.06;
+  vPhase  += 0.025;
+  const CX = 170, CY = 170, R = 100;
+  for (let i = 4; i >= 1; i--) {
     vctx.beginPath();
-
-    vctx.arc(
-      CX,
-      CY,
-      R + i*14 + vEnergy*20,
-      0,
-      Math.PI*2
-    );
-
+    vctx.arc(CX, CY, R + i*14 + vEnergy*20, 0, Math.PI*2);
     let alpha = vEnergy*0.18/i;
-
-    vctx.fillStyle =
-      orbState === 'thinking'
-      ? `rgba(168,85,247,${alpha})`
-      : `rgba(75,127,255,${alpha})`;
-
+    vctx.fillStyle = orbState==='thinking' ? `rgba(168,85,247,${alpha})` : `rgba(75,127,255,${alpha})`;
     vctx.fill();
   }
-
   vctx.beginPath();
-
-  for(let i=0;i<=120;i++){
-
+  for (let i = 0; i <= 120; i++) {
     const angle = (i/120)*Math.PI*2;
-
     let bump = 0;
-
-    if(orbState === 'listening'){
-      bump = Math.sin(angle*9 + vPhase*5)*vEnergy*14;
-    }
-
-    if(orbState === 'thinking'){
-      bump = Math.sin(angle*5 + vPhase*2)*vEnergy*10;
-    }
-
-    if(orbState === 'speaking'){
-      bump =
-        Math.sin(angle*12 + vPhase*5)*vEnergy*22 +
-        Math.sin(angle*6 - vPhase*3)*vEnergy*10;
-    }
-
+    if (orbState === 'listening') bump = Math.sin(angle*9 + vPhase*5)*vEnergy*14;
+    if (orbState === 'thinking')  bump = Math.sin(angle*5 + vPhase*2)*vEnergy*10;
+    if (orbState === 'speaking')  bump = Math.sin(angle*12 + vPhase*5)*vEnergy*22 + Math.sin(angle*6 - vPhase*3)*vEnergy*10;
     const rr = R + bump;
-
-    const x = CX + Math.cos(angle)*rr;
-    const y = CY + Math.sin(angle)*rr;
-
-    if(i===0){
-      vctx.moveTo(x,y);
-    }else{
-      vctx.lineTo(x,y);
-    }
+    const x  = CX + Math.cos(angle)*rr;
+    const y  = CY + Math.sin(angle)*rr;
+    if (i===0) vctx.moveTo(x,y); else vctx.lineTo(x,y);
   }
-
   vctx.closePath();
-
-  const grd = vctx.createRadialGradient(CX-20,CY-24,0,CX,CY,R+50);
-
-  if(orbState === 'thinking'){
-    grd.addColorStop(0,'#d9c8ff');
-    grd.addColorStop(1,'#1d0b42');
-  }else{
-    grd.addColorStop(0,'#d5e6ff');
-    grd.addColorStop(1,'#10214f');
+  const grd = vctx.createRadialGradient(CX-20, CY-24, 0, CX, CY, R+50);
+  if (orbState === 'thinking') {
+    grd.addColorStop(0,'#d9c8ff'); grd.addColorStop(1,'#1d0b42');
+  } else {
+    grd.addColorStop(0,'#d5e6ff'); grd.addColorStop(1,'#10214f');
   }
-
   vctx.fillStyle = grd;
   vctx.fill();
-
   requestAnimationFrame(renderBigOrb);
 }
-
 renderBigOrb();
 
-
-/* CHAT FEED */
-
+/* ──────────────────────────────────────────
+   CHAT FEED
+────────────────────────────────────────── */
 const feed = document.getElementById('live-chat-feed');
 
-function appendMsg(role,text){
-
+function appendMsg(role, text) {
   const div = document.createElement('div');
-
   div.className = 'msg ' + role;
-
   div.textContent = text;
-
   feed.appendChild(div);
-
   feed.scrollTop = feed.scrollHeight;
 }
 
-
-/* VOICE MODE */
-
-const micBtn = document.getElementById('micBtn');
+/* ──────────────────────────────────────────
+   VOICE MODE  (WebRTC Realtime)
+────────────────────────────────────────── */
+const micBtn  = document.getElementById('micBtn');
 const overlay = document.getElementById('voiceOverlay');
-const endBtn = document.getElementById('voiceEndBtn');
+const endBtn  = document.getElementById('voiceEndBtn');
 
-let pc = null;
-let dc = null;
-let remoteAudio = null;
+let pc = null, dc = null, remoteAudio = null;
 
-micBtn.addEventListener('click', openVoiceMode);
+micBtn.addEventListener('click', () => {
+  if (!selectedModel) {
+    // Bounce back to selector if no model chosen
+    companionScreen.classList.remove('hidden');
+    return;
+  }
+  openVoiceMode();
+});
+
 endBtn.addEventListener('click', closeVoiceMode);
 
-async function openVoiceMode(){
-
+async function openVoiceMode() {
   document.querySelector('.orb-shell').classList.add('active');
-
   overlay.classList.add('active');
-
   setState('thinking');
 
-  try{
-
-    const tokenRes = await fetch('/api/realtime-token');
+  try {
+    const tokenRes  = await fetch(`/api/realtime-token?model=${selectedModel}`);
     const tokenData = await tokenRes.json();
-
     const EPHEMERAL_KEY = tokenData?.value || tokenData?.client_secret?.value;
 
     pc = new RTCPeerConnection();
@@ -780,110 +1148,61 @@ async function openVoiceMode(){
     remoteAudio = document.createElement('audio');
     remoteAudio.autoplay = true;
 
-    pc.ontrack = e=>{
-      remoteAudio.srcObject = e.streams[0];
-    };
+    pc.ontrack = e => { remoteAudio.srcObject = e.streams[0]; };
 
-    const ms = await navigator.mediaDevices.getUserMedia({audio:true});
-
+    const ms = await navigator.mediaDevices.getUserMedia({ audio:true });
     pc.addTrack(ms.getTracks()[0]);
 
     dc = pc.createDataChannel('oai-events');
 
-    dc.onopen = ()=>{
-
+    dc.onopen = () => {
       setState('listening');
-
       dc.send(JSON.stringify({
-        type:'session.update',
-        session:{
-          input_audio_transcription:{model:'whisper-1'}
-        }
+        type: 'session.update',
+        session: { input_audio_transcription: { model:'whisper-1' } }
       }));
     };
 
-    dc.onmessage = e=>{
-
+    dc.onmessage = e => {
       const msg = JSON.parse(e.data);
-
-      if(msg.type === 'response.created'){
-        setState('thinking');
-      }
-
-      if(msg.type === 'response.output_item.added'){
-        setState('speaking');
-      }
-
-      if(msg.type === 'response.done'){
-        setState('listening');
-      }
-
-      if(msg.type === 'conversation.item.input_audio_transcription.completed'){
+      if (msg.type === 'response.created')           setState('thinking');
+      if (msg.type === 'response.output_item.added') setState('speaking');
+      if (msg.type === 'response.done')              setState('listening');
+      if (msg.type === 'conversation.item.input_audio_transcription.completed')
         appendMsg('user', msg.transcript);
-      }
-
-      if(
-        msg.type === 'response.audio_transcript.done' ||
-        msg.type === 'response.output_audio_transcript.done'
-      ){
+      if (msg.type === 'response.audio_transcript.done' || msg.type === 'response.output_audio_transcript.done')
         appendMsg('ai', msg.transcript || '...');
-      }
     };
 
     const offer = await pc.createOffer();
-
     await pc.setLocalDescription(offer);
 
-    const sdpRes = await fetch(
-      'https://api.openai.com/v1/realtime/calls',
-      {
-        method:'POST',
-        body:offer.sdp,
-        headers:{
-          Authorization:`Bearer ${EPHEMERAL_KEY}`,
-          'Content-Type':'application/sdp'
-        }
+    const sdpRes = await fetch('https://api.openai.com/v1/realtime/calls', {
+      method: 'POST',
+      body: offer.sdp,
+      headers: {
+        Authorization: `Bearer ${EPHEMERAL_KEY}`,
+        'Content-Type': 'application/sdp'
       }
-    );
+    });
 
-    const answer = {
-      type:'answer',
-      sdp:await sdpRes.text()
-    };
-
+    const answer = { type:'answer', sdp: await sdpRes.text() };
     await pc.setRemoteDescription(answer);
 
-  }catch(err){
-
+  } catch (err) {
     console.error(err);
-
     closeVoiceMode();
   }
 }
 
-function closeVoiceMode(){
-
+function closeVoiceMode() {
   overlay.classList.remove('active');
-
   document.querySelector('.orb-shell').classList.remove('active');
-
   setState('idle');
-
-  if(dc){
-    dc.close();
-    dc = null;
-  }
-
-  if(pc){
-
-    pc.getSenders().forEach(sender=>{
-      if(sender.track){
-        sender.track.stop();
-      }
-    });
-
+  if (dc)  { dc.close(); dc = null; }
+  if (pc)  {
+    pc.getSenders().forEach(s => { if(s.track) s.track.stop(); });
     pc.close();
-
     pc = null;
   }
 }
@@ -891,4 +1210,3 @@ function closeVoiceMode(){
 
 </body>
 </html>
-```

@@ -2,7 +2,6 @@ const express = require('express');
 const cors    = require('cors');
 const path    = require('path');
 const multer  = require('multer');
-const fs      = require('fs');
 require('dotenv').config();
 const OpenAI  = require('openai');
 
@@ -11,23 +10,22 @@ const openai  = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const systemPrompt = `
 IDENTITY & PURPOSE:
 You are Aria, the highly intelligent, empathetic conversational engine of unhesitated.ai.
-You are designed to help learners master spoken English, but your capabilities extend far beyond simple language tutoring. You possess world-class intellect, analytical reasoning, and vast knowledge.
+You are designed to help learners master spoken English.
 
 INTELLECTUAL CAPABILITY & REASONING:
 - You can effortlessly discuss any complex topic with absolute fluency, depth, and nuance.
-- Break down difficult concepts using clear, intuitive analogies. Be dynamic, intellectually stimulating, and insightful. 
+- Break down difficult concepts using clear, intuitive analogies. Be dynamic and insightful. 
 
 CONVERSATIONAL DYNAMICS (THE "REAL HUMAN" RULES):
-1. SPOKEN, NOT WRITTEN: No matter how complex the topic is, you must sound like a brilliant human speaking in real-time, not a textbook. Limit responses to 2-4 short, punchy sentences. 
-2. NATURAL VOCAL CUES: Use natural conversational fillers ("Hmm," "Yeah," "That's a fascinating question," "Actually...") to make the interaction feel organic and unscripted.
+1. SPOKEN, NOT WRITTEN: Limit responses to 2-4 short, punchy sentences. 
+2. NATURAL VOCAL CUES: Use natural conversational fillers ("Hmm," "Yeah," "Actually...").
 3. FLUENCY & ADAPTABILITY: Match the user's intellectual level.
-4. IMPLICIT CORRECTION: Never interrupt to correct grammar. Mirror the correct phrasing naturally in your response.
+4. IMPLICIT CORRECTION: Never interrupt to correct grammar. Mirror the correct phrasing naturally.
 5. ENGAGEMENT: End your thoughts by naturally passing the conversational ball back to the user.
 `;
 
-const upload  = multer({ dest: 'uploads/' });
-const app     = express();
-const PORT    = process.env.PORT || 3000;
+const app  = express();
+const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
@@ -38,7 +36,7 @@ app.get('/', (req, res) => {
 });
 
 // ─────────────────────────────────────────────
-// ⚡ REALTIME WEBRTC TOKEN ENDPOINT (GA UPDATED)
+// ⚡ REALTIME WEBRTC TOKEN ENDPOINT (BULLETPROOF)
 // ─────────────────────────────────────────────
 app.get('/api/realtime-token', async (req, res) => {
     try {
@@ -48,14 +46,14 @@ app.get('/api/realtime-token', async (req, res) => {
                 'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
                 'Content-Type': 'application/json',
             },
+            // Structured exactly to OpenAI's strict General Availability rules
             body: JSON.stringify({
+                model: 'gpt-4o-realtime-preview-2024-12-17',
                 session: {
                     type: 'realtime',
-                    model: 'gpt-4o-realtime-preview-2024-12-17',
                     instructions: systemPrompt,
                     audio: {
                         output: {
-                            // UPDATED: Changed from 'nova' to 'shimmer' (Supported Realtime voice)
                             voice: 'shimmer'
                         }
                     }
@@ -64,10 +62,12 @@ app.get('/api/realtime-token', async (req, res) => {
         });
         
         const data = await response.json();
+        if (!response.ok) console.error("OpenAI API Error:", data);
         res.json(data);
+
     } catch (error) {
         console.error('Token fetch error:', error);
-        res.status(500).json({ error: 'Failed to get Realtime token' });
+        res.status(500).json({ error: 'Backend failed to fetch token.' });
     }
 });
 
@@ -78,7 +78,6 @@ app.post('/api/tts', async (req, res) => {
     try {
         const speech = await openai.audio.speech.create({
             model : 'tts-1', 
-            // Standard TTS still supports 'nova'
             voice : 'nova',    
             input : text
         });

@@ -851,6 +851,8 @@ function initRecognition(){
   };
 
   recognition.onresult = (event) => {
+    if(isThinking) return; // FIX 1: Prevent duplicate reading
+
     let interim = '', final = '';
     for(let i = event.resultIndex; i < event.results.length; i++){
       const t = event.results[i][0].transcript;
@@ -876,7 +878,7 @@ function initRecognition(){
           voiceTranscript.textContent = '';
           sendVoiceMessage(toSend);
         }
-      }, 800);
+      }, 1500); // FIX 2: Updated delay to 1500ms
     }
   };
 
@@ -889,7 +891,7 @@ function initRecognition(){
 
   recognition.onend = () => {
     isListening = false;
-    // FIX: Only restart when NOT speaking and NOT thinking
+    // Only restart when NOT speaking and NOT thinking
     if(isVoiceMode && !isThinking && !isSpeaking && !isListening){
       setTimeout(() => {
         if(isVoiceMode && !isListening && !isSpeaking && !isThinking){
@@ -937,7 +939,8 @@ function closeVoiceMode(){
 }
 
 async function sendVoiceMessage(text){
-  if(!text) return;
+  if(!text || isThinking) return; // FIX 3: Guard against double execution
+
   if(recognition){ try { recognition.stop(); } catch(e){} }
   setOrbState('thinking');
   isThinking = true;
@@ -956,10 +959,10 @@ async function sendVoiceMessage(text){
     appendMsg('ai', data.message);
 
     isThinking = false;
-    isSpeaking = true;   // FIX: set before audio starts
+    isSpeaking = true;   // set before audio starts
     setOrbState('speaking');
 
-    // FIX: mic restarts ONLY inside the callback — after audio ends
+    // mic restarts ONLY inside the callback — after audio ends
     speakVoice(data.message, () => {
       isSpeaking = false;
       if(isVoiceMode && !isThinking){

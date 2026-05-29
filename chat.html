@@ -36,7 +36,6 @@
     flex-direction:column;
   }
 
-  /* ── STAR CANVAS ── */
   #starCanvas{
     position:fixed;inset:0;
     width:100%;height:100%;
@@ -44,7 +43,6 @@
     z-index:0;
   }
 
-  /* ── ATMOSPHERE ── */
   .atmo-orb{
     position:fixed;border-radius:50%;
     pointer-events:none;z-index:0;
@@ -62,7 +60,6 @@
     filter:blur(110px);
   }
 
-  /* ── NAV ── */
   .nav{
     position:fixed;top:0;left:0;right:0;
     background:rgba(3,5,13,0.80);
@@ -97,14 +94,12 @@
   }
   .nav-links a:hover{color:var(--white)}
 
-  /* ── MAIN LAYOUT ── */
   main{
     position:relative;z-index:2;
     flex:1;display:flex;align-items:center;justify-content:center;
     padding:110px 24px 40px;
   }
 
-  /* ── GLASS CARD ── */
   .glass{
     background:rgba(8,13,26,0.80);
     border:1px solid var(--border-glass);
@@ -116,7 +111,6 @@
     width:100%;max-width:660px;padding:28px;
   }
 
-  /* ── CHAT HEADER ── */
   .chat-top{
     display:flex;align-items:center;justify-content:space-between;
     padding-bottom:16px;margin-bottom:16px;
@@ -140,7 +134,6 @@
     transition:all 0.4s;
   }
 
-  /* ── TODAY'S PHRASE STRIP ── */
   .phrase-strip{
     display:flex;flex-direction:column;align-items:center;
     margin-bottom:20px;padding:14px 18px;
@@ -172,7 +165,6 @@
     margin-top:4px;text-align:center;font-style:italic;
   }
 
-  /* ── TOPIC PLANETS ── */
   .topics-label{
     font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;
     color:rgba(255,255,255,0.3);margin-bottom:10px;
@@ -198,7 +190,6 @@
     box-shadow:0 4px 18px rgba(75,127,255,0.18);
   }
 
-  /* ── MESSAGES ── */
   .msg{
     padding:12px 16px;font-size:0.93rem;line-height:1.58;color:var(--white);
     max-width:86%;margin-bottom:10px;
@@ -230,7 +221,6 @@
     30%{transform:translateY(-7px);opacity:1}
   }
 
-  /* ── INPUT BAR ── */
   .chat-input{
     margin-top:18px;display:flex;gap:10px;align-items:center;
     background:rgba(3,5,13,0.55);
@@ -264,9 +254,6 @@
     box-shadow:0 0 22px rgba(75,127,255,0.45);
   }
 
-  /* ══════════════════════════════════════
-     VOICE OVERLAY
-  ══════════════════════════════════════ */
   .voice-overlay{
     position:fixed;inset:0;
     background:rgba(3,5,13,0.97);
@@ -277,7 +264,6 @@
   }
   .voice-overlay.active{display:flex}
 
-  /* ── ORB ── */
   .voice-orb-wrap{
     position:relative;width:230px;height:230px;
     display:flex;align-items:center;justify-content:center;
@@ -294,7 +280,6 @@
     50%{transform:scale(1.07);opacity:1}
   }
 
-  /* The canvas-driven orb */
   #orbCanvas{
     width:160px;height:160px;
     border-radius:50%;
@@ -302,7 +287,6 @@
     cursor:pointer;
   }
 
-  /* ── VOICE STATUS ── */
   .voice-status-wrap{
     display:flex;flex-direction:column;align-items:center;gap:8px;
     text-align:center;
@@ -323,7 +307,6 @@
     font-style:italic;transition:opacity 0.3s;
   }
 
-  /* ── END BUTTON ── */
   .voice-end-btn{
     background:transparent;
     border:1px solid rgba(255,255,255,0.13);
@@ -344,7 +327,6 @@
     letter-spacing:0.06em;font-family:'Sora',sans-serif;
   }
 
-  /* ── BROWSER WARN ── */
   .browser-warn{
     position:fixed;bottom:22px;left:50%;transform:translateX(-50%);
     background:rgba(255,100,50,0.10);
@@ -632,7 +614,6 @@ sendBtn.addEventListener('click', async () => {
     const data = await res.json();
     appendMsg('ai', data.message);
     
-    // Play fallback TTS
     const ttsRes = await fetch('/api/tts',{
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({text: data.message})
@@ -676,7 +657,7 @@ async function openVoiceMode() {
     const tokenRes = await fetch('/api/realtime-token');
     const tokenData = await tokenRes.json();
 
-    // 🚨 BULLETPROOF ERROR CATCHER
+    // 🚨 CATCH API REJECTIONS SAFELY
     if (tokenData.error) {
         let errorMsg = tokenData.error.message || JSON.stringify(tokenData.error);
         alert("OpenAI rejected the connection:\n\n" + errorMsg);
@@ -684,11 +665,11 @@ async function openVoiceMode() {
         return; 
     }
 
-    // 🚨 BULLETPROOF TOKEN EXTRACTOR (Catches both flat and nested JSON structures)
+    // 🚨 EXTRACT TOKEN REGARDLESS OF NEW OR OLD JSON STRUCTURE
     const EPHEMERAL_KEY = tokenData?.client_secret?.value || tokenData?.client_secret || tokenData?.value;
     
     if (!EPHEMERAL_KEY) {
-        alert("Failed to extract the secure key from OpenAI's response. The structure may have changed again.");
+        alert("Failed to extract the secure key from OpenAI's response.");
         closeVoiceMode();
         return;
     }
@@ -710,6 +691,13 @@ async function openVoiceMode() {
     dc = pc.createDataChannel('oai-events');
     dc.onopen = () => {
       setOrbState('listening');
+      // Request active transcription of user's voice
+      dc.send(JSON.stringify({
+          type: 'session.update',
+          session: { 
+              input_audio_transcription: { model: 'whisper-1' }
+          }
+      }));
     };
 
     dc.onmessage = (e) => {
@@ -717,16 +705,18 @@ async function openVoiceMode() {
       if (msg.type === 'response.created') setOrbState('thinking');
       if (msg.type === 'response.output_item.added') { setOrbState('speaking'); aiTextBuffer = ''; }
       
-      // Handle transcription streaming
       if (msg.type === 'response.audio_transcript.delta' || msg.type === 'response.output_audio_transcript.delta') {
         aiTextBuffer += msg.delta;
         voiceTranscript.textContent = aiTextBuffer;
       }
       
-      // Handle transcription finished
       if (msg.type === 'response.audio_transcript.done' || msg.type === 'response.output_audio_transcript.done') {
         appendMsg('ai', aiTextBuffer);
         voiceTranscript.textContent = '';
+      }
+      
+      if (msg.type === 'conversation.item.input_audio_transcription.completed') {
+        appendMsg('user', msg.transcript);
       }
       
       if (msg.type === 'response.done') setOrbState('listening');
@@ -755,7 +745,6 @@ async function openVoiceMode() {
     await pc.setRemoteDescription(answer);
 
   } catch (err) {
-    // 🚨 PLAIN ENGLISH CRASH ALERT
     alert("Connection failed to start.\n\nError Details: " + err.message);
     closeVoiceMode();
   }

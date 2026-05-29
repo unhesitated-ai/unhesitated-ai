@@ -36,7 +36,7 @@ app.get('/', (req, res) => {
 });
 
 // ─────────────────────────────────────────────
-// ⚡ REALTIME WEBRTC TOKEN ENDPOINT (BULLETPROOF)
+// ⚡ REALTIME WEBRTC TOKEN ENDPOINT 
 // ─────────────────────────────────────────────
 app.get('/api/realtime-token', async (req, res) => {
     try {
@@ -46,10 +46,10 @@ app.get('/api/realtime-token', async (req, res) => {
                 'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
                 'Content-Type': 'application/json',
             },
-            // Structured exactly to OpenAI's strict General Availability rules
+            // Strictly formatted to OpenAI's GA requirements
             body: JSON.stringify({
-                model: 'gpt-4o-realtime-preview-2024-12-17',
                 session: {
+                    model: 'gpt-4o-realtime-preview-2024-12-17',
                     type: 'realtime',
                     instructions: systemPrompt,
                     audio: {

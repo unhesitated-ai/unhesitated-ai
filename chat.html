@@ -666,7 +666,7 @@ async function openVoiceMode() {
     }
 
     // 🚨 EXTRACT TOKEN REGARDLESS OF NEW OR OLD JSON STRUCTURE
-    const EPHEMERAL_KEY = tokenData?.client_secret?.value || tokenData?.client_secret || tokenData?.value;
+    const EPHEMERAL_KEY = tokenData?.value || tokenData?.client_secret?.value;
     
     if (!EPHEMERAL_KEY) {
         alert("Failed to extract the secure key from OpenAI's response.");

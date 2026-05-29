@@ -48,17 +48,17 @@ app.get('/api/realtime-token', async (req, res) => {
             },
             // Strictly formatted to OpenAI's GA requirements
             body: JSON.stringify({
-                session: {
-                    model: 'gpt-4o-realtime-preview-2024-12-17',
-                    type: 'realtime',
-                    instructions: systemPrompt,
-                    audio: {
-                        output: {
-                            voice: 'shimmer'
-                        }
-                    }
-                }
-            }),
+    session: {
+        model: 'gpt-4o-realtime-preview',  // ← Fixed model name
+        type: 'realtime',
+        instructions: systemPrompt,
+        audio: {
+            output: {
+                voice: 'alloy'  // ← Safe GA voice name
+            }
+        }
+    }
+}),
         });
         
         const data = await response.json();

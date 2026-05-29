@@ -426,23 +426,23 @@
    TODAY'S PHRASE & STAR CANVAS (UI Logic)
 ═══════════════════════════════════════════════════ */
 const PHRASES = [
-  { text: '"Break the ice"',         meaning: 'Start a conversation in a social situation' },
-  { text: '"Under the weather"',     meaning: 'Feeling slightly ill or unwell' },
+  { text: '"Break the ice"',            meaning: 'Start a conversation in a social situation' },
+  { text: '"Under the weather"',        meaning: 'Feeling slightly ill or unwell' },
   { text: '"Hit the nail on the head"', meaning: 'Describe exactly what is happening' },
-  { text: '"Bite the bullet"',       meaning: 'Endure a painful or difficult situation' },
-  { text: '"On the same page"',      meaning: 'In agreement and thinking the same way' },
-  { text: '"Piece of cake"',         meaning: 'Something very easy to do' },
+  { text: '"Bite the bullet"',          meaning: 'Endure a painful or difficult situation' },
+  { text: '"On the same page"',         meaning: 'In agreement and thinking the same way' },
+  { text: '"Piece of cake"',            meaning: 'Something very easy to do' },
 ];
 const chosen = PHRASES[Math.floor(Math.random() * PHRASES.length)];
 document.getElementById('phraseText').textContent    = chosen.text;
 document.getElementById('phraseMeaning').textContent = chosen.meaning;
 
 (function(){
-  const sc = document.getElementById('starCanvas');
+  const sc   = document.getElementById('starCanvas');
   const sctx = sc.getContext('2d');
   let W, H;
   let mouse = {x: -9999, y: -9999};
-  const STAR_COUNT = 200;
+  const STAR_COUNT   = 200;
   const REPEL_RADIUS = 130;
   const REPEL_FORCE  = 3.5;
   const MAX_SPEED    = 2.2;
@@ -451,17 +451,20 @@ document.getElementById('phraseMeaning').textContent = chosen.meaning;
 
   function resize(){ W = sc.width = window.innerWidth; H = sc.height = window.innerHeight; }
   resize(); window.addEventListener('resize', resize);
-  window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
-  window.addEventListener('mouseleave', () => { mouse.x = -9999; mouse.y = -9999; });
+  window.addEventListener('mousemove',  e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+  window.addEventListener('mouseleave', ()  => { mouse.x = -9999;   mouse.y = -9999; });
 
   function mkStar(){
     const speed = Math.random() * 0.25 + 0.05;
     const angle = Math.random() * Math.PI * 2;
     return {
-      x: Math.random() * (window.innerWidth || 1400),
-      y: Math.random() * (window.innerHeight || 900),
-      vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
-      r: Math.random() * 1.5 + 0.3, a: Math.random() * 0.7 + 0.2, da: (Math.random() - 0.5) * 0.005
+      x:  Math.random() * (window.innerWidth  || 1400),
+      y:  Math.random() * (window.innerHeight || 900),
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      r:  Math.random() * 1.5 + 0.3,
+      a:  Math.random() * 0.7 + 0.2,
+      da: (Math.random() - 0.5) * 0.005
     };
   }
   stars = Array.from({length: STAR_COUNT}, mkStar);
@@ -469,29 +472,36 @@ document.getElementById('phraseMeaning').textContent = chosen.meaning;
   function drawStars(){
     sctx.clearRect(0, 0, W, H);
     stars.forEach(s => {
-      const dx = s.x - mouse.x, dy = s.y - mouse.y;
+      const dx   = s.x - mouse.x, dy = s.y - mouse.y;
       const dist = Math.sqrt(dx * dx + dy * dy);
       if(dist < REPEL_RADIUS && dist > 0){
         const force = ((REPEL_RADIUS - dist) / REPEL_RADIUS) * REPEL_FORCE;
-        s.vx += (dx / dist) * force; s.vy += (dy / dist) * force;
+        s.vx += (dx / dist) * force;
+        s.vy += (dy / dist) * force;
       }
       const spd = Math.sqrt(s.vx * s.vx + s.vy * s.vy);
-      if(spd > MAX_SPEED){ s.vx = (s.vx / spd) * MAX_SPEED; s.vy = (s.vy / spd) * MAX_SPEED; }
+      if(spd > MAX_SPEED){ s.vx = (s.vx/spd)*MAX_SPEED; s.vy = (s.vy/spd)*MAX_SPEED; }
       s.vx *= FRICTION; s.vy *= FRICTION;
-      
+
       const minSpd = 0.04;
       const curSpd = Math.sqrt(s.vx * s.vx + s.vy * s.vy);
       if(curSpd < minSpd && curSpd > 0){
-        s.vx = (s.vx / curSpd) * minSpd; s.vy = (s.vy / curSpd) * minSpd;
+        s.vx = (s.vx/curSpd)*minSpd; s.vy = (s.vy/curSpd)*minSpd;
       }
 
       s.x += s.vx; s.y += s.vy;
-      if(s.x < -4) s.x = W + 4; if(s.x > W+4) s.x = -4;
-      if(s.y < -4) s.y = H + 4; if(s.y > H+4) s.y = -4;
+      if(s.x < -4)   s.x = W + 4;
+      if(s.x > W+4)  s.x = -4;
+      if(s.y < -4)   s.y = H + 4;
+      if(s.y > H+4)  s.y = -4;
 
-      s.a += s.da; if(s.a > 0.95 || s.a < 0.12) s.da *= -1;
-      sctx.globalAlpha = s.a; sctx.fillStyle = '#ffffff';
-      sctx.beginPath(); sctx.arc(s.x, s.y, s.r, 0, Math.PI * 2); sctx.fill();
+      s.a += s.da;
+      if(s.a > 0.95 || s.a < 0.12) s.da *= -1;
+      sctx.globalAlpha = s.a;
+      sctx.fillStyle   = '#ffffff';
+      sctx.beginPath();
+      sctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      sctx.fill();
     });
     sctx.globalAlpha = 1;
     requestAnimationFrame(drawStars);
@@ -506,33 +516,38 @@ const orbCanvas = document.getElementById('orbCanvas');
 const orbCtx    = orbCanvas.getContext('2d');
 const OW = 160, OH = 160;
 const CX = OW/2, CY = OH/2, R = 68;
-let orbState = 0, orbEnergy = 0, orbTarget = 0, aiPhase = 0;   
+let orbState = 0, orbEnergy = 0, orbTarget = 0, aiPhase = 0;
 let micAnalyser = null, micDataArr = null;
 
 function getMicVolume(){
   if(!micAnalyser) return 0;
   micAnalyser.getByteFrequencyData(micDataArr);
   let sum = 0;
-  for(let i=0;i<micDataArr.length;i++) sum += micDataArr[i];
+  for(let i = 0; i < micDataArr.length; i++) sum += micDataArr[i];
   return Math.min(1, (sum / micDataArr.length) / 60);
 }
 
 function drawOrb(){
   orbCtx.clearRect(0, 0, OW, OH);
-  if(orbState === 1){ orbTarget = getMicVolume(); } 
-  else if(orbState === 3){ aiPhase += 0.06; orbTarget = 0.45 + Math.sin(aiPhase) * 0.45; } 
-  else if(orbState === 2){ aiPhase += 0.025; orbTarget = 0.3 + Math.abs(Math.sin(aiPhase)) * 0.3; } 
-  else { aiPhase += 0.012; orbTarget = 0.08 + Math.abs(Math.sin(aiPhase)) * 0.10; }
-  
+  if(orbState === 1)      { orbTarget = getMicVolume(); }
+  else if(orbState === 3) { aiPhase += 0.06; orbTarget = 0.45 + Math.sin(aiPhase) * 0.45; }
+  else if(orbState === 2) { aiPhase += 0.025; orbTarget = 0.3 + Math.abs(Math.sin(aiPhase)) * 0.3; }
+  else                    { aiPhase += 0.012; orbTarget = 0.08 + Math.abs(Math.sin(aiPhase)) * 0.10; }
+
   orbEnergy += (orbTarget - orbEnergy) * 0.12;
   const scale = 1 + orbEnergy * 0.22;
   const rings = orbState === 1 ? 3 : orbState === 3 ? 4 : 2;
-  
+
   for(let i = rings; i >= 1; i--){
-    const rr = R * scale + i * (6 + orbEnergy * 14);
+    const rr    = R * scale + i * (6 + orbEnergy * 14);
     const alpha = orbEnergy * 0.18 / i;
-    const col = orbState === 3 ? `rgba(107,159,255,${alpha})` : orbState === 2 ? `rgba(168,85,247,${alpha})` : `rgba(75,127,255,${alpha})`;
-    orbCtx.beginPath(); orbCtx.arc(CX, CY, rr, 0, Math.PI*2); orbCtx.fillStyle = col; orbCtx.fill();
+    const col   = orbState === 3
+      ? `rgba(107,159,255,${alpha})`
+      : orbState === 2
+        ? `rgba(168,85,247,${alpha})`
+        : `rgba(75,127,255,${alpha})`;
+    orbCtx.beginPath(); orbCtx.arc(CX, CY, rr, 0, Math.PI*2);
+    orbCtx.fillStyle = col; orbCtx.fill();
   }
 
   orbCtx.save(); orbCtx.beginPath();
@@ -543,21 +558,28 @@ function drawOrb(){
       const fi = Math.floor((i / 80) * micDataArr.length * 0.5);
       bump = (micDataArr[fi] / 255) * orbEnergy * 18;
     } else if(orbState === 3){
-      bump = Math.sin(angle * 4 + aiPhase * 2) * orbEnergy * 10 + Math.sin(angle * 7 - aiPhase * 1.5) * orbEnergy * 6;
+      bump = Math.sin(angle * 4 + aiPhase * 2) * orbEnergy * 10
+           + Math.sin(angle * 7 - aiPhase * 1.5) * orbEnergy * 6;
     } else if(orbState === 2){
       bump = Math.sin(angle * 5 + aiPhase * 3) * orbEnergy * 6;
     } else {
       bump = Math.sin(angle * 3 + aiPhase) * orbEnergy * 5;
     }
     const r2 = R * scale + bump;
-    i === 0 ? orbCtx.moveTo(CX + Math.cos(angle) * r2, CY + Math.sin(angle) * r2) : orbCtx.lineTo(CX + Math.cos(angle) * r2, CY + Math.sin(angle) * r2);
+    i === 0
+      ? orbCtx.moveTo(CX + Math.cos(angle)*r2, CY + Math.sin(angle)*r2)
+      : orbCtx.lineTo(CX + Math.cos(angle)*r2, CY + Math.sin(angle)*r2);
   }
   orbCtx.closePath();
 
-  const grd = orbCtx.createRadialGradient(CX - 18, CY - 22, 0, CX, CY, R * scale + 10);
-  if(orbState === 2){ grd.addColorStop(0, '#c4b0ff'); grd.addColorStop(1, '#1a0a40'); } 
-  else if(orbState === 3){ grd.addColorStop(0, '#b8d4ff'); grd.addColorStop(1, '#0d1a4a'); } 
-  else { grd.addColorStop(0, '#a0c4ff'); grd.addColorStop(1, '#1a0a40'); }
+  const grd = orbCtx.createRadialGradient(CX-18, CY-22, 0, CX, CY, R*scale+10);
+  if(orbState === 2){
+    grd.addColorStop(0, '#c4b0ff'); grd.addColorStop(1, '#1a0a40');
+  } else if(orbState === 3){
+    grd.addColorStop(0, '#b8d4ff'); grd.addColorStop(1, '#0d1a4a');
+  } else {
+    grd.addColorStop(0, '#a0c4ff'); grd.addColorStop(1, '#1a0a40');
+  }
   orbCtx.fillStyle = grd; orbCtx.fill();
   orbCtx.restore();
   requestAnimationFrame(drawOrb);
@@ -567,75 +589,97 @@ drawOrb();
 /* ═══════════════════════════════════════════════════
    DOM REFS & GLOBALS
 ═══════════════════════════════════════════════════ */
-const micBtn = document.getElementById('micBtn');
-const sendBtn = document.getElementById('sendBtn');
-const chatInput = document.getElementById('chatInputField');
-const chatFeed = document.getElementById('live-chat-feed');
-const statusBadge = document.getElementById('statusBadge');
+const micBtn       = document.getElementById('micBtn');
+const sendBtn      = document.getElementById('sendBtn');
+const chatInput    = document.getElementById('chatInputField');
+const chatFeed     = document.getElementById('live-chat-feed');
+const statusBadge  = document.getElementById('statusBadge');
 const voiceOverlay = document.getElementById('voiceOverlay');
-const voiceStatus = document.getElementById('voiceStatus');
+const voiceStatus  = document.getElementById('voiceStatus');
 const voiceTranscript = document.getElementById('voiceTranscript');
-const voiceEndBtn = document.getElementById('voiceEndBtn');
+const voiceEndBtn  = document.getElementById('voiceEndBtn');
 
 function setOrbState(state){
   const map = {listening:1, thinking:2, speaking:3};
   orbState = map[state] || 0;
   if(voiceStatus){
-    voiceStatus.className = 'voice-status state-' + state;
-    voiceStatus.textContent = {listening:'Listening...', thinking:'Thinking...', speaking:'Speaking...'}[state] || '';
+    voiceStatus.className  = 'voice-status state-' + state;
+    voiceStatus.textContent = {
+      listening: 'Listening...',
+      thinking:  'Thinking...',
+      speaking:  'Speaking...'
+    }[state] || '';
   }
-  statusBadge.textContent = {listening:'Listening', thinking:'Thinking...', speaking:'Speaking'}[state] || 'Ready';
+  statusBadge.textContent = {
+    listening: 'Listening',
+    thinking:  'Thinking...',
+    speaking:  'Speaking'
+  }[state] || 'Ready';
 }
 
 function appendMsg(role, html){
   const div = document.createElement('div');
-  div.className = 'msg ' + role; div.innerHTML = html;
-  chatFeed.appendChild(div); chatFeed.scrollTop = chatFeed.scrollHeight;
+  div.className = 'msg ' + role;
+  div.innerHTML = html;
+  chatFeed.appendChild(div);
+  chatFeed.scrollTop = chatFeed.scrollHeight;
 }
 
 function pickTopic(el, topic){
   document.querySelectorAll('.planet').forEach(p => p.classList.remove('active'));
-  el.classList.add('active'); chatInput.value = `Let's talk about ${topic}. `; chatInput.focus();
+  el.classList.add('active');
+  chatInput.value = `Let's talk about ${topic}. `;
+  chatInput.focus();
 }
 
 /* ═══════════════════════════════════════════════════
-   TEXT CHAT FALLBACK
+   TEXT CHAT (with Enter key support)
 ═══════════════════════════════════════════════════ */
-sendBtn.addEventListener('click', async () => {
+async function sendTextMessage(){
   const text = chatInput.value.trim();
   if(!text) return;
-  appendMsg('user', text); chatInput.value = '';
-  
+  appendMsg('user', text);
+  chatInput.value = '';
+
   try {
-    const res = await fetch('/api/text-chat', {
-      method:'POST', headers:{'Content-Type':'application/json'},
+    const res  = await fetch('/api/text-chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ message: text })
     });
     const data = await res.json();
     appendMsg('ai', data.message);
-    
-    const ttsRes = await fetch('/api/tts',{
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({text: data.message})
+
+    const ttsRes = await fetch('/api/tts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: data.message })
     });
     const audio = new Audio(URL.createObjectURL(await ttsRes.blob()));
     audio.play();
-  } catch(err){}
+  } catch(err){
+    appendMsg('ai', 'Sorry, something went wrong. Please try again.');
+  }
+}
+
+sendBtn.addEventListener('click', sendTextMessage);
+chatInput.addEventListener('keydown', e => {
+  if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); sendTextMessage(); }
 });
 
 /* ═══════════════════════════════════════════════════
-   VOICE MODE — BULLETPROOF OPENAI REALTIME API
+   VOICE MODE — OPENAI REALTIME API (WebRTC)
 ═══════════════════════════════════════════════════ */
-let pc = null;
-let dc = null;
+let pc            = null;
+let dc            = null;
 let remoteAudioEl = null;
-let audioCtx = null;
-let isVoiceMode = false;
-let aiTextBuffer = '';
+let audioCtx      = null;
+let isVoiceMode   = false;
+let aiTextBuffer  = '';
 
 function initMicAnalyser(stream){
   if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  const src = audioCtx.createMediaStreamSource(stream);
+  const src   = audioCtx.createMediaStreamSource(stream);
   micAnalyser = audioCtx.createAnalyser();
   micAnalyser.fftSize = 64;
   micDataArr  = new Uint8Array(micAnalyser.frequencyBinCount);
@@ -645,123 +689,126 @@ function initMicAnalyser(stream){
 micBtn.addEventListener('click', openVoiceMode);
 voiceEndBtn.addEventListener('click', closeVoiceMode);
 
-async function openVoiceMode() {
+async function openVoiceMode(){
   isVoiceMode = true;
   voiceOverlay.classList.add('active');
   setOrbState('thinking');
-  voiceStatus.textContent = 'Connecting...';
+  voiceStatus.textContent  = 'Connecting...';
   voiceTranscript.textContent = '';
 
   try {
-    // 1. Fetch ephemeral token from backend
-    const tokenRes = await fetch('/api/realtime-token');
+    /* ── 1. Fetch ephemeral token from our backend ── */
+    const tokenRes  = await fetch('/api/realtime-token');
     const tokenData = await tokenRes.json();
 
-    // 🚨 CATCH API REJECTIONS SAFELY
-    if (tokenData.error) {
-        let errorMsg = tokenData.error.message || JSON.stringify(tokenData.error);
-        alert("OpenAI rejected the connection:\n\n" + errorMsg);
-        closeVoiceMode();
-        return; 
+    /* ── Catch any API-level errors returned in the JSON ── */
+    if(tokenData.error){
+      const errMsg = tokenData.error.message || JSON.stringify(tokenData.error);
+      alert('OpenAI rejected the connection:\n\n' + errMsg);
+      closeVoiceMode();
+      return;
     }
 
-    // 🚨 EXTRACT TOKEN REGARDLESS OF NEW OR OLD JSON STRUCTURE
+    /* ── FIX: GA endpoint returns the key directly as tokenData.value ── */
     const EPHEMERAL_KEY = tokenData?.value || tokenData?.client_secret?.value;
-    
-    if (!EPHEMERAL_KEY) {
-        alert("Failed to extract the secure key from OpenAI's response.");
-        closeVoiceMode();
-        return;
+
+    if(!EPHEMERAL_KEY){
+      alert('Failed to extract the secure key from OpenAI\'s response.\n\nResponse received:\n' + JSON.stringify(tokenData, null, 2));
+      closeVoiceMode();
+      return;
     }
 
-    // 2. Setup WebRTC Peer Connection
+    /* ── 2. Setup WebRTC Peer Connection ── */
     pc = new RTCPeerConnection();
 
-    // 3. Setup audio playback for AI
-    remoteAudioEl = document.createElement('audio');
-    remoteAudioEl.autoplay = true;
+    /* ── 3. Setup audio playback for AI voice ── */
+    remoteAudioEl           = document.createElement('audio');
+    remoteAudioEl.autoplay  = true;
     pc.ontrack = e => { remoteAudioEl.srcObject = e.streams[0]; };
 
-    // 4. Get User Mic and attach to WebRTC + Orb Analyser
+    /* ── 4. Get user mic and attach to WebRTC + Orb analyser ── */
     const ms = await navigator.mediaDevices.getUserMedia({ audio: true });
     initMicAnalyser(ms);
     pc.addTrack(ms.getTracks()[0]);
 
-    // 5. Setup Data Channel for Realtime Events
+    /* ── 5. Setup Data Channel for Realtime events ── */
     dc = pc.createDataChannel('oai-events');
+
     dc.onopen = () => {
       setOrbState('listening');
-      // Request active transcription of user's voice
+      /* Request active transcription of the user's voice */
       dc.send(JSON.stringify({
-          type: 'session.update',
-          session: { 
-              input_audio_transcription: { model: 'whisper-1' }
-          }
+        type: 'session.update',
+        session: {
+          input_audio_transcription: { model: 'whisper-1' }
+        }
       }));
     };
 
     dc.onmessage = (e) => {
       const msg = JSON.parse(e.data);
-      if (msg.type === 'response.created') setOrbState('thinking');
-      if (msg.type === 'response.output_item.added') { setOrbState('speaking'); aiTextBuffer = ''; }
-      
-      if (msg.type === 'response.audio_transcript.delta' || msg.type === 'response.output_audio_transcript.delta') {
+
+      if(msg.type === 'response.created')            setOrbState('thinking');
+      if(msg.type === 'response.output_item.added'){ setOrbState('speaking'); aiTextBuffer = ''; }
+
+      if(msg.type === 'response.audio_transcript.delta' ||
+         msg.type === 'response.output_audio_transcript.delta'){
         aiTextBuffer += msg.delta;
         voiceTranscript.textContent = aiTextBuffer;
       }
-      
-      if (msg.type === 'response.audio_transcript.done' || msg.type === 'response.output_audio_transcript.done') {
+
+      if(msg.type === 'response.audio_transcript.done' ||
+         msg.type === 'response.output_audio_transcript.done'){
         appendMsg('ai', aiTextBuffer);
         voiceTranscript.textContent = '';
       }
-      
-      if (msg.type === 'conversation.item.input_audio_transcription.completed') {
+
+      if(msg.type === 'conversation.item.input_audio_transcription.completed'){
         appendMsg('user', msg.transcript);
       }
-      
-      if (msg.type === 'response.done') setOrbState('listening');
+
+      if(msg.type === 'response.done') setOrbState('listening');
     };
 
-    // 6. Connect to OpenAI GA Endpoint
+    /* ── 6. Create SDP offer and connect to OpenAI ── */
     const offer = await pc.createOffer();
     await pc.setLocalDescription(offer);
-    
-    const baseUrl = 'https://api.openai.com/v1/realtime/calls';
-    const sdpRes = await fetch(baseUrl, {
-        method: 'POST',
-        body: offer.sdp,
-        headers: { 
-            Authorization: `Bearer ${EPHEMERAL_KEY}`, 
-            'Content-Type': 'application/sdp' 
-        }
+
+    const sdpRes = await fetch('https://api.openai.com/v1/realtime/calls', {
+      method: 'POST',
+      body:   offer.sdp,
+      headers: {
+        'Authorization': `Bearer ${EPHEMERAL_KEY}`,
+        'Content-Type':  'application/sdp'
+      }
     });
 
-    if (!sdpRes.ok) {
-        const errText = await sdpRes.text();
-        throw new Error(`OpenAI SDP Exchange Failed: ${sdpRes.status} ${errText}`);
+    if(!sdpRes.ok){
+      const errText = await sdpRes.text();
+      throw new Error(`OpenAI SDP Exchange Failed: ${sdpRes.status} ${errText}`);
     }
 
     const answer = { type: 'answer', sdp: await sdpRes.text() };
     await pc.setRemoteDescription(answer);
 
-  } catch (err) {
-    alert("Connection failed to start.\n\nError Details: " + err.message);
+  } catch(err){
+    alert('Connection failed to start.\n\nError Details: ' + err.message);
     closeVoiceMode();
   }
 }
 
-function closeVoiceMode() {
+function closeVoiceMode(){
   isVoiceMode = false;
   voiceOverlay.classList.remove('active');
   setOrbState('listening');
   voiceTranscript.textContent = '';
-  
-  if (dc) { dc.close(); dc = null; }
-  if (pc) {
-    pc.getSenders().forEach(sender => { if (sender.track) sender.track.stop(); });
+
+  if(dc){ dc.close(); dc = null; }
+  if(pc){
+    pc.getSenders().forEach(sender => { if(sender.track) sender.track.stop(); });
     pc.close(); pc = null;
   }
-  if (remoteAudioEl) { remoteAudioEl.pause(); remoteAudioEl = null; }
+  if(remoteAudioEl){ remoteAudioEl.pause(); remoteAudioEl = null; }
   statusBadge.textContent = 'Ready';
 }
 </script>

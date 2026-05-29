@@ -343,15 +343,31 @@
     font-size:0.76rem;color:var(--white-faint);
     letter-spacing:0.06em;font-family:'Sora',sans-serif;
   }
+
+  /* ── BROWSER WARN ── */
+  .browser-warn{
+    position:fixed;bottom:22px;left:50%;transform:translateX(-50%);
+    background:rgba(255,100,50,0.10);
+    border:1px solid rgba(255,100,50,0.28);
+    color:#ffaa80;border-radius:50px;
+    padding:10px 24px;font-size:0.80rem;
+    z-index:400;display:none;white-space:nowrap;
+  }
 </style>
 </head>
 <body>
 
+<!-- Star field canvas -->
 <canvas id="starCanvas" aria-hidden="true"></canvas>
 
 <div class="atmo-orb one" aria-hidden="true"></div>
 <div class="atmo-orb two" aria-hidden="true"></div>
 
+<div class="browser-warn" id="browserWarn">
+  ⚠️ Voice Mode works best in Chrome or Edge. Please switch browsers for full support.
+</div>
+
+<!-- ══ VOICE OVERLAY ══ -->
 <div class="voice-overlay" id="voiceOverlay" aria-modal="true" role="dialog" aria-label="Voice conversation mode">
   <p class="voice-hint">Speak naturally to interrupt. OpenAI handles the rest.</p>
 
@@ -374,9 +390,11 @@
   </button>
 </div>
 
+<!-- ══ NAV ══ -->
 <nav class="nav" aria-label="Primary">
   <a href="index.html" class="logo" aria-label="unhesitated.ai home">
-    <span>unhesitated<span class="dot-ai">.ai</span></span>
+    <!-- Zero-space formatting applied -->
+    <span style="font-size:0"><span style="font-size:1.2rem;font-weight:700;color:#fff">unhesitated</span><span class="dot-ai" style="font-size:1.2rem">.ai</span></span>
     <span class="pulse-dot" aria-hidden="true"></span>
   </a>
   <ul class="nav-links">
@@ -384,13 +402,16 @@
   </ul>
 </nav>
 
+<!-- ══ MAIN ══ -->
 <main>
   <div class="glass chat-window">
 
     <div class="chat-top">
       <div class="chat-title">
         <span class="pulse-dot" aria-hidden="true"></span>
-        <span style="font-size:0"><span style="font-size:1.05rem;font-weight:700;color:#fff">unhesitated</span><span class="dot-ai" style="font-size:1.05rem">.ai</span></span></div>
+        <!-- Zero-space formatting applied -->
+        <span style="font-size:0"><span style="font-size:1.05rem;font-weight:700;color:#fff">unhesitated</span><span class="dot-ai" style="font-size:1.05rem">.ai</span></span>
+      </div>
       <span class="status-badge" id="statusBadge">Ready</span>
     </div>
 
@@ -666,6 +687,15 @@ async function openVoiceMode() {
     // 1. Fetch ephemeral token from backend
     const tokenRes = await fetch('/api/realtime-token');
     const tokenData = await tokenRes.json();
+
+    // 🚨 NEW SAFETY CHECK: Did OpenAI send an error instead of a token?
+    if (tokenData.error) {
+        console.error("OpenAI Error Details:", tokenData.error);
+        alert("OpenAI Error: " + (tokenData.error.message || "Check the console for details."));
+        closeVoiceMode();
+        return; 
+    }
+
     const EPHEMERAL_KEY = tokenData.client_secret.value;
 
     // 2. Setup WebRTC Peer Connection

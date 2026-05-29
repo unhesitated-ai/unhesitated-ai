@@ -393,7 +393,6 @@
 <!-- ══ NAV ══ -->
 <nav class="nav" aria-label="Primary">
   <a href="index.html" class="logo" aria-label="unhesitated.ai home">
-    <!-- Zero-space formatting applied -->
     <span style="font-size:0"><span style="font-size:1.2rem;font-weight:700;color:#fff">unhesitated</span><span class="dot-ai" style="font-size:1.2rem">.ai</span></span>
     <span class="pulse-dot" aria-hidden="true"></span>
   </a>
@@ -409,7 +408,6 @@
     <div class="chat-top">
       <div class="chat-title">
         <span class="pulse-dot" aria-hidden="true"></span>
-        <!-- Zero-space formatting applied -->
         <span style="font-size:0"><span style="font-size:1.05rem;font-weight:700;color:#fff">unhesitated</span><span class="dot-ai" style="font-size:1.05rem">.ai</span></span>
       </div>
       <span class="status-badge" id="statusBadge">Ready</span>
@@ -655,7 +653,7 @@ sendBtn.addEventListener('click', async () => {
 });
 
 /* ═══════════════════════════════════════════════════
-   VOICE MODE — OPENAI REALTIME API (WebRTC)
+   VOICE MODE — OPENAI REALTIME API (WebRTC GA VERSION)
 ═══════════════════════════════════════════════════ */
 let pc = null;
 let dc = null;
@@ -688,10 +686,10 @@ async function openVoiceMode() {
     const tokenRes = await fetch('/api/realtime-token');
     const tokenData = await tokenRes.json();
 
-    // 🚨 NEW SAFETY CHECK: Did OpenAI send an error instead of a token?
+    // 🚨 SAFETY CHECK: Catch OpenAI API Rejections (Billing limits, Tier errors)
     if (tokenData.error) {
         console.error("OpenAI Error Details:", tokenData.error);
-        alert("OpenAI Error: " + (tokenData.error.message || "Check the console for details."));
+        alert("OpenAI Error: " + (tokenData.error.message || "Please check your backend logs."));
         closeVoiceMode();
         return; 
     }
@@ -725,11 +723,13 @@ async function openVoiceMode() {
       const msg = JSON.parse(e.data);
       if (msg.type === 'response.created') setOrbState('thinking');
       if (msg.type === 'response.output_item.added') { setOrbState('speaking'); aiTextBuffer = ''; }
-      if (msg.type === 'response.audio_transcript.delta') {
+      
+      // GA Event: output_audio_transcript
+      if (msg.type === 'response.output_audio_transcript.delta') {
         aiTextBuffer += msg.delta;
         voiceTranscript.textContent = aiTextBuffer;
       }
-      if (msg.type === 'response.audio_transcript.done') {
+      if (msg.type === 'response.output_audio_transcript.done') {
         appendMsg('ai', aiTextBuffer);
         voiceTranscript.textContent = '';
       }
@@ -739,11 +739,12 @@ async function openVoiceMode() {
       if (msg.type === 'response.done') setOrbState('listening');
     };
 
-    // 6. Connect to OpenAI
+    // 6. Connect to OpenAI GA Endpoint
     const offer = await pc.createOffer();
     await pc.setLocalDescription(offer);
     
-    const baseUrl = 'https://api.openai.com/v1/realtime';
+    // UPDATED: The GA endpoint for establishing calls is /v1/realtime/calls
+    const baseUrl = 'https://api.openai.com/v1/realtime/calls';
     const model = 'gpt-4o-realtime-preview-2024-12-17';
     
     const sdpRes = await fetch(`${baseUrl}?model=${model}`, {

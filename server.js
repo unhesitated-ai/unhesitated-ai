@@ -38,22 +38,25 @@ app.get('/', (req, res) => {
 });
 
 // ─────────────────────────────────────────────
-// ⚡ REALTIME WEBRTC TOKEN ENDPOINT
-// Generates a temporary, secure token so the browser 
-// can stream audio directly to OpenAI with zero latency.
+// ⚡ REALTIME WEBRTC TOKEN ENDPOINT (UPDATED FOR OPENAI GA)
 // ─────────────────────────────────────────────
 app.get('/api/realtime-token', async (req, res) => {
     try {
-        const response = await fetch('https://api.openai.com/v1/realtime/sessions', {
+        // UPDATED: Using the new /client_secrets endpoint
+        const response = await fetch('https://api.openai.com/v1/realtime/client_secrets', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
                 'Content-Type': 'application/json',
             },
+            // UPDATED: Wrapped in the required "session" object
             body: JSON.stringify({
-                model: 'gpt-4o-realtime-preview-2024-12-17',
-                voice: 'nova',
-                instructions: systemPrompt,
+                session: {
+                    type: 'realtime',
+                    model: 'gpt-4o-realtime-preview-2024-12-17',
+                    voice: 'nova',
+                    instructions: systemPrompt
+                }
             }),
         });
         

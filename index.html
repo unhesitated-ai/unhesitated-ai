@@ -4,86 +4,80 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>unhesitated.ai — Speak. Without the pause.</title>
-<meta name="description" content="An AI English speaking companion built for South Asian learners. Judgment-free, mother-tongue aware, always patient." />
+<meta name="description" content="An AI English speaking companion built for learners worldwide. Judgment-free, mother-tongue aware, always patient." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
 <style>
   :root{
-    --bg-void:#05080F;
+    /* Theme from chat.html */
+    --bg-void:#03050D;
     --bg-deep:#080D1A;
-    --bg-surface:#0D1526;
-    --bg-card:rgba(13,21,38,0.85);
     --electric:#4B7FFF;
     --electric-bright:#6B9FFF;
-    --electric-glow:rgba(75,127,255,0.20);
-    --electric-ray:rgba(75,127,255,0.06);
-    --blue-mid:#1E3A8A;
+    --electric-glow:rgba(75,127,255,0.22);
     --white:#FFFFFF;
-    --white-muted:rgba(255,255,255,0.65);
-    --white-faint:rgba(255,255,255,0.25);
+    --white-muted:rgba(255,255,255,0.60);
+    --white-faint:rgba(255,255,255,0.22);
     --border-glass:rgba(255,255,255,0.07);
-    --border-electric:rgba(75,127,255,0.25);
-    --shadow-deep:rgba(0,0,0,0.5);
-    --shadow-electric:rgba(75,127,255,0.15);
+    --border-electric:rgba(75,127,255,0.28);
     --ease:cubic-bezier(0.25,0.46,0.45,0.94);
+    
+    /* Retained for specific index sections */
+    --bg-surface:#0D1526;
+    --bg-card:rgba(8,13,26,0.80);
+    --blue-mid:#1E3A8A;
+    --shadow-deep:rgba(0,0,0,0.5);
   }
 
   *{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth}
   body{
-    font-family:'Inter',system-ui,-apple-system,sans-serif;
-    /* Added the split gradient background */
-    background: linear-gradient(90deg, var(--bg-deep) 0%, var(--bg-deep) 20%, #1A0A29 80%, #1A0A29 100%);
-    background-attachment: fixed;
+    font-family:'DM Sans',system-ui,-apple-system,sans-serif;
+    background:var(--bg-void);
     color:var(--white);
     line-height:1.6;
     overflow-x:hidden;
     -webkit-font-smoothing:antialiased;
     position:relative;
+    min-height:100vh;
   }
 
-  /* ---------- Global background texture ---------- */
-  body::before{
-    content:"";
+  /* ── STAR CANVAS ── */
+  #starCanvas{
     position:fixed;inset:0;
-    background-image:
-      radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px);
-    background-size:24px 24px;
+    width:100%;height:100%;
     pointer-events:none;
     z-index:0;
   }
+
   .atmo-orb{
     position:fixed;border-radius:50%;
     pointer-events:none;z-index:0;
-    filter:blur(80px);
+    filter:blur(90px);
   }
   .atmo-orb.one{
-    width:600px;height:600px;
-    top:-150px;left:-150px;
-    background:radial-gradient(circle,rgba(75,127,255,0.08),transparent 70%);
+    width:700px;height:700px;
+    top:-200px;left:-200px;
+    background:radial-gradient(circle,rgba(75,127,255,0.07),transparent 70%);
   }
   .atmo-orb.two{
-    width:800px;height:800px;
-    bottom:-200px;right:-200px;
-    /* Updated orb to have a purplish glow to match the right side */
-    background:radial-gradient(circle, rgba(168, 85, 247, 0.08), transparent 70%);
-    filter:blur(100px);
-  }
-  .noise{
-    position:fixed;inset:0;pointer-events:none;z-index:1;opacity:0.03;
-    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.8'/></svg>");
+    width:900px;height:900px;
+    bottom:-250px;right:-250px;
+    background:radial-gradient(circle,rgba(168,85,247,0.07),transparent 70%);
+    filter:blur(110px);
   }
 
   main, nav, footer{position:relative;z-index:2}
+  h1, h2, h3, .logo, .badge, .label { font-family: 'Sora', sans-serif; }
 
   /* ---------- Navbar ---------- */
   .nav{
     position:fixed;top:0;left:0;right:0;
-    background:rgba(5,8,15,0.85);
+    background:rgba(3,5,13,0.80);
     -webkit-backdrop-filter:blur(20px);
     backdrop-filter:blur(20px);
-    border-bottom:1px solid rgba(255,255,255,0.06);
+    border-bottom:1px solid var(--border-glass);
     z-index:100;
     padding:18px 32px;
     display:flex;align-items:center;justify-content:space-between;
@@ -93,28 +87,28 @@
   @keyframes navIn{to{opacity:1;transform:none}}
 
   .logo{
-    font-family:'Inter',sans-serif;font-weight:700;
-    font-size:1.25rem;color:var(--white);
-    letter-spacing:-0.01em;display:flex;align-items:center;gap:6px;
+    font-weight:700;
+    font-size:1.2rem;color:var(--white);
+    letter-spacing:-0.02em;display:flex;align-items:center;gap:8px;
     text-decoration:none;
   }
-  .logo .dot-ai{color:var(--electric);font-weight:500}
+  .logo .dot-ai{color:var(--electric);font-weight:400}
   .pulse-dot{
-    width:8px;height:8px;border-radius:50%;
+    width:7px;height:7px;border-radius:50%;
     background:var(--electric);
-    box-shadow:0 0 12px var(--electric);
-    animation:pulse 2s infinite var(--ease);
+    box-shadow:0 0 10px var(--electric);
+    animation:pulse 2.2s infinite var(--ease);
     display:inline-block;
   }
   @keyframes pulse{
     0%,100%{opacity:1;transform:scale(1)}
-    50%{opacity:0.2;transform:scale(1.4)}
+    50%{opacity:0.15;transform:scale(1.5)}
   }
 
-  .nav-links{display:flex;align-items:center;gap:32px;list-style:none}
+  .nav-links{display:flex;align-items:center;gap:28px;list-style:none}
   .nav-links a{
     color:var(--white-muted);text-decoration:none;
-    font-size:0.9rem;position:relative;transition:color 0.3s var(--ease);
+    font-size:0.88rem;position:relative;transition:color 0.3s var(--ease);
   }
   .nav-links a:not(.btn-pill)::after{
     content:"";position:absolute;left:0;bottom:-4px;
@@ -129,12 +123,12 @@
     background:var(--electric);color:var(--white) !important;
     border-radius:50px;padding:10px 22px;font-weight:600;
     transition:all 0.3s var(--ease);display:inline-block;
-    border:none;cursor:pointer;font-size:0.9rem;
-    font-family:inherit;
+    border:none;cursor:pointer;font-size:0.84rem;
+    font-family:'DM Sans', sans-serif;
   }
   .btn-pill:hover{
     background:var(--electric-bright);
-    box-shadow:0 0 24px rgba(75,127,255,0.45);
+    box-shadow:0 0 22px rgba(75,127,255,0.45);
   }
   .btn-pill::after{display:none !important}
 
@@ -151,7 +145,7 @@
   .btn{
     display:inline-flex;align-items:center;justify-content:center;gap:8px;
     border-radius:50px;padding:14px 32px;font-weight:600;
-    font-family:inherit;font-size:1rem;cursor:pointer;
+    font-family:'DM Sans', sans-serif;font-size:1rem;cursor:pointer;
     text-decoration:none;border:1px solid transparent;
     transition:all 0.3s var(--ease);
   }
@@ -180,7 +174,6 @@
 
   /* ---------- Hero ---------- */
   .hero{
-    /* Made background transparent so body gradient shows through */
     background: transparent;
     min-height:100vh;
     padding:140px 24px 80px;
@@ -232,7 +225,7 @@
   }
 
   h1.hero-headline{
-    font-size:clamp(2.8rem,6vw,5.5rem);
+    font-size:clamp(2.2rem,5vw,4.5rem); /* Adjusted font size */
     font-weight:700;line-height:1.05;letter-spacing:-0.03em;
     color:var(--white);
     text-shadow:0 0 40px rgba(75,127,255,0.3);
@@ -259,10 +252,10 @@
   .glass{
     background:var(--bg-card);
     border:1px solid var(--border-glass);
-    -webkit-backdrop-filter:blur(12px);
-    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(16px);
+    backdrop-filter:blur(16px);
     border-radius:16px;
-    box-shadow:0 8px 32px rgba(0,0,0,0.4), 0 0 0 1px rgba(75,127,255,0.08);
+    box-shadow:0 8px 48px rgba(0,0,0,0.5), 0 0 0 1px rgba(75,127,255,0.07);
     transition:all 0.35s var(--ease);
   }
   .glass:hover{
@@ -270,10 +263,10 @@
     box-shadow:0 8px 32px rgba(0,0,0,0.5), 0 0 28px rgba(75,127,255,0.15);
   }
 
-  /* ---------- Hero chat preview (Static Marketing Visual) ---------- */
+  /* ---------- Hero chat preview (Dynamic Marketing Visual) ---------- */
   .hero-chat{
     max-width:500px;width:100%;
-    margin-top:50px;padding:20px;
+    margin-top:50px;padding:24px;
     opacity:0;transform:translateY(40px);
     animation:fadeUp 0.8s var(--ease) forwards 1s, float 4s ease-in-out infinite 1.8s;
   }
@@ -286,42 +279,44 @@
     padding-bottom:14px;margin-bottom:14px;
     border-bottom:1px solid var(--border-glass);
   }
-  .chat-title{display:flex;align-items:center;gap:10px;color:var(--white);font-weight:600;font-size:0.9rem}
+  .chat-title{display:flex;align-items:center;gap:10px;color:var(--white);font-weight:700;font-size:0.95rem;font-family:'Sora',sans-serif;letter-spacing:-0.01em;}
   .listening{
-    font-size:0.72rem;letter-spacing:0.05em;
+    font-size:0.7rem;letter-spacing:0.06em;
     color:var(--electric-bright);
     background:rgba(75,127,255,0.08);
     border:1px solid var(--border-electric);
-    border-radius:50px;padding:4px 10px;
+    border-radius:50px;padding:4px 12px;
+    font-family:'Sora',sans-serif;
   }
   .msg{
-    padding:12px 16px;font-size:0.95rem;line-height:1.55;color:var(--white);
-    max-width:85%;margin-bottom:10px;
+    padding:12px 16px;font-size:0.93rem;line-height:1.58;color:var(--white);
+    max-width:86%;margin-bottom:10px;
+    transition:opacity 0.5s var(--ease);
   }
   .msg.user{
-    background:rgba(75,127,255,0.15);
-    border:1px solid rgba(75,127,255,0.25);
+    background:rgba(75,127,255,0.14);
+    border:1px solid rgba(75,127,255,0.24);
     border-radius:18px 18px 4px 18px;
     margin-left:auto;
     text-align: left;
   }
   .msg.ai{
-    background:rgba(255,255,255,0.05);
-    border:1px solid rgba(255,255,255,0.08);
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.07);
     border-radius:18px 18px 18px 4px;
     margin-right:auto;
     text-align: left;
   }
-  .typing{display:inline-flex;gap:5px;padding:14px 16px;background:rgba(255,255,255,0.04);border-radius:18px;margin-bottom:10px}
+  .typing{display:inline-flex;gap:5px;padding:14px 16px;background:rgba(255,255,255,0.03);border-radius:18px;margin-bottom:10px}
   .typing span{
     width:6px;height:6px;border-radius:50%;background:var(--electric);
     animation:bounce 1.2s infinite;
   }
   .typing span:nth-child(2){animation-delay:0.15s}
-  .typing span:nth-child(3){animation-delay:0.3s}
+  .typing span:nth-child(3){animation-delay:0.30s}
   @keyframes bounce{
-    0%,60%,100%{transform:translateY(0);opacity:0.4}
-    30%{transform:translateY(-6px);opacity:1}
+    0%,60%,100%{transform:translateY(0);opacity:0.35}
+    30%{transform:translateY(-7px);opacity:1}
   }
 
   /* ---------- Sections ---------- */
@@ -351,7 +346,6 @@
   .reveal.in{opacity:1;transform:none}
 
   /* ---------- Empathy ---------- */
-  /* Made background transparent so body gradient shows through */
   .empathy{background:transparent;text-align:center}
   .empathy blockquote{
     font-size:clamp(1.6rem,3vw,2.4rem);
@@ -376,6 +370,7 @@
     color:var(--electric-bright);font-weight:700;
     display:flex;align-items:center;justify-content:center;
     font-size:0.95rem;
+    font-family:'Sora',sans-serif;
   }
   .step-card h3, .feature-card h3, .principle-card h3{
     font-size:1.25rem;font-weight:700;color:var(--white);
@@ -401,8 +396,8 @@
   /* ---------- Founding card ---------- */
   .founding-card{
     max-width:680px;margin:0 auto;padding:48px 40px;text-align:center;
-    background:rgba(13,21,38,0.9);
-    border:1px solid rgba(75,127,255,0.2);
+    background:rgba(8,13,26,0.9);
+    border:1px solid var(--border-glass);
     box-shadow:0 0 60px rgba(75,127,255,0.08), 0 8px 32px rgba(0,0,0,0.4);
     border-radius:20px;
     display:flex;flex-direction:column;gap:20px;align-items:center;
@@ -417,7 +412,6 @@
   .principle-card{align-items:flex-start;text-align:left}
 
   /* ---------- Final CTA ---------- */
-  /* Made background transparent so body gradient shows through */
   .final-cta{
     background:transparent;text-align:center;overflow:hidden;
     padding:140px 24px;
@@ -436,51 +430,38 @@
     letter-spacing:0.18em;font-size:0.78rem;font-weight:600;
   }
 
-  /* ---------- Footer ---------- */
+  /* ---------- Footer Alignment Fix ---------- */
   footer{
-    /* Slightly translucent glass background to let the gradient peek through */
-    background:rgba(5, 8, 15, 0.3);
-    border-top:1px solid rgba(255,255,255,0.06);
+    background:rgba(3, 5, 13, 0.8);
+    backdrop-filter: blur(20px);
+    border-top:1px solid rgba(255,255,255,0.05);
     padding:60px 24px 32px;color:var(--white-faint);font-size:0.85rem;
   }
-  .footer-top{
-    display:flex;align-items:center;justify-content:space-between;gap:20px;
-    flex-wrap:wrap;max-width:1100px;margin:0 auto;
+  .footer-main {
+    display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; max-width: 1100px; margin: 0 auto;
   }
   .footer-center{color:var(--white-faint);font-size:0.9rem;text-align:center;flex:1;min-width:240px}
-  .socials{display:flex;gap:14px}
+  
+  /* PERFECT ALIGNMENT FOR LINKS + SOCIALS */
+  .footer-nav-row {
+    display: flex; align-items: center; justify-content: center; gap: 28px; flex-wrap: wrap; margin: 32px 0 24px;
+  }
+  .footer-links{
+    display:flex;flex-wrap:wrap;justify-content:center;gap:24px;
+  }
+  .footer-links a{color:var(--white-faint);text-decoration:none;transition:color 0.3s var(--ease)}
+  .footer-links a:hover{color:var(--white)}
+  
+  .socials{display:flex;gap:14px;align-items:center;}
   .socials a{
     color:var(--white-faint);transition:color 0.3s var(--ease);
     display:inline-flex;
   }
   .socials a:hover{color:var(--electric)}
   .socials svg{width:18px;height:18px}
-  .footer-links{
-    text-align:center;margin:32px 0 18px;
-    display:flex;flex-wrap:wrap;justify-content:center;gap:14px 22px;
-  }
-  .footer-links a{color:var(--white-faint);text-decoration:none;transition:color 0.3s var(--ease)}
-  .footer-links a:hover{color:var(--white)}
+  
   .footer-strip{text-align:center;margin-bottom:10px}
   .footer-micro{text-align:center;font-size:0.8rem;color:var(--white-faint)}
-
-  /* ---------- Cursor ---------- */
-  .cursor-dot{
-    position:fixed;top:0;left:0;width:8px;height:8px;
-    border-radius:50%;background:var(--electric);
-    pointer-events:none;z-index:9999;
-    transform:translate(-50%,-50%);
-    box-shadow:0 0 12px var(--electric);
-    transition:opacity 0.2s;mix-blend-mode:screen;
-  }
-  .cursor-trail{
-    position:fixed;top:0;left:0;width:24px;height:24px;
-    border-radius:50%;
-    background:radial-gradient(circle,rgba(75,127,255,0.25),transparent 70%);
-    pointer-events:none;z-index:9998;
-    transform:translate(-50%,-50%);
-    transition:opacity 0.3s;
-  }
 
   /* ---------- Mobile ---------- */
   @media (max-width:900px){
@@ -504,15 +485,15 @@
     .grid-3,.grid-2x3{grid-template-columns:1fr}
     section{padding:70px 20px}
     .hero{padding:120px 20px 60px}
-    .cursor-dot,.cursor-trail{display:none}
   }
 </style>
 </head>
 <body>
 
+<canvas id="starCanvas" aria-hidden="true"></canvas>
+
 <div class="atmo-orb one" aria-hidden="true"></div>
 <div class="atmo-orb two" aria-hidden="true"></div>
-<div class="noise" aria-hidden="true"></div>
 
 <nav class="nav" aria-label="Primary">
   <a href="#" class="logo" aria-label="unhesitated.ai home">
@@ -537,7 +518,7 @@
     <div class="hero-content">
       <span class="badge"><span class="pulse-dot" aria-hidden="true"></span> Your AI English Companion</span>
       <h1 class="hero-headline" id="heroHead">You already speak perfect English in your head. Let's say it out loud.</h1>
-      <p class="subhead">unhesitated.ai is a judgment-free space where South Asian learners can practice English with an AI friend who understands their language, their culture, and their journey.</p>
+      <p class="subhead">unhesitated.ai is a judgment-free space where learners can practice English with an AI friend who understands their language, their culture, and their journey.</p>
       <div class="cta-row">
         <a href="chat.html" class="btn btn-primary">Start Talking — It's Free</a>
         <a href="#how" class="btn btn-secondary">See How It Works</a>
@@ -546,12 +527,12 @@
 
       <div class="glass hero-chat" role="region" aria-label="Conversation preview">
         <div class="chat-top">
-          <div class="chat-title"><span class="pulse-dot" aria-hidden="true"></span> unhesitated.ai</div>
+          <div class="chat-title"><span class="pulse-dot" aria-hidden="true"></span> <span style="font-size:0"><span style="font-size:0.95rem;font-weight:700;color:#fff">unhesitated</span><span class="dot-ai" style="font-size:0.95rem;color:var(--electric);font-weight:400">.ai</span></span></div>
           <span class="listening">Listening...</span>
         </div>
-        <div class="msg user">I went to the bazaar and bought... um... سبزیاں (sabziyaan)</div>
-        <div class="typing" aria-label="AI is typing"><span></span><span></span><span></span></div>
-        <div class="msg ai">Fresh vegetables — lovely! Was the bazaar crowded today, or did you get there early?</div>
+        <div class="msg user" id="dynamicUserMsg">I went to the bazaar and bought... um... سبزیاں (sabziyaan)</div>
+        <div class="typing" aria-label="AI is typing" id="heroTyping" style="display:none;"><span></span><span></span><span></span></div>
+        <div class="msg ai" id="dynamicAiMsg">Fresh vegetables — lovely! Was the bazaar crowded today, or did you get there early?</div>
       </div>
     </div>
   </section>
@@ -560,7 +541,7 @@
 
   <section class="empathy reveal" aria-label="Why we exist">
     <div class="container">
-      <blockquote>"Millions of brilliant people across South Asia speak English perfectly — in their heads. They just never had someone safe enough to say it to."</blockquote>
+      <blockquote>"Millions of brilliant people across the globe speak English perfectly — in their heads. They just never had someone safe enough to say it to."</blockquote>
       <span class="badge">unhesitated.ai exists for them.</span>
     </div>
   </section>
@@ -580,7 +561,7 @@
         <div class="glass step-card reveal">
           <div class="num-badge">02</div>
           <h3>Mix Languages Freely</h3>
-          <p>Forgot the English word? Say it in Urdu, Hindi, or Bengali — your AI friend understands and gently keeps the conversation going.</p>
+          <p>Forgot the English word? Say it in your native tongue — your AI friend understands and gently keeps the conversation going.</p>
         </div>
         <div class="glass step-card reveal">
           <div class="num-badge">03</div>
@@ -602,7 +583,7 @@
         <div class="glass feature-card reveal">
           <div class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
           <h3>Speaks Your Language</h3>
-          <p>Whether you switch to Hindi, Urdu, or Bengali mid-sentence — unhesitated.ai understands and gently keeps the conversation going in English.</p>
+          <p>Whether you switch to Hindi, Spanish, or Arabic mid-sentence — unhesitated.ai understands and gently keeps the conversation going in English.</p>
         </div>
         <div class="glass feature-card reveal">
           <div class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg></div>
@@ -612,7 +593,7 @@
         <div class="glass feature-card reveal">
           <div class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg></div>
           <h3>Culturally Grounded</h3>
-          <p>Examples and references drawn from South Asian daily life — not just Western contexts.</p>
+          <p>Examples and references drawn from diverse cultures and global daily life — not just one perspective.</p>
         </div>
         <div class="glass feature-card reveal">
           <div class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg></div>
@@ -622,7 +603,7 @@
         <div class="glass feature-card reveal">
           <div class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h7l-1 8 10-12h-7z"/></svg></div>
           <h3>Conversation Starters Ready</h3>
-          <p>Never face a blank screen — 30+ warm prompts built around everyday South Asian life: markets, family, work, dreams, food.</p>
+          <p>Never face a blank screen — 30+ warm prompts built around everyday life: markets, family, work, dreams, food.</p>
         </div>
         <div class="glass feature-card reveal">
           <div class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
@@ -688,49 +669,209 @@
 </main>
 
 <footer>
-  <div class="footer-top">
+  <div class="footer-main">
     <a href="#" class="logo" aria-label="unhesitated.ai">
       <span>unhesitated<span class="dot-ai">.ai</span></span>
       <span class="pulse-dot" aria-hidden="true"></span>
     </a>
     <div class="footer-center">A safe space for your English journey.</div>
+  </div>
+  
+  <div class="footer-nav-row">
+    <nav class="footer-links" aria-label="Footer">
+      <a href="#">About</a>
+      <a href="#">Privacy</a>
+      <a href="#">Languages Supported</a>
+      <a href="#">Contact</a>
+    </nav>
     <div class="socials" aria-label="Social links">
-  <!-- X (formerly Twitter) Logo in Solid White -->
-  <a href="https://x.com/unhesitatedai" target="_blank" rel="noopener noreferrer" aria-label="X" style="color: #FFFFFF;">
-    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 22.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-  </a>
+      <a href="https://x.com/unhesitatedai" target="_blank" rel="noopener noreferrer" aria-label="X" style="color: #FFFFFF;">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 22.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+      </a>
 
-  <!-- Instagram Logo with Official Brand Gradient -->
-  <a href="https://www.instagram.com/unhesitatedai?igsh=MW9teXI3ZGt1b3djaw==" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
-    <svg viewBox="0 0 24 24" fill="none" stroke="url(#ig-grad)" stroke-width="2">
-      <defs>
-        <linearGradient id="ig-grad" x1="0%" y1="100%" x2="100%" y2="0%">
-          <stop offset="0%" stop-color="#FCAF45" />
-          <stop offset="50%" stop-color="#F56040" />
-          <stop offset="100%" stop-color="#833AB4" />
-        </linearGradient>
-      </defs>
-      <rect x="3" y="3" width="18" height="18" rx="5"/>
-      <circle cx="12" cy="12" r="4"/>
-      <circle cx="17.5" cy="6.5" r="1" fill="url(#ig-grad)" stroke="none"/>
-    </svg>
-  </a>
-</div>
-  <nav class="footer-links" aria-label="Footer">
-    <a href="#">About</a>
-    <a href="#">Privacy</a>
-    <a href="#">Languages Supported</a>
-    <a href="#">Contact</a>
-  </nav>
-  <p class="footer-strip">Built with love for learners across South Asia.</p>
+      <a href="https://www.instagram.com/unhesitatedai?igsh=MW9teXI3ZGt1b3djaw==" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+        <svg viewBox="0 0 24 24" fill="none" stroke="url(#ig-grad)" stroke-width="2">
+          <defs>
+            <linearGradient id="ig-grad" x1="0%" y1="100%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#FCAF45" />
+              <stop offset="50%" stop-color="#F56040" />
+              <stop offset="100%" stop-color="#833AB4" />
+            </linearGradient>
+          </defs>
+          <rect x="3" y="3" width="18" height="18" rx="5"/>
+          <circle cx="12" cy="12" r="4"/>
+          <circle cx="17.5" cy="6.5" r="1" fill="url(#ig-grad)" stroke="none"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+  <p class="footer-strip">Built with love for learners worldwide.</p>
   <p class="footer-micro">© 2026 unhesitated.ai — Speak. Without the pause.</p>
 </footer>
 
-<div class="cursor-dot" id="cd" aria-hidden="true"></div>
-<div class="cursor-trail" id="ct" aria-hidden="true"></div>
-
 <script>
-  // Word-by-word hero reveal
+  // ── DYNAMIC CHAT PREVIEW SCENARIOS ──
+  const chatScenarios = [
+    {
+      user: "I went to the bazaar and bought... um... سبزیاں (sabziyaan)",
+      ai: "Fresh vegetables — lovely! Was the market crowded today, or did you get there early?"
+    },
+    {
+      user: "The presentation was tough, but I think I did... bueno.",
+      ai: "That’s great! Doing well on a tough presentation is a huge win. What was it about?"
+    },
+    {
+      user: "I need to catch the train to the... uh... gare.",
+      ai: "The train station! That sounds exciting. Where are you traveling to?"
+    },
+    {
+      user: "Today I was feeling very... thak gaya, you know?",
+      ai: "I understand completely. Feeling tired after a long day is normal. Did you get a chance to rest?"
+    }
+  ];
+
+  let sIdx = 0;
+  setInterval(() => {
+    const uMsg = document.getElementById('dynamicUserMsg');
+    const aMsg = document.getElementById('dynamicAiMsg');
+    const typ = document.getElementById('heroTyping');
+    
+    // Fade out
+    uMsg.style.opacity = 0;
+    aMsg.style.opacity = 0;
+    
+    setTimeout(() => {
+      // Switch text and show user msg
+      sIdx = (sIdx + 1) % chatScenarios.length;
+      uMsg.textContent = chatScenarios[sIdx].user;
+      uMsg.style.opacity = 1;
+      
+      // Hide AI msg, show typing indicator
+      aMsg.style.display = 'none';
+      typ.style.display = 'inline-flex';
+      
+      setTimeout(() => {
+        // Hide typing, show AI msg
+        typ.style.display = 'none';
+        aMsg.textContent = chatScenarios[sIdx].ai;
+        aMsg.style.display = 'block';
+        setTimeout(() => aMsg.style.opacity = 1, 50);
+      }, 1800); // Wait 1.8s simulating thinking
+    }, 500); // Wait 0.5s for fade out
+  }, 7000); // Cycle every 7 seconds
+
+
+  // ── STAR CANVAS SCRIPT ──
+  (function(){
+    const sc   = document.getElementById('starCanvas');
+    const sctx = sc.getContext('2d');
+    let W, H;
+    let mouse = {x: -9999, y: -9999};
+    const STAR_COUNT = 200;
+    const REPEL_RADIUS = 130;
+    const REPEL_FORCE  = 3.5;
+    const MAX_SPEED    = 2.2;
+    const FRICTION     = 0.985;
+    let stars = [];
+
+    function resize(){
+      W = sc.width  = window.innerWidth;
+      H = sc.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+    window.addEventListener('mouseleave', () => { mouse.x = -9999; mouse.y = -9999; });
+    window.addEventListener('touchmove', e => {
+      mouse.x = e.touches[0].clientX;
+      mouse.y = e.touches[0].clientY;
+    }, {passive:true});
+    window.addEventListener('touchend', () => { mouse.x = -9999; mouse.y = -9999; });
+
+    function mkStar(){
+      const speed = Math.random() * 0.25 + 0.05;
+      const angle = Math.random() * Math.PI * 2;
+      return {
+        x  : Math.random() * (window.innerWidth  || 1400),
+        y  : Math.random() * (window.innerHeight || 900),
+        vx : Math.cos(angle) * speed,
+        vy : Math.sin(angle) * speed,
+        r  : Math.random() * 1.5 + 0.3,
+        a  : Math.random() * 0.7 + 0.2,
+        da : (Math.random() - 0.5) * 0.005,
+      };
+    }
+    stars = Array.from({length: STAR_COUNT}, mkStar);
+
+    function drawStars(){
+      sctx.clearRect(0, 0, W, H);
+
+      stars.forEach(s => {
+        const dx   = s.x - mouse.x;
+        const dy   = s.y - mouse.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if(dist < REPEL_RADIUS && dist > 0){
+          const force = ((REPEL_RADIUS - dist) / REPEL_RADIUS) * REPEL_FORCE;
+          s.vx += (dx / dist) * force;
+          s.vy += (dy / dist) * force;
+        }
+
+        const spd = Math.sqrt(s.vx * s.vx + s.vy * s.vy);
+        if(spd > MAX_SPEED){
+          s.vx = (s.vx / spd) * MAX_SPEED;
+          s.vy = (s.vy / spd) * MAX_SPEED;
+        }
+
+        s.vx *= FRICTION;
+        s.vy *= FRICTION;
+
+        const minSpd = 0.04;
+        const curSpd = Math.sqrt(s.vx * s.vx + s.vy * s.vy);
+        if(curSpd < minSpd && curSpd > 0){
+          s.vx = (s.vx / curSpd) * minSpd;
+          s.vy = (s.vy / curSpd) * minSpd;
+        } else if(curSpd === 0){
+          const a = Math.random() * Math.PI * 2;
+          s.vx = Math.cos(a) * minSpd;
+          s.vy = Math.sin(a) * minSpd;
+        }
+
+        s.x += s.vx;
+        s.y += s.vy;
+
+        if(s.x < -4)  s.x = W + 4;
+        if(s.x > W+4) s.x = -4;
+        if(s.y < -4)  s.y = H + 4;
+        if(s.y > H+4) s.y = -4;
+
+        s.a += s.da;
+        if(s.a > 0.95 || s.a < 0.12) s.da *= -1;
+
+        if(s.r > 1.1){
+          const g = sctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.r * 5);
+          g.addColorStop(0, `rgba(180,210,255,${s.a * 0.45})`);
+          g.addColorStop(1, 'transparent');
+          sctx.fillStyle = g;
+          sctx.beginPath();
+          sctx.arc(s.x, s.y, s.r * 5, 0, Math.PI * 2);
+          sctx.fill();
+        }
+
+        sctx.globalAlpha = s.a;
+        sctx.fillStyle   = '#ffffff';
+        sctx.beginPath();
+        sctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        sctx.fill();
+      });
+
+      sctx.globalAlpha = 1;
+      requestAnimationFrame(drawStars);
+    }
+    requestAnimationFrame(drawStars);
+  })();
+
+  // ── WORD BY WORD HERO REVEAL ──
   (() => {
     const h = document.getElementById('heroHead');
     if (!h) return;
@@ -738,7 +879,7 @@
     h.innerHTML = words.map((w,i)=>`<span class="word" style="animation-delay:${0.3 + i*0.08}s">${w}&nbsp;</span>`).join('');
   })();
 
-  // Hamburger menu
+  // ── HAMBURGER MENU ──
   const hb = document.getElementById('hamburger');
   const nl = document.getElementById('navLinks');
   hb?.addEventListener('click', () => {
@@ -747,7 +888,7 @@
   });
   nl?.querySelectorAll('a').forEach(a => a.addEventListener('click', () => nl.classList.remove('open')));
 
-  // Scroll reveal animations
+  // ── SCROLL REVEAL ──
   const io = new IntersectionObserver((entries) => {
     entries.forEach((e) => {
       if (e.isIntersecting) {
@@ -761,26 +902,6 @@
   }, { threshold: 0.15 });
   document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 
-  // Custom cursor (desktop only)
-  if (window.matchMedia('(pointer:fine)').matches) {
-    const cd = document.getElementById('cd');
-    const ct = document.getElementById('ct');
-    let tx=0,ty=0,cx=0,cy=0;
-    window.addEventListener('mousemove', (e) => {
-      cd.style.left = e.clientX + 'px';
-      cd.style.top = e.clientY + 'px';
-      tx = e.clientX; ty = e.clientY;
-    });
-    function loop(){
-      cx += (tx-cx)*0.15; cy += (ty-cy)*0.15;
-      ct.style.left = cx+'px'; ct.style.top = cy+'px';
-      requestAnimationFrame(loop);
-    }
-    loop();
-  } else {
-    document.getElementById('cd').style.display='none';
-    document.getElementById('ct').style.display='none';
-  }
 </script>
 </body>
 </html>

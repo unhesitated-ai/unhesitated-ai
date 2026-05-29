@@ -357,9 +357,7 @@
 </head>
 <body>
 
-<!-- Star field canvas -->
 <canvas id="starCanvas" aria-hidden="true"></canvas>
-
 <div class="atmo-orb one" aria-hidden="true"></div>
 <div class="atmo-orb two" aria-hidden="true"></div>
 
@@ -367,21 +365,17 @@
   ⚠️ Voice Mode works best in Chrome or Edge. Please switch browsers for full support.
 </div>
 
-<!-- ══ VOICE OVERLAY ══ -->
 <div class="voice-overlay" id="voiceOverlay" aria-modal="true" role="dialog" aria-label="Voice conversation mode">
   <p class="voice-hint">Speak naturally to interrupt. OpenAI handles the rest.</p>
-
   <div class="voice-orb-wrap">
     <div class="voice-orb-ring"></div>
     <div class="voice-orb-ring"></div>
     <canvas id="orbCanvas" width="160" height="160" aria-hidden="true"></canvas>
   </div>
-
   <div class="voice-status-wrap">
     <p class="voice-status" id="voiceStatus">Listening...</p>
     <p class="voice-transcript" id="voiceTranscript"></p>
   </div>
-
   <button class="voice-end-btn" id="voiceEndBtn" aria-label="End voice chat">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
@@ -390,7 +384,6 @@
   </button>
 </div>
 
-<!-- ══ NAV ══ -->
 <nav class="nav" aria-label="Primary">
   <a href="index.html" class="logo" aria-label="unhesitated.ai home">
     <span style="font-size:0"><span style="font-size:1.2rem;font-weight:700;color:#fff">unhesitated</span><span class="dot-ai" style="font-size:1.2rem">.ai</span></span>
@@ -401,10 +394,8 @@
   </ul>
 </nav>
 
-<!-- ══ MAIN ══ -->
 <main>
   <div class="glass chat-window">
-
     <div class="chat-top">
       <div class="chat-title">
         <span class="pulse-dot" aria-hidden="true"></span>
@@ -445,7 +436,6 @@
       </button>
       <button class="send-btn" id="sendBtn">Send</button>
     </div>
-
   </div>
 </main>
 
@@ -653,7 +643,7 @@ sendBtn.addEventListener('click', async () => {
 });
 
 /* ═══════════════════════════════════════════════════
-   VOICE MODE — OPENAI REALTIME API (WebRTC GA VERSION)
+   VOICE MODE — OPENAI REALTIME API (GA VERSION)
 ═══════════════════════════════════════════════════ */
 let pc = null;
 let dc = null;
@@ -686,7 +676,6 @@ async function openVoiceMode() {
     const tokenRes = await fetch('/api/realtime-token');
     const tokenData = await tokenRes.json();
 
-    // 🚨 SAFETY CHECK: Catch OpenAI API Rejections (Billing limits, Tier errors)
     if (tokenData.error) {
         console.error("OpenAI Error Details:", tokenData.error);
         alert("OpenAI Error: " + (tokenData.error.message || "Please check your backend logs."));
@@ -713,9 +702,16 @@ async function openVoiceMode() {
     dc = pc.createDataChannel('oai-events');
     dc.onopen = () => {
       setOrbState('listening');
+      // UPDATED: Transcription settings are now nested inside audio.input
       dc.send(JSON.stringify({
           type: 'session.update',
-          session: { input_audio_transcription: { model: 'whisper-1' } }
+          session: { 
+              audio: {
+                  input: {
+                      transcription: { model: 'whisper-1' }
+                  }
+              }
+          }
       }));
     };
 
@@ -723,8 +719,6 @@ async function openVoiceMode() {
       const msg = JSON.parse(e.data);
       if (msg.type === 'response.created') setOrbState('thinking');
       if (msg.type === 'response.output_item.added') { setOrbState('speaking'); aiTextBuffer = ''; }
-      
-      // GA Event: output_audio_transcript
       if (msg.type === 'response.output_audio_transcript.delta') {
         aiTextBuffer += msg.delta;
         voiceTranscript.textContent = aiTextBuffer;
@@ -743,11 +737,10 @@ async function openVoiceMode() {
     const offer = await pc.createOffer();
     await pc.setLocalDescription(offer);
     
-    // UPDATED: The GA endpoint for establishing calls is /v1/realtime/calls
+    // UPDATED: GA connection endpoint without query parameters
     const baseUrl = 'https://api.openai.com/v1/realtime/calls';
-    const model = 'gpt-4o-realtime-preview-2024-12-17';
     
-    const sdpRes = await fetch(`${baseUrl}?model=${model}`, {
+    const sdpRes = await fetch(baseUrl, {
         method: 'POST',
         body: offer.sdp,
         headers: { Authorization: `Bearer ${EPHEMERAL_KEY}`, 'Content-Type': 'application/sdp' }

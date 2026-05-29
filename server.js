@@ -38,24 +38,27 @@ app.get('/', (req, res) => {
 });
 
 // ─────────────────────────────────────────────
-// ⚡ REALTIME WEBRTC TOKEN ENDPOINT (UPDATED FOR OPENAI GA)
+// ⚡ REALTIME WEBRTC TOKEN ENDPOINT (GA UPDATED)
 // ─────────────────────────────────────────────
 app.get('/api/realtime-token', async (req, res) => {
     try {
-        // UPDATED: Using the new /client_secrets endpoint
         const response = await fetch('https://api.openai.com/v1/realtime/client_secrets', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
                 'Content-Type': 'application/json',
             },
-            // UPDATED: Wrapped in the required "session" object
             body: JSON.stringify({
                 session: {
                     type: 'realtime',
                     model: 'gpt-4o-realtime-preview-2024-12-17',
-                    voice: 'nova',
-                    instructions: systemPrompt
+                    instructions: systemPrompt,
+                    // UPDATED: Voice is now strictly nested under audio.output
+                    audio: {
+                        output: {
+                            voice: 'nova'
+                        }
+                    }
                 }
             }),
         });

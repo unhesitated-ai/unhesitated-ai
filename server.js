@@ -74,7 +74,7 @@ app.get('/api/realtime-token', (req, res) => {
   const payload = JSON.stringify({
     session: {
       type: 'realtime',
-      model: 'gpt-4o-realtime-preview',
+      model: 'gpt-realtime-2',
       instructions: buildSystemPrompt(modelKey),
       audio: {
         output: {

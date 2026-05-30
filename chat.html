@@ -257,116 +257,172 @@ main{
 #companionScreen{
   position:fixed; inset:0; z-index:200;
   display:flex; justify-content:center; align-items:flex-start;
-  padding:100px 20px 60px;
+  padding:80px 20px 60px;
   background:rgba(3,5,13,0.97);
   backdrop-filter:blur(28px);
   overflow-y:auto;
 }
 #companionScreen.hidden{ display:none; }
 
-.companion-wrapper{ width:100%; max-width:660px; }
+.companion-wrapper{ width:100%; max-width:720px; }
 
 .companion-header{
-  text-align:center; margin-bottom:40px;
+  text-align:center; margin-bottom:48px; position:relative;
+}
+.companion-back{
+  position:absolute; left:0; top:50%;
+  transform:translateY(-50%);
+  display:flex; align-items:center; gap:6px;
+  color:rgba(255,255,255,0.4); text-decoration:none;
+  font-size:0.82rem; letter-spacing:0.06em;
+  transition:color 0.2s ease;
+  font-family:'Sora',sans-serif;
+}
+.companion-back:hover{ color:rgba(255,255,255,0.85); }
+.companion-back svg{ width:14px; height:14px; }
+
+.companion-badge{
+  display:inline-flex; align-items:center; gap:6px;
+  padding:5px 14px; border-radius:50px;
+  background:rgba(75,127,255,0.08);
+  border:1px solid rgba(75,127,255,0.2);
+  font-size:0.68rem; letter-spacing:0.14em;
+  text-transform:uppercase; color:rgba(107,159,255,0.7);
+  font-family:'Sora',sans-serif; margin-bottom:16px;
+}
+.companion-badge-dot{
+  width:5px; height:5px; border-radius:50%;
+  background:var(--electric);
+  box-shadow:0 0 8px var(--electric);
+  animation:pulse 2s infinite;
 }
 .companion-header h2{
-  font-family:'Sora',sans-serif; font-size:1.5rem;
-  font-weight:700; letter-spacing:-0.01em; margin-bottom:8px;
+  font-family:'Sora',sans-serif; font-size:2rem;
+  font-weight:700; letter-spacing:-0.02em; margin-bottom:10px;
+  background:linear-gradient(135deg,#fff 40%,rgba(107,159,255,0.8));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  background-clip:text;
 }
 .companion-header p{
-  color:var(--white-muted); font-size:0.88rem;
+  color:var(--white-muted); font-size:0.88rem; line-height:1.6;
 }
 
-/* Grid of cards — 5 columns on desktop, 2 on mobile */
+/* Grid — 5 columns desktop, 2 mobile */
 .companion-grid{
   display:grid;
   grid-template-columns: repeat(5, 1fr);
-  gap:12px;
-  margin-bottom:36px;
+  gap:14px;
+  margin-bottom:40px;
 }
 @media(max-width:600px){
   .companion-grid{ grid-template-columns: repeat(2, 1fr); }
+  .companion-header h2{ font-size:1.5rem; }
+  .companion-back{ display:none; }
 }
 
 .companion-card{
   display:flex; flex-direction:column;
   align-items:center; justify-content:center;
-  gap:10px; padding:20px 12px;
-  border-radius:20px;
+  gap:12px; padding:22px 10px 18px;
+  border-radius:22px;
   border:1px solid rgba(255,255,255,0.06);
-  background:rgba(255,255,255,0.03);
+  background:rgba(255,255,255,0.02);
   cursor:pointer;
-  transition:all 0.22s var(--ease);
+  transition:all 0.25s cubic-bezier(0.25,0.46,0.45,0.94);
   position:relative; overflow:hidden;
   text-align:center;
 }
-.companion-card::before{
-  content:''; position:absolute; inset:0; border-radius:20px;
-  background:radial-gradient(circle at 50% 30%, rgba(75,127,255,0.09), transparent 70%);
+.companion-card::after{
+  content:''; position:absolute;
+  inset:0; border-radius:22px;
+  background:radial-gradient(circle at 50% 0%, rgba(75,127,255,0.12), transparent 65%);
   opacity:0; transition:opacity 0.3s ease;
 }
-.companion-card:hover::before{ opacity:1; }
+.companion-card:hover::after{ opacity:1; }
 .companion-card:hover{
-  border-color:rgba(75,127,255,0.35);
-  background:rgba(75,127,255,0.07);
-  transform:translateY(-3px);
+  border-color:rgba(75,127,255,0.3);
+  background:rgba(75,127,255,0.05);
+  transform:translateY(-4px);
+  box-shadow:0 12px 40px rgba(0,0,0,0.3);
 }
 .companion-card.selected{
-  border-color:rgba(107,159,255,0.75);
-  background:rgba(75,127,255,0.14);
-  box-shadow:0 0 24px rgba(75,127,255,0.22);
+  border-color:rgba(107,159,255,0.6);
+  background:rgba(75,127,255,0.1);
+  box-shadow:0 0 0 1px rgba(107,159,255,0.2), 0 12px 40px rgba(75,127,255,0.15);
 }
 
 .companion-avatar{
-  width:48px; height:48px; border-radius:50%;
+  width:52px; height:52px; border-radius:50%;
   display:flex; align-items:center; justify-content:center;
-  font-size:1.3rem;
+  font-size:1.4rem;
   border:1px solid rgba(255,255,255,0.08);
   flex-shrink:0;
+  position:relative; z-index:1;
+  transition:transform 0.25s ease;
 }
+.companion-card:hover .companion-avatar{ transform:scale(1.08); }
 .companion-avatar.male{
-  background:radial-gradient(circle at 30% 30%, rgba(75,127,255,0.35), rgba(10,20,60,0.92));
+  background:radial-gradient(circle at 30% 30%, rgba(75,127,255,0.45), rgba(10,20,60,0.95));
+  box-shadow:0 0 20px rgba(75,127,255,0.2);
 }
 .companion-avatar.female{
-  background:radial-gradient(circle at 30% 30%, rgba(168,85,247,0.32), rgba(30,10,60,0.92));
+  background:radial-gradient(circle at 30% 30%, rgba(168,85,247,0.4), rgba(30,10,60,0.95));
+  box-shadow:0 0 20px rgba(168,85,247,0.2);
 }
 
 .companion-name{
   font-family:'Sora',sans-serif;
-  font-weight:600; font-size:0.95rem;
+  font-weight:600; font-size:0.9rem;
+  position:relative; z-index:1;
+  color:rgba(255,255,255,0.85);
+  transition:color 0.2s ease;
 }
+.companion-card.selected .companion-name{ color:#fff; }
 
-/* selected checkmark ring */
+.companion-trait{
+  font-size:0.68rem; color:rgba(255,255,255,0.3);
+  letter-spacing:0.04em; position:relative; z-index:1;
+  margin-top:-6px;
+}
+.companion-card.selected .companion-trait{ color:rgba(107,159,255,0.6); }
+
 .companion-check{
   position:absolute; top:10px; right:10px;
   width:18px; height:18px; border-radius:50%;
-  border:1.5px solid rgba(255,255,255,0.15);
+  border:1.5px solid rgba(255,255,255,0.12);
   display:flex; align-items:center; justify-content:center;
-  transition:all 0.2s ease;
+  transition:all 0.2s ease; z-index:2;
 }
 .companion-card.selected .companion-check{
   background:var(--electric); border-color:var(--electric);
+  box-shadow:0 0 10px rgba(75,127,255,0.5);
 }
 .companion-check svg{ opacity:0; transition:opacity 0.2s ease; }
 .companion-card.selected .companion-check svg{ opacity:1; }
 
-/* CTA button */
+/* CTA */
 .companion-cta{
-  display:flex; justify-content:center;
+  display:flex; flex-direction:column;
+  align-items:center; gap:14px;
+}
+.companion-cta-hint{
+  font-size:0.75rem; color:rgba(255,255,255,0.2);
+  font-family:'Sora',sans-serif; letter-spacing:0.04em;
 }
 .btn-start{
-  padding:14px 48px; border-radius:50px; border:none;
-  background:linear-gradient(135deg,rgba(75,127,255,0.9),rgba(107,159,255,0.7));
+  padding:15px 56px; border-radius:50px; border:none;
+  background:linear-gradient(135deg,rgba(75,127,255,0.9),rgba(107,159,255,0.75));
   color:white; font-family:'Sora',sans-serif;
   font-weight:600; font-size:0.95rem; cursor:pointer;
   transition:all 0.25s ease;
-  box-shadow:0 0 30px rgba(75,127,255,0.3);
-  opacity:0.38; pointer-events:none;
+  box-shadow:0 0 30px rgba(75,127,255,0.25);
+  opacity:0.3; pointer-events:none;
+  letter-spacing:0.02em;
 }
 .btn-start.ready{ opacity:1; pointer-events:all; }
 .btn-start.ready:hover{
   transform:translateY(-2px);
-  box-shadow:0 0 50px rgba(75,127,255,0.5);
+  box-shadow:0 0 50px rgba(75,127,255,0.5), 0 8px 24px rgba(0,0,0,0.3);
 }
 </style>
 </head>
@@ -391,8 +447,18 @@ main{
   <div class="companion-wrapper">
 
     <div class="companion-header">
-      <h2>Choose Your Speaking Companion</h2>
-      <p>Pick the voice you'd like to practise with today.</p>
+      <a href="index.html" class="companion-back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M19 12H5M12 5l-7 7 7 7"/>
+        </svg>
+        Back to Home
+      </a>
+      <div class="companion-badge">
+        <span class="companion-badge-dot"></span>
+        AI Speaking Companions
+      </div>
+      <h2>Who do you want to talk to?</h2>
+      <p>Each companion has a unique personality and voice.<br/>Pick the one that feels right for today.</p>
     </div>
 
     <div class="companion-grid">
@@ -405,6 +471,7 @@ main{
         </div>
         <div class="companion-avatar male">🎙️</div>
         <div class="companion-name">Orion</div>
+        <div class="companion-trait">Bold & Direct</div>
       </div>
 
       <div class="companion-card" data-key="nova" data-gender="female">
@@ -415,6 +482,7 @@ main{
         </div>
         <div class="companion-avatar female">🎙️</div>
         <div class="companion-name">Nova</div>
+        <div class="companion-trait">Warm & Expressive</div>
       </div>
 
       <div class="companion-card" data-key="arthur" data-gender="male">
@@ -425,6 +493,7 @@ main{
         </div>
         <div class="companion-avatar male">🎙️</div>
         <div class="companion-name">Arthur</div>
+        <div class="companion-trait">Refined & Witty</div>
       </div>
 
       <div class="companion-card" data-key="eleanor" data-gender="female">
@@ -435,6 +504,7 @@ main{
         </div>
         <div class="companion-avatar female">🎙️</div>
         <div class="companion-name">Eleanor</div>
+        <div class="companion-trait">Elegant & Warm</div>
       </div>
 
       <div class="companion-card" data-key="kabir" data-gender="male">
@@ -445,6 +515,7 @@ main{
         </div>
         <div class="companion-avatar male">🎙️</div>
         <div class="companion-name">Kabir</div>
+        <div class="companion-trait">Wise & Grounded</div>
       </div>
 
       <div class="companion-card" data-key="maya" data-gender="female">
@@ -455,6 +526,7 @@ main{
         </div>
         <div class="companion-avatar female">🎙️</div>
         <div class="companion-name">Maya</div>
+        <div class="companion-trait">Nurturing & Sharp</div>
       </div>
 
       <div class="companion-card" data-key="ren" data-gender="male">
@@ -465,6 +537,7 @@ main{
         </div>
         <div class="companion-avatar male">🎙️</div>
         <div class="companion-name">Ren</div>
+        <div class="companion-trait">Calm & Patient</div>
       </div>
 
       <div class="companion-card" data-key="mei" data-gender="female">
@@ -475,6 +548,7 @@ main{
         </div>
         <div class="companion-avatar female">🎙️</div>
         <div class="companion-name">Mei</div>
+        <div class="companion-trait">Gentle & Precise</div>
       </div>
 
       <div class="companion-card" data-key="amir" data-gender="male">
@@ -485,6 +559,7 @@ main{
         </div>
         <div class="companion-avatar male">🎙️</div>
         <div class="companion-name">Amir</div>
+        <div class="companion-trait">Poetic & Soulful</div>
       </div>
 
       <div class="companion-card" data-key="layla" data-gender="female">
@@ -495,10 +570,14 @@ main{
         </div>
         <div class="companion-avatar female">🎙️</div>
         <div class="companion-name">Layla</div>
+        <div class="companion-trait">Vibrant & Caring</div>
       </div>
 
-    </div><div class="companion-cta">
+    </div>
+
+    <div class="companion-cta">
       <button class="btn-start" id="btnStartChat">Start Conversation →</button>
+      <div class="companion-cta-hint">Select a companion above to continue</div>
     </div>
 
   </div>

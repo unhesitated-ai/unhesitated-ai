@@ -72,7 +72,6 @@ app.get('/api/realtime-token', (req, res) => {
   const modelDef = MODELS[modelKey] || MODELS['nova'];
 
   const payload = JSON.stringify({
-    model: 'gpt-4o-realtime-preview-2024-12-17',
     voice: modelDef.ttsVoice,
     instructions: buildSystemPrompt(modelKey),
     input_audio_transcription: { model: 'whisper-1' },
@@ -82,7 +81,7 @@ app.get('/api/realtime-token', (req, res) => {
   const options = {
     hostname: 'api.openai.com',
     port: 443,
-    path: '/v1/realtime/client_secrets',
+    path: '/v1/realtime/client_secrets?model=gpt-4o-realtime-preview-2024-12-17',
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,

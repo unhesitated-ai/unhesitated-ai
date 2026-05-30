@@ -61,13 +61,10 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// ─────────────────────────────────────────────
-// REALTIME TOKEN — native https only, no SDK
-// ─────────────────────────────────────────────
 app.get('/api/realtime-token', (req, res) => {
-  console.log('🔑 KEY:', process.env.OPENAI_API_KEY?.slice(0, 8));
-  console.log('🌐 Calling OpenAI now...');
-  const modelKey = req.query.model || 'nova';
+  console.log('🔑 KEY starts with:', process.env.OPENAI_API_KEY?.slice(0, 8));
+  console.log('🌐 Calling OpenAI realtime sessions...');
+
   const modelKey = req.query.model || 'nova';
   const modelDef = MODELS[modelKey] || MODELS['nova'];
 
@@ -102,10 +99,10 @@ app.get('/api/realtime-token', (req, res) => {
           console.error('❌ OpenAI error:', JSON.stringify(parsed, null, 2));
           return res.status(apiRes.statusCode).json({ error: parsed });
         }
-        console.log(`✅ Token issued — model: ${modelDef.name}, voice: ${modelDef.ttsVoice}`);
+        console.log('✅ Token issued for:', modelDef.name);
         res.json(parsed);
       } catch (e) {
-        console.error('❌ Parse error. Raw response:', raw);
+        console.error('❌ Parse error. Raw:', raw);
         res.status(500).json({ error: 'Failed to parse OpenAI response', raw });
       }
     });
@@ -120,9 +117,6 @@ app.get('/api/realtime-token', (req, res) => {
   apiReq.end();
 });
 
-// ─────────────────────────────────────────────
-// FALLBACK TTS
-// ─────────────────────────────────────────────
 app.post('/api/tts', async (req, res) => {
   const { text, model: modelKey } = req.body;
   if (!text) return res.status(400).json({ error: 'No text provided.' });
@@ -140,9 +134,6 @@ app.post('/api/tts', async (req, res) => {
   }
 });
 
-// ─────────────────────────────────────────────
-// FALLBACK TEXT CHAT
-// ─────────────────────────────────────────────
 const chatHistories = {};
 
 app.post('/api/text-chat', async (req, res) => {

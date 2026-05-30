@@ -62,7 +62,7 @@ app.get('/', (req, res) => {
 });
 
 // ─────────────────────────────────────────────
-// REALTIME TOKEN — GA endpoint, no Beta header
+// REALTIME TOKEN — GA format, session wrapper
 // ─────────────────────────────────────────────
 app.get('/api/realtime-token', (req, res) => {
   console.log('🔑 KEY starts with:', process.env.OPENAI_API_KEY?.slice(0, 8));
@@ -72,16 +72,26 @@ app.get('/api/realtime-token', (req, res) => {
   const modelDef = MODELS[modelKey] || MODELS['nova'];
 
   const payload = JSON.stringify({
-    voice: modelDef.ttsVoice,
-    instructions: buildSystemPrompt(modelKey),
-    input_audio_transcription: { model: 'whisper-1' },
-    turn_detection: { type: 'server_vad' }
+    session: {
+      type: 'realtime',
+      model: 'gpt-4o-realtime-preview-2024-12-17',
+      instructions: buildSystemPrompt(modelKey),
+      audio: {
+        output: {
+          voice: modelDef.ttsVoice
+        },
+        input: {
+          transcription: { model: 'whisper-1' }
+        }
+      },
+      turn_detection: { type: 'server_vad' }
+    }
   });
 
   const options = {
     hostname: 'api.openai.com',
     port: 443,
-    path: '/v1/realtime/client_secrets?model=gpt-4o-realtime-preview-2024-12-17',
+    path: '/v1/realtime/client_secrets',
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
@@ -172,7 +182,4 @@ app.post('/api/text-chat', async (req, res) => {
   }
 });
 
-// ─────────────────────────────────────────────
-// START
-// ─────────────────────────────────────────────
 app.listen(PORT, () => console.log(`🚀 unhesitatedai running on port ${PORT}`));

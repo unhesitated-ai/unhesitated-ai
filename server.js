@@ -1,6 +1,7 @@
 const express = require('express');
 const cors    = require('cors');
 const path    = require('path');
+const https   = require('https');
 require('dotenv').config();
 const OpenAI  = require('openai');
 
@@ -8,8 +9,6 @@ const openai  = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 // ─────────────────────────────────────────────
 // MODEL REGISTRY
-// Each model has a distinct OpenAI voice and personality.
-// Available OpenAI Realtime voices: alloy, ash, ballad, coral, echo, sage, shimmer, verse
 // ─────────────────────────────────────────────
 const MODELS = {
   orion: {
@@ -144,7 +143,7 @@ You make every learner feel like they have a true companion in their journey.
 };
 
 // ─────────────────────────────────────────────
-// SHARED COACHING RULES — appended to every model
+// SHARED COACHING RULES
 // ─────────────────────────────────────────────
 const SHARED_COACHING_RULES = `
 YOUR COMPANIONS — you know all of them on unhesitatedai:
@@ -199,40 +198,58 @@ app.get('/', (req, res) => {
 });
 
 // ─────────────────────────────────────────────
-// ⚡ REALTIME WEBRTC TOKEN ENDPOINT
+// REALTIME TOKEN — uses native https, no SDK interference
 // ─────────────────────────────────────────────
-app.get('/api/realtime-token', async (req, res) => {
+app.get('/api/realtime-token', (req, res) => {
   const modelKey = req.query.model || 'nova';
   const modelDef = MODELS[modelKey] || MODELS['nova'];
 
-  try {
-    const response = await fetch('https://api.openai.com/v1/realtime/sessions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-        'Content-Type': 'application/json',
-        'OpenAI-Beta': 'realtime=v1'          // ← ADD THIS HEADER
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-realtime-preview-2024-12-17',   // ← USE DATED VERSION
-        voice: modelDef.ttsVoice,
-        instructions: buildSystemPrompt(modelKey),
-        input_audio_transcription: { model: 'whisper-1' },
-        turn_detection: { type: 'server_vad' }
-      }),
-    });
+  const payload = JSON.stringify({
+    model: 'gpt-4o-realtime-preview-2024-12-17',
+    voice: modelDef.ttsVoice,
+    instructions: buildSystemPrompt(modelKey),
+    input_audio_transcription: { model: 'whisper-1' },
+    turn_detection: { type: 'server_vad' }
+  });
 
-    const data = await response.json();
-    if (!response.ok) {
-      console.error('OpenAI Realtime Session Error:', data);
-      return res.status(response.status).json({ error: data });
+  const options = {
+    hostname: 'api.openai.com',
+    path: '/v1/realtime/sessions',
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+      'Content-Type': 'application/json',
+      'OpenAI-Beta': 'realtime=v1',
+      'Content-Length': Buffer.byteLength(payload)
     }
-    res.json(data);
+  };
 
-  } catch (error) {
-    console.error('Token fetch error:', error);
+  const request = https.request(options, (response) => {
+    let data = '';
+    response.on('data', chunk => { data += chunk; });
+    response.on('end', () => {
+      try {
+        const parsed = JSON.parse(data);
+        if (response.statusCode !== 200) {
+          console.error('OpenAI Realtime Session Error:', parsed);
+          return res.status(response.statusCode).json({ error: parsed });
+        }
+        console.log(`✅ Realtime token issued for: ${modelDef.name} (${modelDef.ttsVoice})`);
+        res.json(parsed);
+      } catch (e) {
+        console.error('Failed to parse OpenAI response:', data);
+        res.status(500).json({ error: 'Failed to parse OpenAI response' });
+      }
+    });
+  });
+
+  request.on('error', (error) => {
+    console.error('HTTPS request error:', error);
     res.status(500).json({ error: 'Backend failed to fetch realtime token.' });
-  }
+  });
+
+  request.write(payload);
+  request.end();
 });
 
 // ─────────────────────────────────────────────
@@ -243,7 +260,6 @@ app.post('/api/tts', async (req, res) => {
   if (!text) return res.status(400).json({ error: 'No text provided.' });
 
   const modelDef = MODELS[modelKey] || MODELS['nova'];
-  // TTS-1 only supports: alloy, echo, fable, onyx, nova, shimmer
   const ttsVoiceMap = {
     ash: 'onyx', coral: 'nova', echo: 'echo', shimmer: 'shimmer',
     verse: 'fable', nova: 'nova', alloy: 'alloy', sage: 'shimmer',
@@ -302,6 +318,9 @@ app.post('/api/text-chat', async (req, res) => {
   }
 });
 
+// ─────────────────────────────────────────────
+// START
+// ─────────────────────────────────────────────
 app.listen(PORT, () => {
   console.log(`🚀 unhesitatedai is running on port ${PORT}`);
 });

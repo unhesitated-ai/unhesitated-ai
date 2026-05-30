@@ -61,9 +61,12 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+// ─────────────────────────────────────────────
+// REALTIME TOKEN — GA endpoint, no Beta header
+// ─────────────────────────────────────────────
 app.get('/api/realtime-token', (req, res) => {
   console.log('🔑 KEY starts with:', process.env.OPENAI_API_KEY?.slice(0, 8));
-  console.log('🌐 Calling OpenAI realtime sessions...');
+  console.log('🌐 Calling OpenAI realtime client_secrets...');
 
   const modelKey = req.query.model || 'nova';
   const modelDef = MODELS[modelKey] || MODELS['nova'];
@@ -79,12 +82,11 @@ app.get('/api/realtime-token', (req, res) => {
   const options = {
     hostname: 'api.openai.com',
     port: 443,
-    path: '/v1/realtime/sessions',
+    path: '/v1/realtime/client_secrets',
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
       'Content-Type': 'application/json',
-      'OpenAI-Beta': 'realtime=v1',
       'Content-Length': Buffer.byteLength(payload)
     }
   };
@@ -117,11 +119,17 @@ app.get('/api/realtime-token', (req, res) => {
   apiReq.end();
 });
 
+// ─────────────────────────────────────────────
+// FALLBACK TTS
+// ─────────────────────────────────────────────
 app.post('/api/tts', async (req, res) => {
   const { text, model: modelKey } = req.body;
   if (!text) return res.status(400).json({ error: 'No text provided.' });
   const modelDef = MODELS[modelKey] || MODELS['nova'];
-  const voiceMap = { ash:'onyx', coral:'nova', echo:'echo', shimmer:'shimmer', verse:'fable', nova:'nova', alloy:'alloy', sage:'shimmer', ballad:'onyx' };
+  const voiceMap = {
+    ash:'onyx', coral:'nova', echo:'echo', shimmer:'shimmer',
+    verse:'fable', nova:'nova', alloy:'alloy', sage:'shimmer', ballad:'onyx'
+  };
   const safeVoice = voiceMap[modelDef.ttsVoice] || 'nova';
   try {
     const speech = await openai.audio.speech.create({ model:'tts-1', voice:safeVoice, input:text });
@@ -134,6 +142,9 @@ app.post('/api/tts', async (req, res) => {
   }
 });
 
+// ─────────────────────────────────────────────
+// FALLBACK TEXT CHAT
+// ─────────────────────────────────────────────
 const chatHistories = {};
 
 app.post('/api/text-chat', async (req, res) => {
@@ -147,10 +158,14 @@ app.post('/api/text-chat', async (req, res) => {
       ...chatHistories[key],
       { role:'user', content: message }
     ];
-    const completion = await openai.chat.completions.create({ model:'gpt-4o', messages, max_tokens:150 });
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o',
+      messages,
+      max_tokens: 150
+    });
     const responseText = completion.choices[0].message.content;
-    chatHistories[key].push({ role:'user', content:message });
-    chatHistories[key].push({ role:'assistant', content:responseText });
+    chatHistories[key].push({ role:'user', content: message });
+    chatHistories[key].push({ role:'assistant', content: responseText });
     res.json({ message: responseText });
   } catch (e) {
     console.error('Text chat error:', e);
@@ -158,4 +173,7 @@ app.post('/api/text-chat', async (req, res) => {
   }
 });
 
+// ─────────────────────────────────────────────
+// START
+// ─────────────────────────────────────────────
 app.listen(PORT, () => console.log(`🚀 unhesitatedai running on port ${PORT}`));

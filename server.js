@@ -65,6 +65,9 @@ app.get('/', (req, res) => {
 // REALTIME TOKEN — native https only, no SDK
 // ─────────────────────────────────────────────
 app.get('/api/realtime-token', (req, res) => {
+  console.log('🔑 KEY:', process.env.OPENAI_API_KEY?.slice(0, 8));
+  console.log('🌐 Calling OpenAI now...');
+  const modelKey = req.query.model || 'nova';
   const modelKey = req.query.model || 'nova';
   const modelDef = MODELS[modelKey] || MODELS['nova'];
 

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Chat | unhesitated.ai</title>
+<title>Chat | unhesitatedai</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -108,14 +108,18 @@ main{
   background:rgba(75,127,255,0.05);
   border:1px solid rgba(75,127,255,0.12);
   border-radius:16px;
+  transition:opacity 0.5s ease;
+}
+.phrase-fade-out {
+  opacity: 0;
 }
 .phrase-label{
   font-size:0.7rem; letter-spacing:0.12em; text-transform:uppercase;
   color:rgba(107,159,255,0.55); margin-bottom:6px;
   font-family:'Sora',sans-serif;
 }
-.phrase-text{ font-family:'Sora',sans-serif; font-size:1.12rem; font-weight:600; }
-.phrase-meaning{ color:var(--white-muted); margin-top:4px; font-size:0.82rem; }
+.phrase-text{ font-family:'Sora',sans-serif; font-size:1.12rem; font-weight:600; text-align:center; }
+.phrase-meaning{ color:var(--white-muted); margin-top:4px; font-size:0.82rem; text-align:center; }
 
 .topics-label{
   text-align:center; margin-bottom:10px;
@@ -171,23 +175,29 @@ main{
   position:relative; cursor:pointer;
   display:flex; justify-content:center; align-items:center;
   transition:transform 1.8s cubic-bezier(0.22,1,0.36,1), box-shadow 0.8s ease;
-  background:radial-gradient(circle at 30% 30%, rgba(180,220,255,0.22), rgba(10,20,60,0.96));
-  box-shadow:0 0 45px rgba(75,127,255,0.35), inset 0 0 25px rgba(255,255,255,0.04);
+  background:linear-gradient(90deg, #000080, #4b0082, #000080);
+  background-size:200% 100%;
+  animation:orbFlow 4s linear infinite;
+  box-shadow:0 0 45px rgba(75,0,130,0.5), inset 0 0 25px rgba(255,255,255,0.15);
+}
+@keyframes orbFlow {
+  0% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
 }
 .orb-shell::before{
   content:''; position:absolute; inset:-10px; border-radius:50%;
-  border:1px solid rgba(75,127,255,0.15);
+  border:1px solid rgba(75,0,130,0.3);
   animation:ringFloat 5s ease-in-out infinite;
 }
 .orb-shell.active{
   transform:scale(2.1);
-  box-shadow:0 0 120px rgba(75,127,255,0.55), 0 0 220px rgba(75,127,255,0.18), inset 0 0 40px rgba(255,255,255,0.08);
+  box-shadow:0 0 120px rgba(75,0,130,0.7), 0 0 220px rgba(0,0,128,0.4), inset 0 0 40px rgba(255,255,255,0.15);
 }
 @keyframes ringFloat{
   0%,100%{transform:scale(1);opacity:0.45}
   50%{transform:scale(1.08);opacity:1}
 }
-#orbButtonCanvas{ width:100%; height:100%; border-radius:50%; }
+#orbButtonCanvas{ width:100%; height:100%; border-radius:50%; mix-blend-mode: screen; }
 
 /* ACTIVE COMPANION BAR */
 .active-companion-bar{
@@ -223,8 +233,11 @@ main{
 .voice-big-orb{
   width:340px; height:340px; border-radius:50%;
   display:flex; justify-content:center; align-items:center; position:relative;
+  background:linear-gradient(90deg, #000080, #4b0082, #000080);
+  background-size:200% 100%;
+  animation:orbFlow 4s linear infinite;
 }
-#voiceOrbCanvas{ width:100%; height:100%; border-radius:50%; }
+#voiceOrbCanvas{ width:100%; height:100%; border-radius:50%; mix-blend-mode: screen; }
 .voice-status{
   margin-top:26px; font-family:'Sora',sans-serif;
   letter-spacing:0.12em; text-transform:uppercase;
@@ -364,10 +377,9 @@ main{
 <div class="atmo-orb one"></div>
 <div class="atmo-orb two"></div>
 
-<!-- NAV -->
 <nav class="nav">
   <a href="index.html" class="logo">
-    <span style="font-size:1.2rem;font-weight:700">unhesitated<span class="dot-ai">.ai</span></span>
+    <span style="font-size:1.2rem;font-weight:700">unhesitated<span class="dot-ai">ai</span></span>
     <span class="pulse-dot"></span>
   </a>
   <ul class="nav-links">
@@ -375,7 +387,6 @@ main{
   </ul>
 </nav>
 
-<!-- ──────── COMPANION SELECTOR ──────── -->
 <div id="companionScreen">
   <div class="companion-wrapper">
 
@@ -386,7 +397,6 @@ main{
 
     <div class="companion-grid">
 
-      <!-- Orion -->
       <div class="companion-card" data-key="orion" data-gender="male">
         <div class="companion-check">
           <svg width="9" height="7" viewBox="0 0 9 7" fill="none">
@@ -397,7 +407,6 @@ main{
         <div class="companion-name">Orion</div>
       </div>
 
-      <!-- Nova -->
       <div class="companion-card" data-key="nova" data-gender="female">
         <div class="companion-check">
           <svg width="9" height="7" viewBox="0 0 9 7" fill="none">
@@ -408,7 +417,6 @@ main{
         <div class="companion-name">Nova</div>
       </div>
 
-      <!-- Arthur -->
       <div class="companion-card" data-key="arthur" data-gender="male">
         <div class="companion-check">
           <svg width="9" height="7" viewBox="0 0 9 7" fill="none">
@@ -419,7 +427,6 @@ main{
         <div class="companion-name">Arthur</div>
       </div>
 
-      <!-- Eleanor -->
       <div class="companion-card" data-key="eleanor" data-gender="female">
         <div class="companion-check">
           <svg width="9" height="7" viewBox="0 0 9 7" fill="none">
@@ -430,7 +437,6 @@ main{
         <div class="companion-name">Eleanor</div>
       </div>
 
-      <!-- Kabir -->
       <div class="companion-card" data-key="kabir" data-gender="male">
         <div class="companion-check">
           <svg width="9" height="7" viewBox="0 0 9 7" fill="none">
@@ -441,7 +447,6 @@ main{
         <div class="companion-name">Kabir</div>
       </div>
 
-      <!-- Maya -->
       <div class="companion-card" data-key="maya" data-gender="female">
         <div class="companion-check">
           <svg width="9" height="7" viewBox="0 0 9 7" fill="none">
@@ -452,7 +457,6 @@ main{
         <div class="companion-name">Maya</div>
       </div>
 
-      <!-- Ren -->
       <div class="companion-card" data-key="ren" data-gender="male">
         <div class="companion-check">
           <svg width="9" height="7" viewBox="0 0 9 7" fill="none">
@@ -463,7 +467,6 @@ main{
         <div class="companion-name">Ren</div>
       </div>
 
-      <!-- Mei -->
       <div class="companion-card" data-key="mei" data-gender="female">
         <div class="companion-check">
           <svg width="9" height="7" viewBox="0 0 9 7" fill="none">
@@ -474,7 +477,6 @@ main{
         <div class="companion-name">Mei</div>
       </div>
 
-      <!-- Amir -->
       <div class="companion-card" data-key="amir" data-gender="male">
         <div class="companion-check">
           <svg width="9" height="7" viewBox="0 0 9 7" fill="none">
@@ -485,7 +487,6 @@ main{
         <div class="companion-name">Amir</div>
       </div>
 
-      <!-- Layla -->
       <div class="companion-card" data-key="layla" data-gender="female">
         <div class="companion-check">
           <svg width="9" height="7" viewBox="0 0 9 7" fill="none">
@@ -496,16 +497,13 @@ main{
         <div class="companion-name">Layla</div>
       </div>
 
-    </div><!-- /companion-grid -->
-
-    <div class="companion-cta">
+    </div><div class="companion-cta">
       <button class="btn-start" id="btnStartChat">Start Conversation →</button>
     </div>
 
   </div>
 </div>
 
-<!-- ──────── VOICE OVERLAY ──────── -->
 <div class="voice-overlay" id="voiceOverlay">
   <div class="voice-big-orb">
     <canvas id="voiceOrbCanvas" width="340" height="340"></canvas>
@@ -514,18 +512,16 @@ main{
   <button class="voice-end-btn" id="voiceEndBtn">End Voice Chat</button>
 </div>
 
-<!-- ──────── MAIN CHAT ──────── -->
 <main>
   <div class="glass">
 
     <div class="chat-top">
       <div class="chat-title">
         <span class="pulse-dot"></span>
-        <span>unhesitated<span class="dot-ai">.ai</span></span>
+        <span>unhesitated<span class="dot-ai">ai</span></span>
       </div>
     </div>
 
-    <!-- Active companion bar — hidden until a model is chosen -->
     <div class="active-companion-bar" id="activeCompanionBar" style="display:none">
       <div class="acb-avatar" id="acbAvatar">🎙️</div>
       <div>
@@ -618,43 +614,150 @@ document.getElementById('activeCompanionBar').addEventListener('click', () => {
 });
 
 /* ─────────────────────────────────────
-   PHRASES
+   DYNAMIC PHRASES (ENGLISH LEARNING CONTEXT)
 ───────────────────────────────────── */
 const PHRASES = [
-  { text:'"Break the ice"',             meaning:'Start a conversation in a social situation' },
-  { text:'"Under the weather"',          meaning:'Feeling slightly ill or unwell' },
-  { text:'"Hit the nail on the head"',   meaning:'Describe exactly what is happening' },
-  { text:'"Bite the bullet"',            meaning:'Endure a painful or difficult situation' },
-  { text:'"On the same page"',           meaning:'In agreement and thinking the same way' },
-  { text:'"Piece of cake"',              meaning:'Something very easy to do' },
+  { text:'"At a loss for words"',          meaning:'Unable to think of anything to say' },
+  { text:'"Break the ice"',                meaning:'Start a conversation in a social situation' },
+  { text:'"On the tip of my tongue"',      meaning:'Almost remembering a word or fact' },
+  { text:'"Speak your mind"',              meaning:'Express your feelings honestly' },
+  { text:'"Lost in translation"',          meaning:'Meaning confused or lost during translation' },
+  { text:'"Bite the bullet"',              meaning:'Endure a difficult or painful situation' },
+  { text:'"Under the weather"',            meaning:'Feeling slightly ill or unwell' },
+  { text:'"Piece of cake"',                meaning:'Something very easy to do' }
 ];
-const chosen = PHRASES[Math.floor(Math.random() * PHRASES.length)];
-document.getElementById('phraseText').textContent    = chosen.text;
-document.getElementById('phraseMeaning').textContent = chosen.meaning;
+
+let phraseIdx = Math.floor(Math.random() * PHRASES.length);
+const phraseTextEl = document.getElementById('phraseText');
+const phraseMeaningEl = document.getElementById('phraseMeaning');
+const phraseStrip = document.querySelector('.phrase-strip');
+
+function updatePhraseUI() {
+  phraseTextEl.textContent = PHRASES[phraseIdx].text;
+  phraseMeaningEl.textContent = PHRASES[phraseIdx].meaning;
+}
+updatePhraseUI();
+
+setInterval(() => {
+  phraseStrip.classList.add('phrase-fade-out');
+  setTimeout(() => {
+    phraseIdx = (phraseIdx + 1) % PHRASES.length;
+    updatePhraseUI();
+    phraseStrip.classList.remove('phrase-fade-out');
+  }, 500);
+}, 7000);
 
 /* ─────────────────────────────────────
-   STARFIELD
+   DYNAMIC STARFIELD (From Index)
 ───────────────────────────────────── */
-const starCanvas = document.getElementById('starCanvas');
-const sctx = starCanvas.getContext('2d');
-let W, H;
-function resize(){ W = starCanvas.width = innerWidth; H = starCanvas.height = innerHeight; }
-resize();
-addEventListener('resize', resize);
-const stars = [];
-for(let i=0;i<180;i++) stars.push({ x:Math.random()*W, y:Math.random()*H, r:Math.random()*1.5, a:Math.random(), v:Math.random()*0.2 });
-function drawStars(){
-  sctx.clearRect(0,0,W,H);
-  stars.forEach(s=>{
-    s.y += s.v;
-    if(s.y>H){ s.y=-10; s.x=Math.random()*W; }
-    sctx.globalAlpha=s.a;
-    sctx.beginPath(); sctx.arc(s.x,s.y,s.r,0,Math.PI*2);
-    sctx.fillStyle='white'; sctx.fill();
-  });
+(function(){
+  const sc   = document.getElementById('starCanvas');
+  const sctx = sc.getContext('2d');
+  let W, H;
+  let mouse = {x: -9999, y: -9999};
+  const STAR_COUNT = 200;
+  const REPEL_RADIUS = 130;
+  const REPEL_FORCE  = 3.5;
+  const MAX_SPEED    = 2.2;
+  const FRICTION     = 0.985;
+  let stars = [];
+
+  function resize(){
+    W = sc.width  = window.innerWidth;
+    H = sc.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+  window.addEventListener('mouseleave', () => { mouse.x = -9999; mouse.y = -9999; });
+  window.addEventListener('touchmove', e => {
+    mouse.x = e.touches[0].clientX;
+    mouse.y = e.touches[0].clientY;
+  }, {passive:true});
+  window.addEventListener('touchend', () => { mouse.x = -9999; mouse.y = -9999; });
+
+  function mkStar(){
+    const speed = Math.random() * 0.25 + 0.05;
+    const angle = Math.random() * Math.PI * 2;
+    return {
+      x  : Math.random() * (window.innerWidth  || 1400),
+      y  : Math.random() * (window.innerHeight || 900),
+      vx : Math.cos(angle) * speed,
+      vy : Math.sin(angle) * speed,
+      r  : Math.random() * 1.5 + 0.3,
+      a  : Math.random() * 0.7 + 0.2,
+      da : (Math.random() - 0.5) * 0.005,
+    };
+  }
+  stars = Array.from({length: STAR_COUNT}, mkStar);
+
+  function drawStars(){
+    sctx.clearRect(0, 0, W, H);
+
+    stars.forEach(s => {
+      const dx   = s.x - mouse.x;
+      const dy   = s.y - mouse.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if(dist < REPEL_RADIUS && dist > 0){
+        const force = ((REPEL_RADIUS - dist) / REPEL_RADIUS) * REPEL_FORCE;
+        s.vx += (dx / dist) * force;
+        s.vy += (dy / dist) * force;
+      }
+
+      const spd = Math.sqrt(s.vx * s.vx + s.vy * s.vy);
+      if(spd > MAX_SPEED){
+        s.vx = (s.vx / spd) * MAX_SPEED;
+        s.vy = (s.vy / spd) * MAX_SPEED;
+      }
+
+      s.vx *= FRICTION;
+      s.vy *= FRICTION;
+
+      const minSpd = 0.04;
+      const curSpd = Math.sqrt(s.vx * s.vx + s.vy * s.vy);
+      if(curSpd < minSpd && curSpd > 0){
+        s.vx = (s.vx / curSpd) * minSpd;
+        s.vy = (s.vy / curSpd) * minSpd;
+      } else if(curSpd === 0){
+        const a = Math.random() * Math.PI * 2;
+        s.vx = Math.cos(a) * minSpd;
+        s.vy = Math.sin(a) * minSpd;
+      }
+
+      s.x += s.vx;
+      s.y += s.vy;
+
+      if(s.x < -4)  s.x = W + 4;
+      if(s.x > W+4) s.x = -4;
+      if(s.y < -4)  s.y = H + 4;
+      if(s.y > H+4) s.y = -4;
+
+      s.a += s.da;
+      if(s.a > 0.95 || s.a < 0.12) s.da *= -1;
+
+      if(s.r > 1.1){
+        const g = sctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.r * 5);
+        g.addColorStop(0, `rgba(180,210,255,${s.a * 0.45})`);
+        g.addColorStop(1, 'transparent');
+        sctx.fillStyle = g;
+        sctx.beginPath();
+        sctx.arc(s.x, s.y, s.r * 5, 0, Math.PI * 2);
+        sctx.fill();
+      }
+
+      sctx.globalAlpha = s.a;
+      sctx.fillStyle   = '#ffffff';
+      sctx.beginPath();
+      sctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      sctx.fill();
+    });
+
+    sctx.globalAlpha = 1;
+    requestAnimationFrame(drawStars);
+  }
   requestAnimationFrame(drawStars);
-}
-drawStars();
+})();
 
 /* ─────────────────────────────────────
    ORB STATE
@@ -669,7 +772,7 @@ function setState(state){
 }
 
 /* ─────────────────────────────────────
-   SMALL ORB
+   SMALL ORB (Dynamic Navy/Purple Combo)
 ───────────────────────────────────── */
 const orbCanvas = document.getElementById('orbButtonCanvas');
 const orbCtx    = orbCanvas.getContext('2d');
@@ -682,12 +785,14 @@ function renderSmallOrb(){
   if(orbState==='speaking')  target=0.9;
   energy+=(target-energy)*0.08; phase+=0.03;
   const CX=75,CY=75,R=42;
+  
   for(let i=3;i>=1;i--){
     orbCtx.beginPath(); orbCtx.arc(CX,CY,R+i*10+energy*16,0,Math.PI*2);
     let alpha=energy*0.16/i;
-    orbCtx.fillStyle=orbState==='thinking'?`rgba(168,85,247,${alpha})`:`rgba(75,127,255,${alpha})`;
+    orbCtx.fillStyle=orbState==='thinking'?`rgba(75,0,130,${alpha})`:`rgba(0,0,128,${alpha})`;
     orbCtx.fill();
   }
+  
   orbCtx.beginPath();
   for(let i=0;i<=80;i++){
     const angle=(i/80)*Math.PI*2;
@@ -697,15 +802,18 @@ function renderSmallOrb(){
     if(i===0) orbCtx.moveTo(x,y); else orbCtx.lineTo(x,y);
   }
   orbCtx.closePath();
-  const grd=orbCtx.createRadialGradient(CX-12,CY-12,0,CX,CY,R+30);
-  grd.addColorStop(0,'#cde2ff'); grd.addColorStop(1,'#14224f');
+  
+  const grd=orbCtx.createLinearGradient(0, 0, 150, 0);
+  grd.addColorStop(0, 'rgba(0,0,128,0.7)');
+  grd.addColorStop(1, 'rgba(75,0,130,0.7)');
   orbCtx.fillStyle=grd; orbCtx.fill();
+  
   requestAnimationFrame(renderSmallOrb);
 }
 renderSmallOrb();
 
 /* ─────────────────────────────────────
-   BIG ORB
+   BIG ORB (Dynamic Navy/Purple Combo)
 ───────────────────────────────────── */
 const voiceOrbCanvas = document.getElementById('voiceOrbCanvas');
 const vctx           = voiceOrbCanvas.getContext('2d');
@@ -718,12 +826,14 @@ function renderBigOrb(){
   if(orbState==='speaking')  target=1;
   vEnergy+=(target-vEnergy)*0.06; vPhase+=0.025;
   const CX=170,CY=170,R=100;
+  
   for(let i=4;i>=1;i--){
     vctx.beginPath(); vctx.arc(CX,CY,R+i*14+vEnergy*20,0,Math.PI*2);
     let alpha=vEnergy*0.18/i;
-    vctx.fillStyle=orbState==='thinking'?`rgba(168,85,247,${alpha})`:`rgba(75,127,255,${alpha})`;
+    vctx.fillStyle=orbState==='thinking'?`rgba(75,0,130,${alpha})`:`rgba(0,0,128,${alpha})`;
     vctx.fill();
   }
+  
   vctx.beginPath();
   for(let i=0;i<=120;i++){
     const angle=(i/120)*Math.PI*2;
@@ -736,10 +846,12 @@ function renderBigOrb(){
     if(i===0) vctx.moveTo(x,y); else vctx.lineTo(x,y);
   }
   vctx.closePath();
-  const grd=vctx.createRadialGradient(CX-20,CY-24,0,CX,CY,R+50);
-  if(orbState==='thinking'){ grd.addColorStop(0,'#d9c8ff'); grd.addColorStop(1,'#1d0b42'); }
-  else{ grd.addColorStop(0,'#d5e6ff'); grd.addColorStop(1,'#10214f'); }
+  
+  const grd=vctx.createLinearGradient(0, 0, 340, 0);
+  grd.addColorStop(0, 'rgba(0,0,128,0.8)');
+  grd.addColorStop(1, 'rgba(75,0,130,0.8)');
   vctx.fillStyle=grd; vctx.fill();
+  
   requestAnimationFrame(renderBigOrb);
 }
 renderBigOrb();
@@ -816,7 +928,7 @@ async function openVoiceMode(){
       let msg;
       try{ msg=JSON.parse(e.data); }catch{ return; }
 
-      if(msg.type==='response.created')           setState('thinking');
+      if(msg.type==='response.created')          setState('thinking');
       if(msg.type==='response.output_item.added') setState('speaking');
       if(msg.type==='response.done')              setState('listening');
 

@@ -79,12 +79,8 @@ app.get('/api/realtime-token', (req, res) => {
       audio: {
         output: {
           voice: modelDef.ttsVoice
-        },
-        input: {
-          transcription: { model: 'whisper-1' }
         }
-      },
-      turn_detection: { type: 'server_vad' }
+      }
     }
   });
 

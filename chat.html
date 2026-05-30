@@ -900,7 +900,7 @@ async function openVoiceMode(){
     /* 1. Get ephemeral key from our backend */
     const tokenRes  = await fetch(`/api/realtime-token?model=${selectedModel}`);
     const tokenData = await tokenRes.json();
-    const EPHEMERAL_KEY = tokenData?.client_secret?.value || tokenData?.value || null;
+    const EPHEMERAL_KEY = tokenData?.value || tokenData?.client_secret?.value || tokenData?.session?.client_secret?.value || null;
 
     if(!EPHEMERAL_KEY){
       console.error('No ephemeral key received:', tokenData);

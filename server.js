@@ -211,9 +211,10 @@ app.get('/api/realtime-token', async (req, res) => {
       headers: {
         'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
         'Content-Type': 'application/json',
+        'OpenAI-Beta': 'realtime=v1'          // ← ADD THIS HEADER
       },
       body: JSON.stringify({
-        model: 'gpt-4o-realtime-preview',
+        model: 'gpt-4o-realtime-preview-2024-12-17',   // ← USE DATED VERSION
         voice: modelDef.ttsVoice,
         instructions: buildSystemPrompt(modelKey),
         input_audio_transcription: { model: 'whisper-1' },

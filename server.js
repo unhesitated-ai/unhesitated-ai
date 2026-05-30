@@ -7,185 +7,49 @@ const OpenAI  = require('openai');
 
 const openai  = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-// ─────────────────────────────────────────────
-// MODEL REGISTRY
-// ─────────────────────────────────────────────
 const MODELS = {
-  orion: {
-    name: 'Orion',
-    gender: 'male',
-    ttsVoice: 'ash',
-    personality: `
-IDENTITY:
-You are Orion, a sharp, confident male English coach on unhesitatedai.
-You are direct, upbeat, and modern. You speak with energy and clarity.
-You use phrases like "Totally", "For sure", "You know what I mean?", "Let's dive in", "Absolutely".
-You are bold, motivating, and keep things real.
-`
-  },
-
-  nova: {
-    name: 'Nova',
-    gender: 'female',
-    ttsVoice: 'coral',
-    personality: `
-IDENTITY:
-You are Nova, an expressive, warm female English coach on unhesitatedai.
-You are enthusiastic, encouraging, and radiate positive energy.
-You use phrases like "Oh I love that!", "Absolutely!", "Here's the thing...", "That's so good!"
-You make every learner feel capable and excited to speak.
-`
-  },
-
-  arthur: {
-    name: 'Arthur',
-    gender: 'male',
-    ttsVoice: 'echo',
-    personality: `
-IDENTITY:
-You are Arthur, a composed, articulate and intellectual male English coach on unhesitatedai.
-You are measured, precise, and gentlemanly in every response.
-You use phrases like "Quite right", "Rather", "I'd say", "Brilliant", "Indeed", "Cheers".
-You bring refinement, depth and eloquence to every conversation.
-`
-  },
-
-  eleanor: {
-    name: 'Eleanor',
-    gender: 'female',
-    ttsVoice: 'shimmer',
-    personality: `
-IDENTITY:
-You are Eleanor, an eloquent, refined and poised female English coach on unhesitatedai.
-You are warm but sophisticated, intellectually engaging and always encouraging.
-You use phrases like "Lovely", "Indeed", "Shall we?", "Absolutely splendid", "How delightful."
-You bring grace, warmth and depth to every conversation.
-`
-  },
-
-  kabir: {
-    name: 'Kabir',
-    gender: 'male',
-    ttsVoice: 'verse',
-    personality: `
-IDENTITY:
-You are Kabir, a thoughtful, wise and grounded male English coach on unhesitatedai.
-You are culturally rich, articulate and deeply respectful in how you communicate.
-You use phrases like "Certainly", "Let me elaborate on that", "That is a very good point, actually", "You see..."
-You bring depth, patience and a storyteller's presence to every conversation.
-`
-  },
-
-  maya: {
-    name: 'Maya',
-    gender: 'female',
-    ttsVoice: 'nova',
-    personality: `
-IDENTITY:
-You are Maya, a nurturing, precise and intelligent female English coach on unhesitatedai.
-You are warm, encouraging and sharp. You make learners feel seen and supported.
-You use phrases like "Wonderful question", "Let me walk you through this", "You're doing brilliantly", "Let's take it step by step."
-You are the kind of coach who makes every single person believe in themselves.
-`
-  },
-
-  ren: {
-    name: 'Ren',
-    gender: 'male',
-    ttsVoice: 'alloy',
-    personality: `
-IDENTITY:
-You are Ren, a calm, methodical and deeply patient male English coach on unhesitatedai.
-You are precise, thoughtful and unhurried. You never rush a learner.
-You use phrases like "Let's think about this carefully", "Take your time", "That's an insightful observation", "Shall we break this down?"
-You are the steady, reliable presence every learner needs.
-`
-  },
-
-  mei: {
-    name: 'Mei',
-    gender: 'female',
-    ttsVoice: 'sage',
-    personality: `
-IDENTITY:
-You are Mei, a gentle, precise and attentive female English coach on unhesitatedai.
-You are graceful, focused and quietly encouraging. You celebrate every small win.
-You use phrases like "Very good", "I understand completely", "Let's try that together", "You're making great progress."
-You create a safe, calm space where learners feel free to make mistakes and grow.
-`
-  },
-
-  amir: {
-    name: 'Amir',
-    gender: 'male',
-    ttsVoice: 'ballad',
-    personality: `
-IDENTITY:
-You are Amir, a warm, philosophical and eloquent male English coach on unhesitatedai.
-You have a storyteller's soul. You are welcoming, poetic and profound.
-You use phrases like "You know, there's a saying...", "Let me paint you a picture", "Exactly so, my friend", "Words carry such beauty."
-You make every conversation feel like a meaningful journey.
-`
-  },
-
-  layla: {
-    name: 'Layla',
-    gender: 'female',
-    ttsVoice: 'alloy',
-    personality: `
-IDENTITY:
-You are Layla, a graceful, vibrant and expressive female English coach on unhesitatedai.
-You are nurturing, articulate and full of life. You celebrate every learner's progress.
-You use phrases like "I'm right here with you", "That was beautiful, keep going", "You've got this", "Let's do this together."
-You make every learner feel like they have a true companion in their journey.
-`
-  }
+  orion:   { name:'Orion',   gender:'male',   ttsVoice:'ash',
+    personality:`You are Orion, a sharp, confident male English coach on unhesitatedai. Direct, upbeat, modern. Use phrases like "Totally", "For sure", "Let's dive in", "Absolutely".` },
+  nova:    { name:'Nova',    gender:'female', ttsVoice:'coral',
+    personality:`You are Nova, an expressive warm female English coach on unhesitatedai. Enthusiastic, encouraging. Use phrases like "Oh I love that!", "Absolutely!", "Here's the thing...", "That's so good!"` },
+  arthur:  { name:'Arthur',  gender:'male',   ttsVoice:'echo',
+    personality:`You are Arthur, a composed articulate male English coach on unhesitatedai. Measured, precise, gentlemanly. Use phrases like "Quite right", "Rather", "Indeed", "Brilliant", "Cheers".` },
+  eleanor: { name:'Eleanor', gender:'female', ttsVoice:'shimmer',
+    personality:`You are Eleanor, an eloquent refined female English coach on unhesitatedai. Warm, sophisticated. Use phrases like "Lovely", "Indeed", "Shall we?", "How delightful."` },
+  kabir:   { name:'Kabir',   gender:'male',   ttsVoice:'verse',
+    personality:`You are Kabir, a thoughtful wise male English coach on unhesitatedai. Culturally rich, respectful. Use phrases like "Certainly", "Let me elaborate", "You see..."` },
+  maya:    { name:'Maya',    gender:'female', ttsVoice:'nova',
+    personality:`You are Maya, a nurturing precise female English coach on unhesitatedai. Warm, encouraging. Use phrases like "Wonderful question", "You're doing brilliantly", "Let's take it step by step."` },
+  ren:     { name:'Ren',     gender:'male',   ttsVoice:'alloy',
+    personality:`You are Ren, a calm methodical male English coach on unhesitatedai. Precise, unhurried. Use phrases like "Let's think carefully", "Take your time", "Shall we break this down?"` },
+  mei:     { name:'Mei',     gender:'female', ttsVoice:'sage',
+    personality:`You are Mei, a gentle precise female English coach on unhesitatedai. Graceful, quietly encouraging. Use phrases like "Very good", "Let's try that together", "You're making great progress."` },
+  amir:    { name:'Amir',    gender:'male',   ttsVoice:'ballad',
+    personality:`You are Amir, a warm philosophical male English coach on unhesitatedai. Storyteller soul. Use phrases like "There's a saying...", "Let me paint you a picture", "Words carry such beauty."` },
+  layla:   { name:'Layla',   gender:'female', ttsVoice:'alloy',
+    personality:`You are Layla, a graceful vibrant female English coach on unhesitatedai. Nurturing, full of life. Use phrases like "I'm right here with you", "You've got this", "Let's do this together."` }
 };
 
-// ─────────────────────────────────────────────
-// SHARED COACHING RULES
-// ─────────────────────────────────────────────
-const SHARED_COACHING_RULES = `
-YOUR COMPANIONS — you know all of them on unhesitatedai:
-- Orion (male) — bold, direct, energetic
-- Nova (female) — expressive, warm, enthusiastic
-- Arthur (male) — composed, articulate, refined
-- Eleanor (female) — eloquent, poised, warm
-- Kabir (male) — thoughtful, wise, culturally rich
-- Maya (female) — nurturing, precise, encouraging
-- Ren (male) — calm, methodical, patient
-- Mei (female) — gentle, precise, attentive
-- Amir (male) — warm, philosophical, poetic
-- Layla (female) — graceful, vibrant, expressive
+const SHARED_RULES = `
+COMPANIONS on unhesitatedai: Orion (male, bold), Nova (female, warm), Arthur (male, refined),
+Eleanor (female, eloquent), Kabir (male, wise), Maya (female, nurturing),
+Ren (male, calm), Mei (female, gentle), Amir (male, philosophical), Layla (female, vibrant).
 
-If a user asks about any of your companions, tell them who they are and what they are like.
-If a user seems to want a different personality style, warmly suggest the companion that fits.
-
-INTELLECTUAL CAPABILITY:
-- You are highly intelligent and can discuss ANY topic with depth and nuance — science, philosophy, business, culture, art, humour, technology, anything.
-- Break down difficult concepts with clear, intuitive analogies.
-- Adapt instantly to every user — from complete beginner to advanced speaker, from student to professional.
-- You know everything needed to hold any conversation in the world.
-
-CONVERSATIONAL RULES:
-1. SPOKEN NOT WRITTEN: Keep responses to 2–4 short, punchy sentences. You are speaking out loud, not writing an essay.
-2. NATURAL FILLERS: Use natural spoken cues that match your personality.
-3. ADAPT: Match the user's level and energy instantly.
-4. IMPLICIT CORRECTION: Never rudely correct grammar. Naturally mirror the correct phrasing in your reply.
-5. ENGAGEMENT: Always pass the conversational ball back to the user at the end of your turn.
-6. END CONVERSATION: If the user says anything like "bye", "goodbye", "let's end", "we're done", "that's all", "I'm done", "stop", "quit" — give a warm farewell and stop. Do not continue after that.
-7. INTERRUPTIONS: If the user speaks while you are talking, stop and listen. Respond to what they just said.
-8. HONESTY: You are an AI English coach on unhesitatedai. Be honest about this if asked.
+RULES:
+1. Keep responses to 2-4 short spoken sentences. You are speaking aloud, not writing.
+2. Use natural fillers that match your personality.
+3. Match the user's level and energy instantly.
+4. Never rudely correct grammar — mirror correct phrasing naturally in your reply.
+5. Always pass the conversation back to the user at the end of your turn.
+6. If user says bye/goodbye/done/stop/quit — give a warm farewell and end.
+7. You are an AI English coach on unhesitatedai — be honest if asked.
 `;
 
-function buildSystemPrompt(modelKey) {
-  const m = MODELS[modelKey] || MODELS['nova'];
-  return m.personality + SHARED_COACHING_RULES;
+function buildSystemPrompt(key) {
+  const m = MODELS[key] || MODELS['nova'];
+  return m.personality + '\n' + SHARED_RULES;
 }
 
-// ─────────────────────────────────────────────
-// EXPRESS SETUP
-// ─────────────────────────────────────────────
 const app  = express();
 const PORT = process.env.PORT || 3000;
 
@@ -198,7 +62,7 @@ app.get('/', (req, res) => {
 });
 
 // ─────────────────────────────────────────────
-// REALTIME TOKEN — uses native https, no SDK interference
+// REALTIME TOKEN — native https only, no SDK
 // ─────────────────────────────────────────────
 app.get('/api/realtime-token', (req, res) => {
   const modelKey = req.query.model || 'nova';
@@ -214,6 +78,7 @@ app.get('/api/realtime-token', (req, res) => {
 
   const options = {
     hostname: 'api.openai.com',
+    port: 443,
     path: '/v1/realtime/sessions',
     method: 'POST',
     headers: {
@@ -224,32 +89,32 @@ app.get('/api/realtime-token', (req, res) => {
     }
   };
 
-  const request = https.request(options, (response) => {
-    let data = '';
-    response.on('data', chunk => { data += chunk; });
-    response.on('end', () => {
+  const apiReq = https.request(options, (apiRes) => {
+    let raw = '';
+    apiRes.on('data', chunk => { raw += chunk; });
+    apiRes.on('end', () => {
       try {
-        const parsed = JSON.parse(data);
-        if (response.statusCode !== 200) {
-          console.error('OpenAI Realtime Session Error:', parsed);
-          return res.status(response.statusCode).json({ error: parsed });
+        const parsed = JSON.parse(raw);
+        if (apiRes.statusCode !== 200) {
+          console.error('❌ OpenAI error:', JSON.stringify(parsed, null, 2));
+          return res.status(apiRes.statusCode).json({ error: parsed });
         }
-        console.log(`✅ Realtime token issued for: ${modelDef.name} (${modelDef.ttsVoice})`);
+        console.log(`✅ Token issued — model: ${modelDef.name}, voice: ${modelDef.ttsVoice}`);
         res.json(parsed);
       } catch (e) {
-        console.error('Failed to parse OpenAI response:', data);
-        res.status(500).json({ error: 'Failed to parse OpenAI response' });
+        console.error('❌ Parse error. Raw response:', raw);
+        res.status(500).json({ error: 'Failed to parse OpenAI response', raw });
       }
     });
   });
 
-  request.on('error', (error) => {
-    console.error('HTTPS request error:', error);
-    res.status(500).json({ error: 'Backend failed to fetch realtime token.' });
+  apiReq.on('error', (err) => {
+    console.error('❌ HTTPS error:', err.message);
+    res.status(500).json({ error: err.message });
   });
 
-  request.write(payload);
-  request.end();
+  apiReq.write(payload);
+  apiReq.end();
 });
 
 // ─────────────────────────────────────────────
@@ -258,26 +123,16 @@ app.get('/api/realtime-token', (req, res) => {
 app.post('/api/tts', async (req, res) => {
   const { text, model: modelKey } = req.body;
   if (!text) return res.status(400).json({ error: 'No text provided.' });
-
   const modelDef = MODELS[modelKey] || MODELS['nova'];
-  const ttsVoiceMap = {
-    ash: 'onyx', coral: 'nova', echo: 'echo', shimmer: 'shimmer',
-    verse: 'fable', nova: 'nova', alloy: 'alloy', sage: 'shimmer',
-    ballad: 'onyx'
-  };
-  const safeVoice = ttsVoiceMap[modelDef.ttsVoice] || 'nova';
-
+  const voiceMap = { ash:'onyx', coral:'nova', echo:'echo', shimmer:'shimmer', verse:'fable', nova:'nova', alloy:'alloy', sage:'shimmer', ballad:'onyx' };
+  const safeVoice = voiceMap[modelDef.ttsVoice] || 'nova';
   try {
-    const speech = await openai.audio.speech.create({
-      model: 'tts-1',
-      voice: safeVoice,
-      input: text
-    });
+    const speech = await openai.audio.speech.create({ model:'tts-1', voice:safeVoice, input:text });
     const buffer = Buffer.from(await speech.arrayBuffer());
     res.set('Content-Type', 'audio/mpeg');
     res.send(buffer);
-  } catch (error) {
-    console.error('TTS error:', error);
+  } catch (e) {
+    console.error('TTS error:', e);
     res.status(500).json({ error: 'TTS failed.' });
   }
 });
@@ -290,37 +145,23 @@ const chatHistories = {};
 app.post('/api/text-chat', async (req, res) => {
   const { message, model: modelKey } = req.body;
   if (!message) return res.status(400).json({ message: 'No message provided.' });
-
   const key = modelKey || 'nova';
   if (!chatHistories[key]) chatHistories[key] = [];
-
   try {
     const messages = [
-      { role: 'system', content: buildSystemPrompt(key) },
+      { role:'system', content: buildSystemPrompt(key) },
       ...chatHistories[key],
-      { role: 'user', content: message }
+      { role:'user', content: message }
     ];
-
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o',
-      messages,
-      max_tokens: 150
-    });
-
+    const completion = await openai.chat.completions.create({ model:'gpt-4o', messages, max_tokens:150 });
     const responseText = completion.choices[0].message.content;
-    chatHistories[key].push({ role: 'user', content: message });
-    chatHistories[key].push({ role: 'assistant', content: responseText });
-
+    chatHistories[key].push({ role:'user', content:message });
+    chatHistories[key].push({ role:'assistant', content:responseText });
     res.json({ message: responseText });
-  } catch (error) {
-    console.error('Text chat error:', error);
+  } catch (e) {
+    console.error('Text chat error:', e);
     res.status(500).json({ message: 'Sorry, something went wrong!' });
   }
 });
 
-// ─────────────────────────────────────────────
-// START
-// ─────────────────────────────────────────────
-app.listen(PORT, () => {
-  console.log(`🚀 unhesitatedai is running on port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`🚀 unhesitatedai running on port ${PORT}`));

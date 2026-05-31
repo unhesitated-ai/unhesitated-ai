@@ -997,7 +997,15 @@ async function openVoiceMode(){
 
   try{
     /* 1. Get ephemeral key from our backend */
-    const tokenRes  = await fetch(`/api/realtime-token?model=${selectedModel}`);
+    // Get the current session token and send it with the request
+const { data: sessionData } = await _sb.auth.getSession();
+const accessToken = sessionData?.session?.access_token;
+
+const tokenRes = await fetch(`/api/realtime-token?model=${selectedModel}`, {
+  headers: {
+    'Authorization': `Bearer ${accessToken}`
+  }
+});
     const tokenData = await tokenRes.json();
     const EPHEMERAL_KEY = tokenData?.value || tokenData?.client_secret?.value || tokenData?.session?.client_secret?.value || null;
 

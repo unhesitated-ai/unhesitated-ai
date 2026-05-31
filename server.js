@@ -4,8 +4,13 @@ const path    = require('path');
 const https   = require('https');
 require('dotenv').config();
 const OpenAI  = require('openai');
+const { createClient } = require('@supabase/supabase-js');
 
-const openai  = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SECRET_KEY
+);
 
 const MODELS = {
   orion:   { name:'Orion',   gender:'male',   ttsVoice:'ash',
@@ -55,9 +60,19 @@ HOW TO SPEAK:
 - You are an AI English coach on unhesitatedai — say so honestly if asked, in a plain, natural way.
 `;
 
-function buildSystemPrompt(key) {
+function buildSystemPrompt(key, memory) {
   const m = MODELS[key] || MODELS['nova'];
-  return m.personality + '\n' + SHARED_RULES;
+  let memoryContext = '';
+  if (memory) {
+    memoryContext = `
+MEMORY ABOUT THIS USER:
+- Previous topics discussed: ${memory.summary || 'none yet'}
+- Areas they need to improve: ${memory.weak_points || 'none noted yet'}
+- Total minutes practiced: ${memory.total_minutes || 0}
+Refer to this naturally in conversation only when relevant. Never announce that you remember them.
+    `;
+  }
+  return m.personality + '\n' + SHARED_RULES + '\n' + memoryContext;
 }
 
 const app  = express();
@@ -72,25 +87,94 @@ app.get('/', (req, res) => {
 });
 
 // ─────────────────────────────────────────────
-// REALTIME TOKEN — GA format, session wrapper
+// AUTH MIDDLEWARE
 // ─────────────────────────────────────────────
-app.get('/api/realtime-token', (req, res) => {
-  console.log('🔑 KEY starts with:', process.env.OPENAI_API_KEY?.slice(0, 8));
-  console.log('🌐 Calling OpenAI realtime client_secrets...');
+async function requireAuth(req, res, next) {
+  const token = req.headers.authorization?.replace('Bearer ', '');
+  if (!token) return res.status(401).json({ error: 'Not logged in.' });
+  const { data: { user }, error } = await supabase.auth.getUser(token);
+  if (error || !user) return res.status(401).json({ error: 'Invalid session.' });
+  req.user = user;
+  next();
+}
 
+// ─────────────────────────────────────────────
+// GET MEMORY
+// ─────────────────────────────────────────────
+async function getUserMemory(userId, companion) {
+  const { data } = await supabase
+    .from('session_memory')
+    .select('*')
+    .eq('user_id', userId)
+    .eq('companion', companion)
+    .single();
+  return data;
+}
+
+// ─────────────────────────────────────────────
+// SAVE MEMORY
+// ─────────────────────────────────────────────
+async function saveMemory(userId, companion, messages) {
+  const transcript = messages.map(m => `${m.role}: ${m.content}`).join('\n');
+  try {
+    const summaryRes = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [{
+        role: 'user',
+        content: `Based on this English practice conversation, write:
+1. A one sentence summary of topics discussed
+2. Any grammar or vocabulary weak points noticed
+
+Conversation:
+${transcript}
+
+Reply in this exact format:
+SUMMARY: ...
+WEAK_POINTS: ...`
+      }],
+      max_tokens: 150
+    });
+    const raw = summaryRes.choices[0].message.content;
+    const summary = raw.match(/SUMMARY:(.*)/)?.[1]?.trim() || '';
+    const weak_points = raw.match(/WEAK_POINTS:(.*)/)?.[1]?.trim() || '';
+    const existing = await getUserMemory(userId, companion);
+    if (existing) {
+      await supabase
+        .from('session_memory')
+        .update({
+          summary,
+          weak_points,
+          last_session: new Date().toISOString(),
+          total_minutes: (existing.total_minutes || 0) + 1
+        })
+        .eq('user_id', userId)
+        .eq('companion', companion);
+    } else {
+      await supabase
+        .from('session_memory')
+        .insert({ user_id: userId, companion, summary, weak_points, total_minutes: 1 });
+    }
+  } catch(e) {
+    console.error('Memory save error:', e);
+  }
+}
+
+// ─────────────────────────────────────────────
+// REALTIME TOKEN
+// ─────────────────────────────────────────────
+app.get('/api/realtime-token', requireAuth, async (req, res) => {
+  console.log('🔑 KEY starts with:', process.env.OPENAI_API_KEY?.slice(0, 8));
   const modelKey = req.query.model || 'nova';
   const modelDef = MODELS[modelKey] || MODELS['nova'];
+  const userId   = req.user.id;
+  const memory   = await getUserMemory(userId, modelKey);
 
   const payload = JSON.stringify({
     session: {
       type: 'realtime',
       model: 'gpt-realtime-2',
-      instructions: buildSystemPrompt(modelKey),
-      audio: {
-        output: {
-          voice: modelDef.ttsVoice
-        }
-      }
+      instructions: buildSystemPrompt(modelKey, memory),
+      audio: { output: { voice: modelDef.ttsVoice } }
     }
   });
 
@@ -118,7 +202,7 @@ app.get('/api/realtime-token', (req, res) => {
         }
         console.log('✅ Token issued for:', modelDef.name);
         res.json(parsed);
-      } catch (e) {
+      } catch(e) {
         console.error('❌ Parse error. Raw:', raw);
         res.status(500).json({ error: 'Failed to parse OpenAI response', raw });
       }
@@ -129,7 +213,6 @@ app.get('/api/realtime-token', (req, res) => {
     console.error('❌ HTTPS error:', err.message);
     res.status(500).json({ error: err.message });
   });
-
   apiReq.write(payload);
   apiReq.end();
 });
@@ -151,38 +234,60 @@ app.post('/api/tts', async (req, res) => {
     const buffer = Buffer.from(await speech.arrayBuffer());
     res.set('Content-Type', 'audio/mpeg');
     res.send(buffer);
-  } catch (e) {
+  } catch(e) {
     console.error('TTS error:', e);
     res.status(500).json({ error: 'TTS failed.' });
   }
 });
 
 // ─────────────────────────────────────────────
-// FALLBACK TEXT CHAT
+// TEXT CHAT
 // ─────────────────────────────────────────────
-const chatHistories = {};
-
-app.post('/api/text-chat', async (req, res) => {
+app.post('/api/text-chat', requireAuth, async (req, res) => {
   const { message, model: modelKey } = req.body;
   if (!message) return res.status(400).json({ message: 'No message provided.' });
-  const key = modelKey || 'nova';
-  if (!chatHistories[key]) chatHistories[key] = [];
+  const userId   = req.user.id;
+  const companion = modelKey || 'nova';
+
+  const { data: history } = await supabase
+    .from('chat_history')
+    .select('role, content')
+    .eq('user_id', userId)
+    .eq('companion', companion)
+    .order('created_at', { ascending: true })
+    .limit(20);
+
+  const memory = await getUserMemory(userId, companion);
+
+  const messages = [
+    { role: 'system', content: buildSystemPrompt(companion, memory) },
+    ...(history || []),
+    { role: 'user', content: message }
+  ];
+
   try {
-    const messages = [
-      { role:'system', content: buildSystemPrompt(key) },
-      ...chatHistories[key],
-      { role:'user', content: message }
-    ];
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o',
       messages,
       max_tokens: 150
     });
     const responseText = completion.choices[0].message.content;
-    chatHistories[key].push({ role:'user', content: message });
-    chatHistories[key].push({ role:'assistant', content: responseText });
+
+    await supabase.from('chat_history').insert([
+      { user_id: userId, companion, role: 'user',      content: message      },
+      { user_id: userId, companion, role: 'assistant', content: responseText }
+    ]);
+
+    if ((history?.length || 0) % 10 === 0) {
+      saveMemory(userId, companion, [
+        ...(history || []),
+        { role: 'user',      content: message      },
+        { role: 'assistant', content: responseText }
+      ]);
+    }
+
     res.json({ message: responseText });
-  } catch (e) {
+  } catch(e) {
     console.error('Text chat error:', e);
     res.status(500).json({ message: 'Sorry, something went wrong!' });
   }

@@ -8,9 +8,18 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+
+<!-- ✅ Supabase loaded in head for auth detection -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const _sb = supabase.createClient(
+    'https://hgiricwmrswqucaveckx.supabase.co',
+    'sb_publishable_dvLA7kbFstY9X_DopLEHOA_oBX16bPC'
+  );
+</script>
+
 <style>
   :root{
-    /* Theme from chat.html */
     --bg-void:#03050D;
     --bg-deep:#080D1A;
     --electric:#4B7FFF;
@@ -22,8 +31,6 @@
     --border-glass:rgba(255,255,255,0.07);
     --border-electric:rgba(75,127,255,0.28);
     --ease:cubic-bezier(0.25,0.46,0.45,0.94);
-    
-    /* Retained for specific index sections */
     --bg-surface:#0D1526;
     --bg-card:rgba(8,13,26,0.80);
     --blue-mid:#1E3A8A;
@@ -43,7 +50,6 @@
     min-height:100vh;
   }
 
-  /* ── STAR CANVAS ── */
   #starCanvas{
     position:fixed;inset:0;
     width:100%;height:100%;
@@ -110,14 +116,14 @@
     color:var(--white-muted);text-decoration:none;
     font-size:0.88rem;position:relative;transition:color 0.3s var(--ease);
   }
-  .nav-links a:not(.btn-pill)::after{
+  .nav-links a:not(.btn-pill):not(.btn-signout)::after{
     content:"";position:absolute;left:0;bottom:-4px;
     height:1px;width:100%;background:var(--electric);
     transform:scaleX(0);transform-origin:left;
     transition:transform 0.3s var(--ease);
   }
-  .nav-links a:not(.btn-pill):hover{color:var(--white)}
-  .nav-links a:not(.btn-pill):hover::after{transform:scaleX(1)}
+  .nav-links a:not(.btn-pill):not(.btn-signout):hover{color:var(--white)}
+  .nav-links a:not(.btn-pill):not(.btn-signout):hover::after{transform:scaleX(1)}
 
   .btn-pill{
     background:var(--electric);color:var(--white) !important;
@@ -131,6 +137,37 @@
     box-shadow:0 0 22px rgba(75,127,255,0.45);
   }
   .btn-pill::after{display:none !important}
+
+  /* ✅ User greeting in nav */
+  .nav-user{
+    display:flex;align-items:center;gap:10px;
+  }
+  .nav-user-name{
+    font-size:0.88rem;color:var(--white-muted);
+    font-family:'Sora',sans-serif;
+  }
+  .nav-user-name strong{
+    color:var(--white);font-weight:600;
+  }
+
+  /* ✅ Sign out button */
+  .btn-signout{
+    font-size:0.84rem;
+    color:rgba(255,255,255,0.4) !important;
+    border:1px solid rgba(255,255,255,0.12);
+    border-radius:50px;padding:7px 16px;
+    cursor:pointer;transition:all 0.25s ease;
+    background:transparent;
+    font-family:'DM Sans',sans-serif;
+    text-decoration:none;
+    display:inline-block;
+  }
+  .btn-signout:hover{
+    color:var(--white) !important;
+    border-color:rgba(255,255,255,0.3);
+    background:rgba(255,255,255,0.05);
+  }
+  .btn-signout::after{display:none !important}
 
   .hamburger{
     display:none;flex-direction:column;gap:5px;
@@ -263,7 +300,7 @@
     box-shadow:0 8px 32px rgba(0,0,0,0.5), 0 0 28px rgba(75,127,255,0.15);
   }
 
-  /* ---------- Hero chat preview (Dynamic Marketing Visual) ---------- */
+  /* ---------- Hero chat preview ---------- */
   .hero-chat{
     max-width:500px;width:100%;
     margin-top:50px;padding:24px;
@@ -341,7 +378,6 @@
     max-width:640px;margin:18px auto 0;font-size:1.05rem;
   }
 
-  /* Reveal */
   .reveal{opacity:0;transform:translateY(40px);transition:all 0.6s var(--ease)}
   .reveal.in{opacity:1;transform:none}
 
@@ -353,7 +389,7 @@
     max-width:800px;margin:0 auto 28px;letter-spacing:-0.01em;
   }
 
-  /* ---------- How it works / Features grids ---------- */
+  /* ---------- Grids ---------- */
   .grid-3{
     display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:60px;
   }
@@ -406,9 +442,7 @@
   .founding-card p{color:var(--white-muted);line-height:1.85;font-size:1.05rem;max-width:560px}
 
   /* ---------- Philosophy ---------- */
-  .diamond{
-    color:var(--electric);font-size:1.4rem;
-  }
+  .diamond{color:var(--electric);font-size:1.4rem;}
   .principle-card{align-items:flex-start;text-align:left}
 
   /* ---------- Final CTA ---------- */
@@ -430,7 +464,7 @@
     letter-spacing:0.18em;font-size:0.78rem;font-weight:600;
   }
 
-  /* ---------- Footer Alignment Fix ---------- */
+  /* ---------- Footer ---------- */
   footer{
     background:rgba(3, 5, 13, 0.8);
     backdrop-filter: blur(20px);
@@ -441,8 +475,6 @@
     display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; max-width: 1100px; margin: 0 auto;
   }
   .footer-center{color:var(--white-faint);font-size:0.9rem;text-align:center;flex:1;min-width:240px}
-  
-  /* PERFECT ALIGNMENT FOR LINKS + SOCIALS */
   .footer-nav-row {
     display: flex; align-items: center; justify-content: center; gap: 28px; flex-wrap: wrap; margin: 32px 0 24px;
   }
@@ -451,7 +483,6 @@
   }
   .footer-links a{color:var(--white-faint);text-decoration:none;transition:color 0.3s var(--ease)}
   .footer-links a:hover{color:var(--white)}
-  
   .socials{display:flex;gap:14px;align-items:center;}
   .socials a{
     color:var(--white-faint);transition:color 0.3s var(--ease);
@@ -459,7 +490,6 @@
   }
   .socials a:hover{color:var(--electric)}
   .socials svg{width:18px;height:18px}
-  
   .footer-strip{text-align:center;margin-bottom:10px}
   .footer-micro{text-align:center;font-size:0.8rem;color:var(--white-faint)}
 
@@ -485,13 +515,13 @@
     .grid-3,.grid-2x3{grid-template-columns:1fr}
     section{padding:70px 20px}
     .hero{padding:120px 20px 60px}
+    .nav-user-name{ display:none; }
   }
 </style>
 </head>
 <body>
 
 <canvas id="starCanvas" aria-hidden="true"></canvas>
-
 <div class="atmo-orb one" aria-hidden="true"></div>
 <div class="atmo-orb two" aria-hidden="true"></div>
 
@@ -507,7 +537,14 @@
     <li><a href="#top">Home</a></li>
     <li><a href="#how">How It Works</a></li>
     <li><a href="#features">Features</a></li>
-    <li><a href="login.html">Sign In / Sign Up</a></li>
+    <!-- ✅ Auth-aware nav items — toggled by JS below -->
+    <li id="navAuthItem"><a href="login.html">Sign In / Sign Up</a></li>
+    <li id="navUserItem" style="display:none">
+      <div class="nav-user">
+        <span class="nav-user-name">Hi, <strong id="navUserName"></strong></span>
+        <a href="#" class="btn-signout" id="btnSignOut">Sign Out</a>
+      </div>
+    </li>
     <li><a href="chat.html" class="btn-pill">Start Talking</a></li>
   </ul>
 </nav>
@@ -677,7 +714,6 @@
     </a>
     <div class="footer-center">A safe space for your English journey.</div>
   </div>
-  
   <div class="footer-nav-row">
     <nav class="footer-links" aria-label="Footer">
       <a href="#">About</a>
@@ -689,7 +725,6 @@
       <a href="https://x.com/unhesitatedai" target="_blank" rel="noopener noreferrer" aria-label="X" style="color: #FFFFFF;">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 22.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
       </a>
-
       <a href="https://www.instagram.com/unhesitatedai?igsh=MW9teXI3ZGt1b3djaw==" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
         <svg viewBox="0 0 24 24" fill="none" stroke="url(#ig-grad)" stroke-width="2">
           <defs>
@@ -719,7 +754,7 @@
     },
     {
       user: "The presentation was tough, but I think I did... bueno.",
-      ai: "That’s great! Doing well on a tough presentation is a huge win. What was it about?"
+      ai: "That's great! Doing well on a tough presentation is a huge win. What was it about?"
     },
     {
       user: "I need to catch the train to the... uh... gare.",
@@ -735,34 +770,56 @@
   setInterval(() => {
     const uMsg = document.getElementById('dynamicUserMsg');
     const aMsg = document.getElementById('dynamicAiMsg');
-    const typ = document.getElementById('heroTyping');
-    
-    // Fade out
+    const typ  = document.getElementById('heroTyping');
     uMsg.style.opacity = 0;
     aMsg.style.opacity = 0;
-    
     setTimeout(() => {
-      // Switch text and show user msg
       sIdx = (sIdx + 1) % chatScenarios.length;
       uMsg.textContent = chatScenarios[sIdx].user;
       uMsg.style.opacity = 1;
-      
-      // Hide AI msg, show typing indicator
       aMsg.style.display = 'none';
       typ.style.display = 'inline-flex';
-      
       setTimeout(() => {
-        // Hide typing, show AI msg
         typ.style.display = 'none';
         aMsg.textContent = chatScenarios[sIdx].ai;
         aMsg.style.display = 'block';
         setTimeout(() => aMsg.style.opacity = 1, 50);
-      }, 1800); // Wait 1.8s simulating thinking
-    }, 500); // Wait 0.5s for fade out
-  }, 7000); // Cycle every 7 seconds
+      }, 1800);
+    }, 500);
+  }, 7000);
 
+  // ── AUTH STATE: Show user name + sign out, or sign in link ──
+  _sb.auth.getSession().then(({ data }) => {
+    const session = data?.session;
+    const authItem = document.getElementById('navAuthItem');
+    const userItem = document.getElementById('navUserItem');
+    const userNameEl = document.getElementById('navUserName');
 
-  // ── STAR CANVAS SCRIPT ──
+    if (session) {
+      // Get first name from full name, or fall back to email prefix
+      const fullName = session.user?.user_metadata?.full_name || session.user?.user_metadata?.name || '';
+      const email    = session.user?.email || '';
+      const firstName = fullName ? fullName.split(' ')[0] : email.split('@')[0];
+
+      userNameEl.textContent = firstName;
+      authItem.style.display = 'none';
+      userItem.style.display = 'list-item';
+    } else {
+      authItem.style.display = 'list-item';
+      userItem.style.display = 'none';
+    }
+  });
+
+  // ── SIGN OUT ──
+  document.getElementById('btnSignOut').addEventListener('click', async (e) => {
+    e.preventDefault();
+    await _sb.auth.signOut();
+    // Refresh the nav state
+    document.getElementById('navAuthItem').style.display = 'list-item';
+    document.getElementById('navUserItem').style.display = 'none';
+  });
+
+  // ── STAR CANVAS ──
   (function(){
     const sc   = document.getElementById('starCanvas');
     const sctx = sc.getContext('2d');
@@ -807,7 +864,6 @@
 
     function drawStars(){
       sctx.clearRect(0, 0, W, H);
-
       stars.forEach(s => {
         const dx   = s.x - mouse.x;
         const dy   = s.y - mouse.y;
@@ -817,55 +873,29 @@
           s.vx += (dx / dist) * force;
           s.vy += (dy / dist) * force;
         }
-
         const spd = Math.sqrt(s.vx * s.vx + s.vy * s.vy);
-        if(spd > MAX_SPEED){
-          s.vx = (s.vx / spd) * MAX_SPEED;
-          s.vy = (s.vy / spd) * MAX_SPEED;
-        }
-
-        s.vx *= FRICTION;
-        s.vy *= FRICTION;
-
+        if(spd > MAX_SPEED){ s.vx = (s.vx / spd) * MAX_SPEED; s.vy = (s.vy / spd) * MAX_SPEED; }
+        s.vx *= FRICTION; s.vy *= FRICTION;
         const minSpd = 0.04;
         const curSpd = Math.sqrt(s.vx * s.vx + s.vy * s.vy);
-        if(curSpd < minSpd && curSpd > 0){
-          s.vx = (s.vx / curSpd) * minSpd;
-          s.vy = (s.vy / curSpd) * minSpd;
-        } else if(curSpd === 0){
-          const a = Math.random() * Math.PI * 2;
-          s.vx = Math.cos(a) * minSpd;
-          s.vy = Math.sin(a) * minSpd;
-        }
-
-        s.x += s.vx;
-        s.y += s.vy;
-
-        if(s.x < -4)  s.x = W + 4;
-        if(s.x > W+4) s.x = -4;
-        if(s.y < -4)  s.y = H + 4;
-        if(s.y > H+4) s.y = -4;
-
+        if(curSpd < minSpd && curSpd > 0){ s.vx = (s.vx / curSpd) * minSpd; s.vy = (s.vy / curSpd) * minSpd; }
+        else if(curSpd === 0){ const a = Math.random() * Math.PI * 2; s.vx = Math.cos(a) * minSpd; s.vy = Math.sin(a) * minSpd; }
+        s.x += s.vx; s.y += s.vy;
+        if(s.x < -4) s.x = W + 4; if(s.x > W+4) s.x = -4;
+        if(s.y < -4) s.y = H + 4; if(s.y > H+4) s.y = -4;
         s.a += s.da;
         if(s.a > 0.95 || s.a < 0.12) s.da *= -1;
-
         if(s.r > 1.1){
           const g = sctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.r * 5);
           g.addColorStop(0, `rgba(180,210,255,${s.a * 0.45})`);
           g.addColorStop(1, 'transparent');
           sctx.fillStyle = g;
-          sctx.beginPath();
-          sctx.arc(s.x, s.y, s.r * 5, 0, Math.PI * 2);
-          sctx.fill();
+          sctx.beginPath(); sctx.arc(s.x, s.y, s.r * 5, 0, Math.PI * 2); sctx.fill();
         }
-
         sctx.globalAlpha = s.a;
-        sctx.fillStyle   = '#ffffff';
-        sctx.beginPath();
-        sctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-        sctx.fill();
+        sctx.fillStyle = '#ffffff';
+        sctx.beginPath(); sctx.arc(s.x, s.y, s.r, 0, Math.PI * 2); sctx.fill();
       });
-
       sctx.globalAlpha = 1;
       requestAnimationFrame(drawStars);
     }
@@ -902,7 +932,6 @@
     });
   }, { threshold: 0.15 });
   document.querySelectorAll('.reveal').forEach(el => io.observe(el));
-
 </script>
 </body>
 </html>

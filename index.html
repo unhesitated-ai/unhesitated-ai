@@ -116,14 +116,34 @@
     color:var(--white-muted);text-decoration:none;
     font-size:0.88rem;position:relative;transition:color 0.3s var(--ease);
   }
-  .nav-links a:not(.btn-pill):not(.btn-signout)::after{
+  .nav-links a:not(.btn-pill):not(.btn-signout):not(.btn-signin)::after{
     content:"";position:absolute;left:0;bottom:-4px;
     height:1px;width:100%;background:var(--electric);
     transform:scaleX(0);transform-origin:left;
     transition:transform 0.3s var(--ease);
   }
-  .nav-links a:not(.btn-pill):not(.btn-signout):hover{color:var(--white)}
-  .nav-links a:not(.btn-pill):not(.btn-signout):hover::after{transform:scaleX(1)}
+  .nav-links a:not(.btn-pill):not(.btn-signout):not(.btn-signin):hover{color:var(--white)}
+  .nav-links a:not(.btn-pill):not(.btn-signout):not(.btn-signin):hover::after{transform:scaleX(1)}
+
+  /* ── NEW: Sign In / Sign Up nav button ── */
+  .btn-signin{
+    background:var(--electric);
+    color:var(--white) !important;
+    border-radius:50px;padding:10px 22px;
+    font-weight:600;font-size:0.84rem;
+    font-family:'DM Sans',sans-serif;
+    cursor:pointer;
+    transition:all 0.3s var(--ease);
+    display:inline-block;
+    text-decoration:none;
+    border:none;
+}
+.btn-signin:hover{
+    background:var(--electric-bright);
+    box-shadow:0 0 22px rgba(75,127,255,0.45);
+    color:var(--white) !important;
+}
+.btn-signin::after{display:none !important}
 
   .btn-pill{
     background:var(--electric);color:var(--white) !important;
@@ -471,10 +491,21 @@
     border-top:1px solid rgba(255,255,255,0.05);
     padding:60px 24px 32px;color:var(--white-faint);font-size:0.85rem;
   }
+  /* ✅ FIXED: footer centered layout */
   .footer-main {
-    display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; max-width: 1100px; margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    max-width: 1100px;
+    margin: 0 auto;
+    text-align: center;
   }
-  .footer-center{color:var(--white-faint);font-size:0.9rem;text-align:center;flex:1;min-width:240px}
+  .footer-center{
+    color:var(--white-faint);font-size:0.9rem;
+    text-align:center;
+  }
   .footer-nav-row {
     display: flex; align-items: center; justify-content: center; gap: 28px; flex-wrap: wrap; margin: 32px 0 24px;
   }
@@ -538,14 +569,15 @@
     <li><a href="#how">How It Works</a></li>
     <li><a href="#features">Features</a></li>
     <!-- ✅ Auth-aware nav items — toggled by JS below -->
-    <li id="navAuthItem"><a href="login.html">Sign In / Sign Up</a></li>
+    <!-- Not signed in: show Sign In / Sign Up button -->
+    <li id="navAuthItem"><a href="login.html" class="btn-signin">Sign In / Sign Up</a></li>
+    <!-- Signed in: show user greeting + sign out -->
     <li id="navUserItem" style="display:none">
       <div class="nav-user">
         <span class="nav-user-name">Hi, <strong id="navUserName"></strong></span>
         <a href="#" class="btn-signout" id="btnSignOut">Sign Out</a>
       </div>
     </li>
-    <li><a href="chat.html" class="btn-pill">Start Talking</a></li>
   </ul>
 </nav>
 
@@ -558,7 +590,7 @@
       <h1 class="hero-headline" id="heroHead">You already speak perfect English in your head. Let's say it out loud.</h1>
       <p class="subhead">unhesitatedai is a judgment-free space where learners can practice English with an AI friend who understands their language, their culture, and their journey.</p>
       <div class="cta-row">
-        <a href="chat.html" class="btn btn-primary">Start Talking — It's Free</a>
+        <a href="chat.html" class="btn btn-primary">Start Talking</a>
         <a href="#how" class="btn btn-secondary">See How It Works</a>
       </div>
       <p class="cta-note">No perfect English required. Speak however feels natural.</p>
@@ -660,7 +692,7 @@
         <span class="badge">Day One</span>
         <h2>Be One Of The First Voices Here.</h2>
         <p>unhesitatedai is brand new. There are no thousands of users yet. There is just a quiet, carefully built space — made for you to try first.</p>
-        <a href="chat.html" class="btn btn-primary">Start Talking — It's Free</a>
+        <a href="chat.html" class="btn btn-primary">Start Talking</a>
       </div>
     </div>
   </section>
@@ -707,6 +739,7 @@
 </main>
 
 <footer>
+  <!-- ✅ FIXED: Logo + tagline centered -->
   <div class="footer-main">
     <a href="#" class="logo" aria-label="unhesitatedai">
       <span>unhesitated<span class="dot-ai">ai</span></span>
@@ -788,7 +821,7 @@
     }, 500);
   }, 7000);
 
-  // ── AUTH STATE: Show user name + sign out, or sign in link ──
+  // ── AUTH STATE: Show user name + sign out, or sign in / sign up button ──
   _sb.auth.getSession().then(({ data }) => {
     const session = data?.session;
     const authItem = document.getElementById('navAuthItem');
@@ -814,7 +847,6 @@
   document.getElementById('btnSignOut').addEventListener('click', async (e) => {
     e.preventDefault();
     await _sb.auth.signOut();
-    // Refresh the nav state
     document.getElementById('navAuthItem').style.display = 'list-item';
     document.getElementById('navUserItem').style.display = 'none';
   });
